@@ -4,12 +4,20 @@ title: '이슈 제목을 적어주세요'
 labels: []  # labels는 빈 상태로 두고 선택된 값을 나중에 설정
 assignees: []  # assignees도 나중에 설정
 body:
+  - type: markdown
+    attributes:
+      value: |
+        이슈를 작성할 때 유의할 점
+        - 이슈 만들기 전, 한 이슈에 너무 많은 책임을 부여하지 않았는지 한번 더 생각해요!
+        - 이슈 만들기 전, label을 무조건 설정해주세요! 이슈를 만든 후에 label을 설정하면 브랜치를 정상적으로 만들지 못합니다 ㅠㅠ
+          - 만약 이슈를 잘못 만들었다면, branch를 수작업으로 새로 만들어주세요..!(컨벤션에 맞게)
+
   - type: input
     id: branch
     attributes:
       label: '🔀 브랜치명 (branch)'
-      description: '영어로 브랜치명을 작성해주세요.'
-      placeholder: 'ex. feature/auth'
+      description: '영어로 브랜치명을 작성해주세요! 브랜치를 자동으로 만들 때 네이밍 맨 뒤에 만들어집니다.'
+      placeholder: 'ex. auth, member, timer, etc...'
     validations:
       required: true
 

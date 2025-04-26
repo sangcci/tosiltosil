@@ -15,7 +15,9 @@ jobs:
         id: extract-branch
         run: |
           ISSUE_BODY="${{ github.event.issue.body }}"
-          ISSUE_NAME=$(echo "$ISSUE_BODY" | awk '/🔀 브랜치명 \(branch\)/ {getline; getline; print}' | sed 's/^ *//; s/ *$//')
+          
+          ISSUE_NAME=$(echo "$ISSUE_BODY" | awk '/🔀 브랜치명 \(branch\)/ {getline; getline; print}' | sed 's/^ *//; s/ *$//' | awk -F'/' '{print $NF}')
+
           echo "ISSUE_NAME=$ISSUE_NAME" >> $GITHUB_ENV
 
       - name: Create a branch for the issue
