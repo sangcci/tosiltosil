@@ -1,0 +1,23 @@
+name: 'ISSUE TEMPLATE'
+description: '이슈 템플릿입니다.'
+title: '이슈 제목을 적어주세요'
+labels: []  # labels는 빈 상태로 두고 선택된 값을 나중에 설정
+assignees: []  # assignees도 나중에 설정
+body:
+  - type: input
+    id: branch
+    attributes:
+      label: '🔀 브랜치명 (branch)'
+      description: '영어로 브랜치명을 작성해주세요.'
+      placeholder: 'ex. feature/auth'
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: '📝 이슈 설명 (description)'
+      description: '이슈에 대한 자세한 설명을 작성해주세요.'
+      placeholder: '설명을 작성해주세요.'
+    validations:
+      required: true

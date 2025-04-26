@@ -1,0 +1,22 @@
+mode: immediate
+branchName: '#${issue.number}-${%ISSUE_NAME}'
+autoCloseIssue: true
+copyIssueLabelsToPR: true
+copyIssueAssigneeToPR: true
+branches:
+  - label: 🚚 devops
+    prefix: feature/
+  - label: 📝 docs
+    prefix: feature/
+  - label: ✨ feat
+    prefix: feature/
+  - label: 🔨 refactor
+    prefix: feature/
+  - label: 🔧 setting
+    prefix: feature/
+  - label: ✅ test
+    prefix: feature/
+  - label: 🐛 bug
+    prefix: hotfix/
+  - label: 💡 question
+    skip: true
