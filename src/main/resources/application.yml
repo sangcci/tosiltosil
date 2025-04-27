@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: tosiltosil
+  profiles:
+    active: dev
