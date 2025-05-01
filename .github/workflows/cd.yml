@@ -22,6 +22,7 @@ jobs:
           docker push pshsh910/tosiltosil:latest
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Staging Server
