@@ -34,7 +34,7 @@ jobs:
           port: ${{ secrets.LOCAL_SERVER_PORT }}
           passphrase: ${{ secrets.LOCAL_SERVER_SSH_PASSPHRASE }}
           script: |
-            echo "✅ Checking if the springboot container is running
+            echo "✅ Checking if the springboot container is running"
             docker stop springboot || true
             docker rm springboot || true
             
