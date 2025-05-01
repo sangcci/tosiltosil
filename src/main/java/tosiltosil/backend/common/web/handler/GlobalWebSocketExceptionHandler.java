@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.exception;
+package tosiltosil.backend.common.web.handler;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,8 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import tosiltosil.backend.common.domain.CustomException;
+import tosiltosil.backend.common.domain.ErrorCode;
 
 @Slf4j
 @ControllerAdvice

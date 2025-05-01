@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.websocket;
+package tosiltosil.backend.common.web.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

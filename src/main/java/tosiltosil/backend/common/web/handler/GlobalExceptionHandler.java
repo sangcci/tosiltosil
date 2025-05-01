@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.exception;
+package tosiltosil.backend.common.web.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import tosiltosil.backend.common.domain.CustomException;
+import tosiltosil.backend.common.domain.ErrorCode;
 
 @Slf4j
 @RestControllerAdvice

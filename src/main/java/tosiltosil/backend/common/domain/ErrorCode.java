@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.exception;
+package tosiltosil.backend.common.domain;
 
 public interface ErrorCode {
 

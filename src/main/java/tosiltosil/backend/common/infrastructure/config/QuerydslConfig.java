@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.querydsl;
+package tosiltosil.backend.common.infrastructure.config;
 
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;

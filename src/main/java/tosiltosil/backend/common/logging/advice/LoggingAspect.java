@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.logging;
+package tosiltosil.backend.common.logging.advice;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

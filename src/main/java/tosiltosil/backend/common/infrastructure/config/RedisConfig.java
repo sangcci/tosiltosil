@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.redis;
+package tosiltosil.backend.common.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
