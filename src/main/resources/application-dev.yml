@@ -26,3 +26,9 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
