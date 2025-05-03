@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Q Class ###
+src/main/generated/
+
+### application.yml ###
+application-stag.yml
+application-prod.yml
