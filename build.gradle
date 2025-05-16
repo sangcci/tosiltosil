@@ -24,13 +24,16 @@ repositories {
 }
 
 dependencies {
+    // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 
+    // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    // database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'io.github.openfeign.querydsl:querydsl-jpa:6.10.1'
     annotationProcessor 'io.github.openfeign.querydsl:querydsl-apt:6.10.1:jpa'
@@ -39,11 +42,12 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // in-memory
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // metric
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
