@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public abstract class Log {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Logger log = LoggerFactory.getLogger(Log.class);
+    protected static final Logger log = LoggerFactory.getLogger(Log.class);
 
     protected String getLogMessage() {
         try {

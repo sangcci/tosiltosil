@@ -1,14 +1,16 @@
 package tosiltosil.backend.common.logging.domain;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
+@Getter
+@RequiredArgsConstructor
 public class InfoLog extends Log {
 
     private final String message;
 
-    public InfoLog(final String message) {
-        this.message = message;
+    public static InfoLog of(final String message) {
+        return new InfoLog(message);
     }
 
     @Override

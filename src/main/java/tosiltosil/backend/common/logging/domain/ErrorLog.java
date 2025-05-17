@@ -1,9 +1,11 @@
 package tosiltosil.backend.common.logging.domain;
 
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
+@Getter
+@RequiredArgsConstructor
 public class ErrorLog extends Log {
 
     private final String message;
@@ -11,14 +13,14 @@ public class ErrorLog extends Log {
     private final String exceptionMessage;
     private final String stackTrace;
 
-    public ErrorLog(
+    public static ErrorLog of(
             final String message,
             final Throwable throwable
     ) {
-        this.message = message;
-        this.exceptionName = throwable.getClass().getName();
-        this.exceptionMessage = throwable.getMessage();
-        this.stackTrace = Arrays.toString(throwable.getStackTrace());
+        String exceptionName = throwable.getClass().getName();
+        String exceptionMessage = throwable.getMessage();
+        String stackTrace = Arrays.toString(throwable.getStackTrace());
+        return new ErrorLog(message, exceptionName, exceptionMessage, stackTrace);
     }
 
     @Override

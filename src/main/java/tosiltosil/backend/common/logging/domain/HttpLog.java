@@ -2,11 +2,9 @@ package tosiltosil.backend.common.logging.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-@Slf4j
 @Getter
 @RequiredArgsConstructor
 public class HttpLog extends Log {
