@@ -15,7 +15,7 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
-import tosiltosil.backend.common.logging.dto.HttpLog;
+import tosiltosil.backend.common.logging.domain.HttpLog;
 import tosiltosil.backend.common.logging.util.MdcUtils;
 
 @Component

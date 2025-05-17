@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.logging.dto;
+package tosiltosil.backend.common.logging.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

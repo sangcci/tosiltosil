@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.logging.dto;
+package tosiltosil.backend.common.logging.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
