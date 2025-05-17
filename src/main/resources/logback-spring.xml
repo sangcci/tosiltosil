@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!-- 공통 속성 -->
-  <property name="LOG_PATH" value="logs" />
-
   <!-- dev -->
   <springProfile name="dev">
     <include resource="logback-dev.xml"/>
