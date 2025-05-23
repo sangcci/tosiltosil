@@ -1,5 +1,5 @@
 spring:
   application:
     name: tosiltosil
-  profiles:
-    active: dev
+  config:
+    import: classpath:tosiltosil-yml/application.yml
