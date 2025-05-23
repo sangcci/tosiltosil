@@ -1,0 +1,3 @@
+[submodule "src/main/resources/tosiltosil-yml"]
+	path = src/main/resources/tosiltosil-yml
+	url = https://github.com/hy5sun/tosiltosil-yml.git
