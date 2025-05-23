@@ -3,3 +3,5 @@ spring:
     name: tosiltosil
   profiles:
     active: dev
+  config:
+    import: tosiltosil-yml/application.yml
