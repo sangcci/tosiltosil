@@ -2,4 +2,4 @@ spring:
   application:
     name: tosiltosil
   config:
-    import: tosiltosil-yml/application.yml
+    import: classpath:tosiltosil-yml/application.yml
