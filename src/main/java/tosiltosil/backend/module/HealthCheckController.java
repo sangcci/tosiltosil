@@ -1,10 +1,9 @@
 package tosiltosil.backend.module;
 
-import jakarta.validation.Valid;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tosiltosil.backend.common.web.response.Response;
 
@@ -13,7 +12,8 @@ import tosiltosil.backend.common.web.response.Response;
 public class HealthCheckController implements HealthCheckApiSpecification {
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public Response<String> healthCheck() {
-        return Response.ok("healthCheck");
+        return Response.ok("OK", "healthCheck");
     }
 }

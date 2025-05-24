@@ -1,11 +1,12 @@
 package tosiltosil.backend.common.web.response;
 
 public record Response<T>(
+        int status,
         String message,
         T data
 ) {
 
-    public static <T> Response<T> ok(T data) {
-        return new Response<>("OK", data);
+    public static <T> Response<T> ok(final String message, final T data) {
+        return new Response<>(200, message, data);
     }
 }
