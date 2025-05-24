@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tosiltosil.backend.common.domain.CustomException;
 import tosiltosil.backend.common.domain.ErrorCode;
 import tosiltosil.backend.common.logging.domain.ErrorLog;
@@ -41,6 +43,7 @@ public class GlobalExceptionHandler {
         infoLog.writeLog();
 
         return ErrorResponse.of(
+                400,
                 "파라미터 값이 잘못되었습니다",
                 errorDetailResponses.isEmpty() ? null : errorDetailResponses
         );
@@ -64,6 +67,7 @@ public class GlobalExceptionHandler {
         infoLog.writeLog();
 
         return ErrorResponse.of(
+                400,
                 "파라미터 타입이 잘못되었습니다",
                 List.of(errorDetailResponse)
         );
@@ -86,6 +90,7 @@ public class GlobalExceptionHandler {
         infoLog.writeLog();
 
         return ErrorResponse.of(
+                400,
                 "파라미터가 누락되었습니다",
                 List.of(errorDetailResponse)
         );
@@ -101,8 +106,39 @@ public class GlobalExceptionHandler {
         infoLog.writeLog();
 
         return ErrorResponse.of(
+                405,
                 "지원하지 않는 HTTP 메서드입니다",
                 List.of(ErrorDetailResponse.of(null, null, e.getMessage()))
+        );
+    }
+
+    /**
+     * 존재하지 않는 api가 호출될 경우 발생
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
+        ErrorLog errorLog = ErrorLog.of("지원하지 않는 API 요청", e);
+        errorLog.writeLog();
+
+        return ErrorResponse.of(
+                404,
+                "지원하지 않는 API 요청입니다"
+        );
+    }
+
+    /**
+     * 존재하지 않는 리소스가 호출될 경우 발생
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ErrorResponse handleNoResourceFoundException(NoResourceFoundException e) {
+        ErrorLog errorLog = ErrorLog.of("지원하지 않는 리소스 요청", e);
+        errorLog.writeLog();
+
+        return ErrorResponse.of(
+                404,
+                "지원하지 않는 리소스 요청입니다"
         );
     }
 
@@ -117,7 +153,7 @@ public class GlobalExceptionHandler {
         InfoLog infoLog = InfoLog.of(errorCode.message());
         infoLog.writeLog();
 
-        return ErrorResponse.of(errorCode.message());
+        return ErrorResponse.of(400, errorCode.message());
     }
 
     /**
@@ -129,6 +165,6 @@ public class GlobalExceptionHandler {
         ErrorLog errorLog = ErrorLog.of("서버 오류", e);
         errorLog.writeLog();
 
-        return ErrorResponse.of("서버 내부에 오류가 발생했습니다");
+        return ErrorResponse.of(500, "서버 내부에 오류가 발생했습니다");
     }
 }

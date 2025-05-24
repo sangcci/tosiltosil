@@ -22,7 +22,7 @@ public class GlobalWebSocketExceptionHandler {
         InfoLog infoLog = InfoLog.of(errorCode.message());
         infoLog.writeLog();
 
-        return ErrorResponse.of(errorCode.message());
+        return ErrorResponse.of(400, errorCode.message());
     }
 
     @MessageExceptionHandler(Exception.class)
@@ -31,6 +31,6 @@ public class GlobalWebSocketExceptionHandler {
         ErrorLog errorLog = ErrorLog.of("서버 오류", e);
         errorLog.writeLog();
 
-        return ErrorResponse.of("서버 내부에 오류가 발생했습니다");
+        return ErrorResponse.of(500, "서버 내부에 오류가 발생했습니다");
     }
 }

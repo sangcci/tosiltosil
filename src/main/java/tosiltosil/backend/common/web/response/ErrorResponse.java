@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 public record ErrorResponse(
+        int status,
         String message,
         @JsonInclude(NON_NULL) List<ErrorDetailResponse> errors
 ) {
@@ -21,11 +22,11 @@ public record ErrorResponse(
         }
     }
 
-    public static ErrorResponse of(final String message) {
-        return new ErrorResponse(message, null);
+    public static ErrorResponse of(final int status, final String message) {
+        return new ErrorResponse(status, message, null);
     }
 
-    public static ErrorResponse of(final String message, final List<ErrorDetailResponse> errorDetailResponses) {
-        return new ErrorResponse(message, errorDetailResponses);
+    public static ErrorResponse of(final int status, final String message, final List<ErrorDetailResponse> errorDetailResponses) {
+        return new ErrorResponse(status, message, errorDetailResponses);
     }
 }

@@ -29,7 +29,7 @@ public class HttpLog extends Log {
 
     @Override
     public void writeLog() {
-        log.info("HTTP 요청 로그",
+        log.info("HTTP 로그",
                 kv("requestMethod", requestMethod),
                 kv("requestUri", requestUri),
                 kv("responseStatus", responseStatus),

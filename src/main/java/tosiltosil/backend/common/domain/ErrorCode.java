@@ -4,7 +4,5 @@ public interface ErrorCode {
 
     int status();
 
-    String title();
-
     String message();
 }
