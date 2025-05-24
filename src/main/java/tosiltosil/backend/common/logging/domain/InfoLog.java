@@ -15,6 +15,6 @@ public class InfoLog extends Log {
 
     @Override
     public void writeLog() {
-        log.info(message);
+        log.info(getLogMessage());
     }
 }

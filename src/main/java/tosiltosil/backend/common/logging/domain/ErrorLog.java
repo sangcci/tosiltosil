@@ -1,7 +1,5 @@
 package tosiltosil.backend.common.logging.domain;
 
-import static net.logstash.logback.argument.StructuredArguments.kv;
-
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +25,6 @@ public class ErrorLog extends Log {
 
     @Override
     public void writeLog() {
-        log.error(message,
-                kv("exceptionName", exceptionName),
-                kv("exceptionMessage", exceptionMessage),
-                kv("stackTrace", stackTrace));
+        log.error(getLogMessage());
     }
 }
