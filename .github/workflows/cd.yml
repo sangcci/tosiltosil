@@ -57,7 +57,7 @@ jobs:
             docker run --rm -it -d -p 8080:8080 \
             --name springboot \
             -e SPRING_PROFILES_ACTIVE=stag \
-            -e logging.config=file:/app/logback-stag.xml \ # Pass logback-stag.xml as logging config
+            -e logging.config=file:/app/logback-stag.xml \
             -e spring.config.location=/app/application-stag.yml \
             -v /home/ubuntu/tosiltosil/logback-stag.xml:/app/logback-stag.xml \
             -v /home/ubuntu/tosiltosil/application-stag.yml:/app/application-stag.yml \
