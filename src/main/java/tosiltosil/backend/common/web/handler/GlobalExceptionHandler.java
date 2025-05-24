@@ -3,6 +3,7 @@ package tosiltosil.backend.common.web.handler;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -145,15 +146,15 @@ public class GlobalExceptionHandler {
     /**
      * 비즈니스 요구사항에 따른 예외 처리
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CustomException.class)
-    protected ErrorResponse handleCustomException(final CustomException e) {
+    protected ResponseEntity<ErrorResponse> handleCustomException(final CustomException e) {
         ErrorCode errorCode = e.getErrorCode();
 
         InfoLog infoLog = InfoLog.of(errorCode.message());
         infoLog.writeLog();
 
-        return ErrorResponse.of(400, errorCode.message());
+        return ResponseEntity.status(errorCode.status())
+                .body(ErrorResponse.of(errorCode.status(), errorCode.message()));
     }
 
     /**
