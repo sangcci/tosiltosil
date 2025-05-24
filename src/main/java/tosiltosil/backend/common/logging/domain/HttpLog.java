@@ -1,5 +1,7 @@
 package tosiltosil.backend.common.logging.domain;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -19,7 +21,6 @@ public class HttpLog extends Log {
             final ContentCachingResponseWrapper response,
             final Long duration
     ) {
-        // Request URI 설정
         String method = request.getMethod();
         String uri = request.getRequestURI();
         int status = response.getStatus();
@@ -28,6 +29,10 @@ public class HttpLog extends Log {
 
     @Override
     public void writeLog() {
-        log.info(getLogMessage());
+        log.info("HTTP 요청 로그",
+                kv("requestMethod", requestMethod),
+                kv("requestUri", requestUri),
+                kv("responseStatus", responseStatus),
+                kv("duration", duration));
     }
 }

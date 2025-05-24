@@ -2,11 +2,11 @@
 <configuration>
   <!-- dev -->
   <springProfile name="dev">
-    <include resource="logback-dev.xml"/>
+    <include resource="tosiltosil-yml/logback-dev.xml"/>
   </springProfile>
 
   <!-- stag -->
   <springProfile name="stag">
-    <include resource="logback-stag.xml"/>
+    <include resource="tosiltosil-yml/logback-stag.xml"/>
   </springProfile>
 </configuration>
