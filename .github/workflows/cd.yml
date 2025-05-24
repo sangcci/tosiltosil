@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive   # Ensure submodules like `logback-stag.xml` are also checked out
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -25,6 +27,19 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Copy Config Files to Staging Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LOCAL_SERVER_HOST }}
+          username: ubuntu
+          key: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
+          port: ${{ secrets.LOCAL_SERVER_PORT }}
+          passphrase: ${{ secrets.LOCAL_SERVER_SSH_PASSPHRASE }}
+          source: |
+            ./tosiltosil-yml/logback-stag.xml
+            ./tosiltosil-yml/application-stag.yml
+          target: /home/ubuntu/tosiltosil/
+
       - name: Deploy to Staging Server
         uses: appleboy/ssh-action@master
         with:
@@ -42,7 +57,9 @@ jobs:
             docker run --rm -it -d -p 8080:8080 \
             --name springboot \
             -e SPRING_PROFILES_ACTIVE=stag \
+            -e logging.config=file:/app/logback-stag.xml \ # Pass logback-stag.xml as logging config
             -e spring.config.location=/app/application-stag.yml \
+            -v /home/ubuntu/tosiltosil/logback-stag.xml:/app/logback-stag.xml \
             -v /home/ubuntu/tosiltosil/application-stag.yml:/app/application-stag.yml \
             --network web \
             pshsh910/tosiltosil:latest
