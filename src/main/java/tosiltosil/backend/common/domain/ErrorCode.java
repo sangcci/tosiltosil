@@ -2,11 +2,7 @@ package tosiltosil.backend.common.domain;
 
 public interface ErrorCode {
 
-    int httpStatus();
-
-    String customCode();
-
-    String title();
+    int status();
 
     String message();
 }
