@@ -1,6 +1,5 @@
 package tosiltosil.backend.common.logging.domain;
 
-import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +18,7 @@ public class ErrorLog extends Log {
     ) {
         String exceptionName = throwable.getClass().getName();
         String exceptionMessage = throwable.getMessage();
-        String stackTrace = Arrays.toString(throwable.getStackTrace());
+        String stackTrace = throwable.getStackTrace()[0].toString();
         return new ErrorLog(message, exceptionName, exceptionMessage, stackTrace);
     }
 
