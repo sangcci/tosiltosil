@@ -77,7 +77,8 @@ public class Goal extends BaseEntity {
             final String title,
             final Long totalTime,
             final int sequence,
-            final Long iconId
+            final Long iconId,
+            final LocalDateTime date
     ) {
         return Goal.builder()
                 .memberId(memberId)
@@ -88,7 +89,7 @@ public class Goal extends BaseEntity {
                 .duration(0L)
                 .sequence(sequence)
                 .iconId(iconId)
-                .date(LocalDateTime.now())
+                .date(date)
                 .build();
     }
 }
