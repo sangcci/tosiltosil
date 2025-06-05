@@ -61,7 +61,7 @@ public class Goal extends BaseEntity {
         this.categoryId = categoryId;
         this.title = title;
         this.totalTime = totalTime;
-        this.status = GoalStatus.PAUSED;
+        this.status = GoalStatus.BEFORE_STARTING;
         this.duration = 0L;
         this.order = order;
         this.iconId = iconId;
