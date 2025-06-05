@@ -29,28 +29,28 @@ public class DailyTotalTime extends BaseEntity {
     private Long time;
 
     @Column(nullable = false)
-    private LocalDateTime dateTime;
+    private LocalDateTime date;
 
     @Builder
     private DailyTotalTime(
             final UUID memberId,
             final Long time,
-            final LocalDateTime dateTime
+            final LocalDateTime date
     ) {
         this.memberId = memberId;
         this.time = time;
-        this.dateTime = dateTime;
+        this.date = date;
     }
 
     public static DailyTotalTime of(
             final UUID memberId,
             final Long time,
-            final LocalDateTime dateTime
+            final LocalDateTime date
     ) {
         return DailyTotalTime.builder()
                 .memberId(memberId)
                 .time(time)
-                .dateTime(dateTime)
+                .date(date)
                 .build();
     }
 }
