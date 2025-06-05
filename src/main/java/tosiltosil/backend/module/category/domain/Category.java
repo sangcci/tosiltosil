@@ -37,4 +37,16 @@ public class Category extends BaseEntity {
         this.title = title;
         this.color = color;
     }
+
+    public static Category of(
+            final UUID memberId,
+            final String title,
+            final String color
+    ) {
+        return Category.builder()
+                .memberId(memberId)
+                .title(title)
+                .color(color)
+                .build();
+    }
 }

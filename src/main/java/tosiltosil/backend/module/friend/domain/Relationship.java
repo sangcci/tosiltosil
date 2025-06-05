@@ -39,4 +39,16 @@ public class Relationship extends BaseEntity {
         this.targetMemberId = targetMemberId;
         this.status = status;
     }
+
+    public static Relationship of(
+            final UUID memberId,
+            final UUID targetMemberId,
+            final RelationshipStatus status
+    ) {
+        return Relationship.builder()
+                .memberId(memberId)
+                .targetMemberId(targetMemberId)
+                .status(status)
+                .build();
+    }
 }

@@ -54,6 +54,9 @@ public class Goal extends BaseEntity {
             final Long categoryId,
             final String title,
             final Long totalTime,
+            final GoalStatus status,
+            final Long duration,
+            final LocalDateTime date,
             final Long iconId,
             final Long order
     ) {
@@ -61,10 +64,31 @@ public class Goal extends BaseEntity {
         this.categoryId = categoryId;
         this.title = title;
         this.totalTime = totalTime;
-        this.status = GoalStatus.BEFORE_STARTING;
-        this.duration = 0L;
-        this.order = order;
+        this.status = status;
+        this.duration = duration;
+        this.date = date;
         this.iconId = iconId;
-        this.date = LocalDateTime.now();
+        this.order = order;
+    }
+
+    public static Goal of(
+            final UUID memberId,
+            final Long categoryId,
+            final String title,
+            final Long totalTime,
+            final Long order,
+            final Long iconId
+    ) {
+        return Goal.builder()
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .title(title)
+                .totalTime(totalTime)
+                .status(GoalStatus.BEFORE_STARTING)
+                .duration(0L)
+                .order(order)
+                .iconId(iconId)
+                .date(LocalDateTime.now())
+                .build();
     }
 }

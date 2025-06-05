@@ -40,4 +40,16 @@ public class SocialAccount extends BaseEntity {
         this.oauthId = oauthId;
         this.provider = provider;
     }
+
+    public static SocialAccount of(
+            final UUID memberId,
+            final String oauthId,
+            final SocialProvider provider
+    ) {
+        return SocialAccount.builder()
+                .memberId(memberId)
+                .oauthId(oauthId)
+                .provider(provider)
+                .build();
+    }
 }

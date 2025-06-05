@@ -35,4 +35,11 @@ public class Stopwatch extends BaseEntity {
         this.goalId = goalId;
         this.startedAt = startedAt;
     }
+
+    public static Stopwatch of(final Long goalId) {
+        return Stopwatch.builder()
+                .goalId(goalId)
+                .startedAt(LocalDateTime.now())
+                .build();
+    }
 }

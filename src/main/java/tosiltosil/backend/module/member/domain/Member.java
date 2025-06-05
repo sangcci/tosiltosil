@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 import tosiltosil.backend.common.domain.BaseEntity;
-import tosiltosil.backend.module.member.domain.value.ActiveStatus;
+import tosiltosil.backend.module.member.domain.value.StopwatchStatus;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 
 @Entity
@@ -39,11 +39,11 @@ public class Member extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
-    private Boolean visibility;
+    private boolean visibility;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ActiveStatus stopwatchStatus;
+    private StopwatchStatus stopwatchStatus;
 
     @Builder
     private Member(
@@ -51,15 +51,17 @@ public class Member extends BaseEntity {
             final String code,
             final String profileImageUrl,
             final LoginType loginType,
-            final String email
+            final String email,
+            final boolean visibility,
+            final StopwatchStatus stopwatchStatus
     ) {
         this.nickname = nickname;
         this.code = code;
         this.profileImageUrl = profileImageUrl;
         this.loginType = loginType;
         this.email = email;
-        this.visibility = true;
-        this.stopwatchStatus = ActiveStatus.INACTIVE;
+        this.visibility = visibility;
+        this.stopwatchStatus = stopwatchStatus;
     }
 
     public static Member of(
@@ -75,6 +77,8 @@ public class Member extends BaseEntity {
                 .profileImageUrl(profileImageUrl)
                 .loginType(loginType)
                 .email(email)
+                .visibility(true)
+                .stopwatchStatus(StopwatchStatus.INACTIVE)
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 package tosiltosil.backend.module.member.domain.value;
 
-public enum ActiveStatus {
+public enum StopwatchStatus {
     ACTIVE,
     INACTIVE
 }
