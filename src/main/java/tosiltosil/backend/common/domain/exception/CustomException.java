@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.domain;
+package tosiltosil.backend.common.domain.exception;
 
 public abstract class CustomException extends RuntimeException {
 
