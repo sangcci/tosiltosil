@@ -22,18 +22,16 @@ public class Member extends BaseEntity {
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
-    // 프로필 설정 방식 고려해야 함
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String nickname;
 
-    // 인증 코드 로직 만들면 false로 변경
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String code;
 
-    // 프로필 설정 방식 고려해야 함
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String profileImageUrl;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
@@ -43,6 +41,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Boolean visibility;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ActiveStatus stopwatchStatus;
 

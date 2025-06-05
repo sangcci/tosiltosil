@@ -26,6 +26,7 @@ public class SocialAccount extends BaseEntity {
     @Column(nullable = false)
     private String oauthId;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private SocialProvider provider;
 

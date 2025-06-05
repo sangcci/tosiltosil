@@ -32,6 +32,7 @@ public class Goal extends BaseEntity {
     @Column(nullable = false)
     private Long totalTime;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GoalStatus status;
 

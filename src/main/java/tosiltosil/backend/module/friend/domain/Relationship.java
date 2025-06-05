@@ -25,6 +25,7 @@ public class Relationship extends BaseEntity {
     @Column(nullable = false, columnDefinition = "BINARY(16)")
     private UUID targetMemberId;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RelationshipStatus status;
 
