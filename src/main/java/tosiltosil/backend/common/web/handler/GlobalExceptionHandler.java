@@ -1,9 +1,11 @@
 package tosiltosil.backend.common.web.handler;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,8 +16,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import tosiltosil.backend.common.domain.CustomException;
-import tosiltosil.backend.common.domain.ErrorCode;
+import tosiltosil.backend.common.domain.exception.CustomException;
+import tosiltosil.backend.common.domain.exception.ErrorCode;
+import tosiltosil.backend.common.domain.exception.InvalidEnumValueException;
 import tosiltosil.backend.common.logging.domain.ErrorLog;
 import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.web.response.ErrorResponse;
@@ -47,6 +50,46 @@ public class GlobalExceptionHandler {
                 400,
                 "파라미터 값이 잘못되었습니다",
                 errorDetailResponses.isEmpty() ? null : errorDetailResponses
+        );
+    }
+
+    /**
+     * HTTP 메시지 읽기 실패 예외 처리 (JSON 파싱 오류, 역직렬화 오류 포함)
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ErrorResponse handleHttpMessageNotReadableException(final HttpMessageNotReadableException e) {
+
+        // InvalidEnumValueException이 원인인 경우 특별 처리
+        if (e.getCause() instanceof JsonMappingException jsonMappingException &&
+                jsonMappingException.getCause() instanceof InvalidEnumValueException invalidEnumException) {
+
+            List<ErrorDetailResponse> errorDetailResponses = List.of(
+                    new ErrorDetailResponse(
+                            invalidEnumException.getFieldName(),
+                            invalidEnumException.getRejectedValue(),
+                            invalidEnumException.getMessage()
+                    )
+            );
+
+            InfoLog infoLog = InfoLog.of("유효하지 않은 Enum 값");
+            infoLog.writeLog();
+
+            return ErrorResponse.of(
+                    400,
+                    "파라미터 값이 잘못되었습니다",
+                    errorDetailResponses
+            );
+        }
+
+        // 기타 JSON 파싱 오류
+        InfoLog infoLog = InfoLog.of("HTTP 메시지 읽기 실패");
+        infoLog.writeLog();
+
+        return ErrorResponse.of(
+                400,
+                "요청 데이터 형식이 올바르지 않습니다",
+                null
         );
     }
 
@@ -118,7 +161,7 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
+    protected ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
         ErrorLog errorLog = ErrorLog.of("지원하지 않는 API 요청", e);
         errorLog.writeLog();
 
@@ -133,7 +176,7 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoResourceFoundException.class)
-    public ErrorResponse handleNoResourceFoundException(NoResourceFoundException e) {
+    protected ErrorResponse handleNoResourceFoundException(NoResourceFoundException e) {
         ErrorLog errorLog = ErrorLog.of("지원하지 않는 리소스 요청", e);
         errorLog.writeLog();
 
