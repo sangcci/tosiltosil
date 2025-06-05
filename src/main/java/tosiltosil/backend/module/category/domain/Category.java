@@ -27,26 +27,33 @@ public class Category extends BaseEntity {
     @Column(nullable = false)
     private String color;
 
+    @Column(nullable = false)
+    private int sequence;
+
     @Builder
     private Category(
             final UUID memberId,
             final String title,
-            final String color
+            final String color,
+            final int sequence
     ) {
         this.memberId = memberId;
         this.title = title;
         this.color = color;
+        this.sequence = sequence;
     }
 
     public static Category of(
             final UUID memberId,
             final String title,
-            final String color
+            final String color,
+            final int sequence
     ) {
         return Category.builder()
                 .memberId(memberId)
                 .title(title)
                 .color(color)
+                .sequence(sequence)
                 .build();
     }
 }

@@ -40,7 +40,7 @@ public class Goal extends BaseEntity {
     private Long duration;
 
     @Column(nullable = false)
-    private Long order;
+    private int sequence;
 
     @Column(nullable = false)
     private Long iconId;
@@ -58,7 +58,7 @@ public class Goal extends BaseEntity {
             final Long duration,
             final LocalDateTime date,
             final Long iconId,
-            final Long order
+            final int sequence
     ) {
         this.memberId = memberId;
         this.categoryId = categoryId;
@@ -68,7 +68,7 @@ public class Goal extends BaseEntity {
         this.duration = duration;
         this.date = date;
         this.iconId = iconId;
-        this.order = order;
+        this.sequence = sequence;
     }
 
     public static Goal of(
@@ -76,7 +76,7 @@ public class Goal extends BaseEntity {
             final Long categoryId,
             final String title,
             final Long totalTime,
-            final Long order,
+            final int sequence,
             final Long iconId
     ) {
         return Goal.builder()
@@ -86,7 +86,7 @@ public class Goal extends BaseEntity {
                 .totalTime(totalTime)
                 .status(GoalStatus.BEFORE_STARTING)
                 .duration(0L)
-                .order(order)
+                .sequence(sequence)
                 .iconId(iconId)
                 .date(LocalDateTime.now())
                 .build();
