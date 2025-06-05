@@ -20,7 +20,7 @@ public class Goal extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BINARY(16)")
     private UUID memberId;
 
     @Column(nullable = false)
