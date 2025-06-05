@@ -24,7 +24,7 @@ public class SocialAccount extends BaseEntity {
     private UUID memberId;
 
     @Column(nullable = false)
-    private String provideId;
+    private String oauthId;
 
     @Enumerated(EnumType.STRING)
     private SocialProvider provider;
@@ -32,11 +32,11 @@ public class SocialAccount extends BaseEntity {
     @Builder
     private SocialAccount(
             final UUID memberId,
-            final String provideId,
+            final String oauthId,
             final SocialProvider provider
     ) {
         this.memberId = memberId;
-        this.provideId = provideId;
+        this.oauthId = oauthId;
         this.provider = provider;
     }
 }
