@@ -22,31 +22,24 @@ public class LocalAccount extends BaseEntity {
     @Column(nullable = false, columnDefinition = "BINARY(16)")
     private UUID memberId;
 
-    @Column(nullable = false)
-    private String email;
-
     @Column(nullable = false, length = 60)
     private String password;
 
     @Builder
     private LocalAccount(
             final UUID memberId,
-            final String email,
             final String password
     ) {
         this.memberId = memberId;
-        this.email = email;
         this.password = password;
     }
 
     public static LocalAccount of(
             final UUID memberId,
-            final String email,
             final String password
     ) {
         return LocalAccount.builder()
                 .memberId(memberId)
-                .email(email)
                 .password(password)
                 .build();
     }
