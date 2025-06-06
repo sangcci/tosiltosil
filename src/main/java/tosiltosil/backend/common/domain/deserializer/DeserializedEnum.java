@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @JacksonAnnotationsInside
-@JsonDeserialize(using = CustomEnumDeserializer.class)
+@JsonDeserialize(using = EnumDeserializer.class)
 @Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidEnum {}
+public @interface DeserializedEnum {}

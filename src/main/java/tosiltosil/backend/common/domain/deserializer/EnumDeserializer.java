@@ -10,19 +10,15 @@ import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
 import java.util.Arrays;
-import tosiltosil.backend.common.domain.exception.InvalidEnumValueException;
 
-public class CustomEnumDeserializer extends StdDeserializer<Enum<?>> implements ContextualDeserializer {
+public class EnumDeserializer extends StdDeserializer<Enum<?>> implements ContextualDeserializer {
 
-    private final String fieldName; // 필드명 저장
-
-    public CustomEnumDeserializer() {
-        this(null, null);
+    public EnumDeserializer() {
+        this(null);
     }
 
-    protected CustomEnumDeserializer(final Class<?> vc, final String fieldName) {
+    protected EnumDeserializer(final Class<?> vc) {
         super(vc);
-        this.fieldName = fieldName;
     }
 
     @SuppressWarnings("unchecked")
@@ -34,24 +30,16 @@ public class CustomEnumDeserializer extends StdDeserializer<Enum<?>> implements 
 
         // 어노테이션과 연결된 Enum 타입으로부터 value 값 가져옴
         Class<? extends Enum> enumType = (Class<? extends Enum>) this._valueClass;
-        String[] validValues = Arrays.stream(enumType.getEnumConstants())
-                .map(Enum::name)
-                .toArray(String[]::new);
 
         // 비교
         return Arrays.stream(enumType.getEnumConstants())
                 .filter(constant -> constant.name().equals(text))
                 .findAny()
-                .orElseThrow(() -> new InvalidEnumValueException(
-                        this.fieldName,
-                        text,
-                        validValues
-                ));
+                .orElse(null);
     }
 
     @Override
     public JsonDeserializer<?> createContextual(final DeserializationContext ctxt, final BeanProperty property) throws JsonMappingException {
-        String propertyName = property != null ? property.getName() : "unknown";
-        return new CustomEnumDeserializer(property.getType().getRawClass(), propertyName);
+        return new EnumDeserializer(property.getType().getRawClass());
     }
 }
