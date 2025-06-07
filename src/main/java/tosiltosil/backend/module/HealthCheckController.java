@@ -18,6 +18,7 @@ public class HealthCheckController implements HealthCheckApiSpecification {
     public Response<String> healthCheck(
             @Valid @RequestBody final HealthCheckRequest request
     ) {
-        return Response.ok("OK", request.healthType().toString());
+        HealthType healthType = HealthType.valueOf(request.healthType());
+        return Response.ok("OK", healthType.name());
     }
 }

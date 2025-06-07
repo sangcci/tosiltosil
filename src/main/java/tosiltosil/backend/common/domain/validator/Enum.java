@@ -17,4 +17,5 @@ public @interface Enum {
     String message() default "파라미터 값이 유효하지 않습니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
+    Class<? extends java.lang.Enum<?>> enumClass();
 }
