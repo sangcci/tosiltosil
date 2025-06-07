@@ -7,7 +7,7 @@ import tosiltosil.backend.common.web.response.Response;
 @SuppressWarnings("unused")
 public interface HealthCheckApiSpecification {
 
-    @Tag(name = "GET", description = "HEALTH CHECK")
+    @Tag(name = "POST", description = "HEALTH CHECK")
     @Operation(summary = "health check", description = "💡서버의 on/off 상태를 확인합니다.")
-    Response<String> healthCheck();
+    Response<String> healthCheck(HealthCheckRequest request);
 }

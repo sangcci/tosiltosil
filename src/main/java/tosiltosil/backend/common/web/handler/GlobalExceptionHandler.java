@@ -1,7 +1,6 @@
 package tosiltosil.backend.common.web.handler;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,14 +13,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import tosiltosil.backend.common.domain.CustomException;
-import tosiltosil.backend.common.domain.ErrorCode;
+import tosiltosil.backend.common.domain.exception.CustomException;
+import tosiltosil.backend.common.domain.exception.ErrorCode;
 import tosiltosil.backend.common.logging.domain.ErrorLog;
 import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.web.response.ErrorResponse;
 import tosiltosil.backend.common.web.response.ErrorResponse.ErrorDetailResponse;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -46,7 +44,7 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(
                 400,
                 "파라미터 값이 잘못되었습니다",
-                errorDetailResponses.isEmpty() ? null : errorDetailResponses
+                errorDetailResponses
         );
     }
 
@@ -118,7 +116,7 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
+    protected ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
         ErrorLog errorLog = ErrorLog.of("지원하지 않는 API 요청", e);
         errorLog.writeLog();
 
@@ -133,7 +131,7 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoResourceFoundException.class)
-    public ErrorResponse handleNoResourceFoundException(NoResourceFoundException e) {
+    protected ErrorResponse handleNoResourceFoundException(NoResourceFoundException e) {
         ErrorLog errorLog = ErrorLog.of("지원하지 않는 리소스 요청", e);
         errorLog.writeLog();
 
