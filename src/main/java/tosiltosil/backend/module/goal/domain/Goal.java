@@ -1,13 +1,18 @@
 package tosiltosil.backend.module.goal.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.time.LocalDate;
+import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
@@ -46,7 +51,7 @@ public class Goal extends BaseEntity {
     private Long iconId;
 
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Builder
     private Goal(
@@ -56,7 +61,7 @@ public class Goal extends BaseEntity {
             final Long totalTime,
             final GoalStatus status,
             final Long duration,
-            final LocalDateTime date,
+            final LocalDate date,
             final Long iconId,
             final int sequence
     ) {
@@ -78,7 +83,7 @@ public class Goal extends BaseEntity {
             final Long totalTime,
             final int sequence,
             final Long iconId,
-            final LocalDateTime date
+            final LocalDate date
     ) {
         return Goal.builder()
                 .memberId(memberId)
@@ -91,5 +96,19 @@ public class Goal extends BaseEntity {
                 .iconId(iconId)
                 .date(date)
                 .build();
+    }
+
+    public void updateBasicInfo(
+            final String title,
+            final Long categoryId,
+            final Long iconId
+    ) {
+        this.title = title;
+        this.iconId = iconId;
+        this.categoryId = categoryId;
+    }
+
+    public void changeDate(final LocalDate date) {
+        this.date = date;
     }
 }
