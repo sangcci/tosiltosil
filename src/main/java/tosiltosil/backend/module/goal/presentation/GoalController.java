@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
+import tosiltosil.backend.module.goal.domain.response.GoalCreateValifyResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalDeleteResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalUpdateResponse;
 
@@ -25,6 +27,14 @@ import tosiltosil.backend.module.goal.domain.response.GoalUpdateResponse;
 public class GoalController {
 
     private final GoalService goalService;
+
+    @GetMapping("/verify-create")
+    public Response<GoalCreateValifyResponse> varifyCreateGoal(
+            final UUID memberId
+    ) {
+        GoalCreateValifyResponse response = goalService.varifyCreateGoal(memberId);
+        return Response.ok("목표 생성 여부", response);
+    }
 
     @PostMapping
     public void createGoal(

@@ -6,11 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.module.goal.domain.DailyTotalTime;
+import tosiltosil.backend.module.goal.domain.DailyTotalTimeRepository;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
+import tosiltosil.backend.module.goal.domain.response.GoalCreateValifyResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalDeleteResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalUpdateResponse;
 
@@ -19,6 +22,17 @@ import tosiltosil.backend.module.goal.domain.response.GoalUpdateResponse;
 public class GoalService {
 
     private final GoalRepository goalRepository;
+    private final DailyTotalTimeRepository dailyTotalTimeRepository;
+
+    @Transactional(readOnly = true)
+    public GoalCreateValifyResponse varifyCreateGoal(
+            final UUID memberId
+    ) {
+        DailyTotalTime dailyTotalTime = dailyTotalTimeRepository.findByMemberId(memberId);
+
+        boolean isUnder24Hours = dailyTotalTime.validateDurationUnder24Hours();
+        return GoalCreateValifyResponse.of(isUnder24Hours);
+    }
 
     @Transactional
     public void createGoal(
