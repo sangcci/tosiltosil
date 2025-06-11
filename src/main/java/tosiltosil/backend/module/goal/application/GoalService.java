@@ -13,7 +13,6 @@ import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalCreateValifyResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalDeleteResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalUpdateResponse;
 
@@ -25,13 +24,12 @@ public class GoalService {
     private final DailyTotalTimeRepository dailyTotalTimeRepository;
 
     @Transactional(readOnly = true)
-    public GoalCreateValifyResponse varifyCreateGoal(
+    public void varifyCreateGoal(
             final UUID memberId
     ) {
         DailyTotalTime dailyTotalTime = dailyTotalTimeRepository.findByMemberId(memberId);
 
-        boolean isUnder24Hours = dailyTotalTime.validateDurationUnder24Hours();
-        return GoalCreateValifyResponse.of(isUnder24Hours);
+        dailyTotalTime.validateDurationUnder24Hours();
     }
 
     @Transactional
@@ -39,6 +37,7 @@ public class GoalService {
             final UUID memberId,
             final GoalCreateRequest request
     ) {
+        varifyCreateGoal(memberId);
         // TODO: 순서 구현
         List<Goal> goals = request.toEntities(memberId);
         goalRepository.saveAll(goals);

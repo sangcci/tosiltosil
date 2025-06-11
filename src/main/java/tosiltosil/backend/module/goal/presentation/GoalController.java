@@ -32,8 +32,8 @@ public class GoalController {
     public Response<GoalCreateValifyResponse> varifyCreateGoal(
             final UUID memberId
     ) {
-        GoalCreateValifyResponse response = goalService.varifyCreateGoal(memberId);
-        return Response.ok("목표 생성 여부", response);
+        goalService.varifyCreateGoal(memberId);
+        return Response.ok("목표 생성 여부", GoalCreateValifyResponse.of(true));
     }
 
     @PostMapping

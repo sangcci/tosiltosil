@@ -54,10 +54,12 @@ public class DailyTotalTime extends BaseEntity {
     }
 
     /**
-     * 24시간 보다 작을 경우 true, 클 경우 false
+     * 24시간 보다 클 경우 예외 발생
      */
-    public boolean validateDurationUnder24Hours() {
+    public void validateDurationUnder24Hours() {
         final Duration max = Duration.ofHours(24);
-        return time.compareTo(max) < 0;
+        if (time.compareTo(max) >= 0) {
+            throw new IllegalArgumentException("일일 목표 총 시간인 24시간을 초과하여 목표를 생성할 수 없습니다.");
+        }
     }
 }

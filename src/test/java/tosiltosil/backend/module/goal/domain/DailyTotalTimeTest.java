@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.goal.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -16,12 +17,10 @@ class DailyTotalTimeTest {
         DailyTotalTime dailyTotalTime = DailyTotalTime.of(UUID.randomUUID());
         Duration currentTime = Duration.ofHours(24).plusMinutes(1);
         ReflectionTestUtils.setField(dailyTotalTime, "time", currentTime);
-        
-        // When
-        boolean result = dailyTotalTime.validateDurationUnder24Hours();
-        
-        // Then
-        assertThat(result).isFalse();
+
+        // When & Then
+        assertThatThrownBy(dailyTotalTime::validateDurationUnder24Hours)
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -30,12 +29,10 @@ class DailyTotalTimeTest {
         DailyTotalTime dailyTotalTime = DailyTotalTime.of(UUID.randomUUID());
         Duration currentTime = Duration.ofHours(23).plusMinutes(59);
         ReflectionTestUtils.setField(dailyTotalTime, "time", currentTime);
-        
-        // When
-        boolean result = dailyTotalTime.validateDurationUnder24Hours();
-        
-        // Then
-        assertThat(result).isTrue();
+
+        // When & Then
+        assertThatCode(dailyTotalTime::validateDurationUnder24Hours)
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -44,11 +41,9 @@ class DailyTotalTimeTest {
         DailyTotalTime dailyTotalTime = DailyTotalTime.of(UUID.randomUUID());
         Duration currentTime = Duration.ofHours(24);
         ReflectionTestUtils.setField(dailyTotalTime, "time", currentTime);
-        
-        // When
-        boolean result = dailyTotalTime.validateDurationUnder24Hours();
-        
-        // Then
-        assertThat(result).isFalse();
+
+        // When & Then
+        assertThatThrownBy(dailyTotalTime::validateDurationUnder24Hours)
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
