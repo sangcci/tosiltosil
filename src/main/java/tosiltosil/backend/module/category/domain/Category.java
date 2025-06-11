@@ -46,14 +46,14 @@ public class Category extends BaseEntity {
     public static Category of(
             final UUID memberId,
             final String title,
-            final String color,
-            final int sequence
+            final String color
+            //final int sequence
     ) {
         return Category.builder()
                 .memberId(memberId)
                 .title(title)
                 .color(color)
-                .sequence(sequence)
+                //.sequence(sequence)
                 .build();
     }
 }

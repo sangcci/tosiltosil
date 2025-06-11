@@ -12,7 +12,7 @@ public interface GoalRepository {
 
     Goal save(Goal goal);
 
-    void saveAll(List<Goal> goals);
+    List<Goal> saveAll(List<Goal> goals);
 
     void delete(Goal goal);
 }

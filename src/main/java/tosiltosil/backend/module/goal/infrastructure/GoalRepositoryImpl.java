@@ -30,9 +30,9 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public void saveAll(final List<Goal> goals) {
+    public List<Goal> saveAll(final List<Goal> goals) {
         // TODO: bulk insert 구현
-        goalJpaRepository.saveAll(goals);
+        return goalJpaRepository.saveAll(goals);
     }
 
     @Override

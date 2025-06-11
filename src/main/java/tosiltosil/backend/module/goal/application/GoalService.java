@@ -13,8 +13,7 @@ import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalDeleteResponse;
-import tosiltosil.backend.module.goal.domain.response.GoalUpdateResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -33,18 +32,21 @@ public class GoalService {
     }
 
     @Transactional
-    public void createGoal(
+    public GoalResponse createGoal(
             final UUID memberId,
             final GoalCreateRequest request
     ) {
         varifyCreateGoal(memberId);
         // TODO: 순서 구현
         List<Goal> goals = request.toEntities(memberId);
-        goalRepository.saveAll(goals);
+        List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
+                .map(Goal::getId)
+                .toList();
+        return GoalResponse.ofList(savedGoalIds);
     }
 
     @Transactional
-    public GoalUpdateResponse updateGoal(
+    public GoalResponse updateGoal(
             final UUID memberId,
             final Long goalId,
             final GoalUpdateRequest request
@@ -55,7 +57,7 @@ public class GoalService {
         goal.updateBasicInfo(request.title(), request.categoryId(), request.iconId());
         goal.changeDate(request.date());
 
-        return GoalUpdateResponse.of(goal.getId());
+        return GoalResponse.ofSingle(goal.getId());
     }
 
     @Transactional
@@ -68,13 +70,13 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalDeleteResponse deleteGoal(
+    public GoalResponse deleteGoal(
             final UUID memberId,
             final Long goalId
     ) {
         Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
                 .orElseThrow(() -> new NotFoundException("목표를 찾을 수 없습니다."));
         goalRepository.delete(goal);
-        return GoalDeleteResponse.of(goal.getId());
+        return GoalResponse.ofSingle(goal.getId());
     }
 }
