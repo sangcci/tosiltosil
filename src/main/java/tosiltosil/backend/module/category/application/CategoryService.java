@@ -2,7 +2,7 @@ package tosiltosil.backend.module.category.application;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.category.domain.Category;
@@ -11,19 +11,21 @@ import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
+import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryDomainService categoryDomainService;
 
     @Transactional
     public CategoryResponse createCategory(
             final UUID memberId,
             final CategoryCreateRequest request
     ) {
-        validateCreateCategory(memberId);
+        categoryDomainService.validateCategoryCreation(memberId);
 
         // TODO: 순서 구현
 
@@ -31,13 +33,6 @@ public class CategoryService {
         Category savedCategory = categoryRepository.save(category);
 
         return CategoryResponse.of(savedCategory.getId());
-    }
-
-    private void validateCreateCategory(final UUID memberId) {
-        Long numberOfCategories = categoryRepository.countByMemberId(memberId);
-        if (numberOfCategories >= 10L) {
-            throw new IllegalStateException("생성 제한을 넘어 카테고리를 생성할 수 없습니다.");
-        }
     }
 
     @Transactional
