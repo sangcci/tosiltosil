@@ -17,7 +17,7 @@ import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalCreateVerifyResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalCreateValidateResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalResponse;
 
 @RestController
@@ -28,11 +28,11 @@ public class GoalController {
     private final GoalService goalService;
 
     @GetMapping("/verify-create")
-    public Response<GoalCreateVerifyResponse> varifyCreateGoal(
+    public Response<GoalCreateValidateResponse> validateCreateGoal(
             final UUID memberId
     ) {
-        goalService.varifyCreateGoal(memberId);
-        return Response.ok("목표 생성 여부", GoalCreateVerifyResponse.of(true));
+        goalService.validateCreateGoal(memberId);
+        return Response.ok("목표 생성 여부", GoalCreateValidateResponse.of(true));
     }
 
     @PostMapping

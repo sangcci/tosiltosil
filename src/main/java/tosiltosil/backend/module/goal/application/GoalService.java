@@ -23,7 +23,7 @@ public class GoalService {
     private final DailyTotalTimeRepository dailyTotalTimeRepository;
 
     @Transactional(readOnly = true)
-    public void varifyCreateGoal(
+    public void validateCreateGoal(
             final UUID memberId
     ) {
         DailyTotalTime dailyTotalTime = dailyTotalTimeRepository.findByMemberId(memberId);
@@ -36,7 +36,7 @@ public class GoalService {
             final UUID memberId,
             final GoalCreateRequest request
     ) {
-        varifyCreateGoal(memberId);
+        validateCreateGoal(memberId);
         // TODO: 순서 구현
         List<Goal> goals = request.toEntities(memberId);
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
