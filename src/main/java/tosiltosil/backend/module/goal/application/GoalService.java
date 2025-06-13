@@ -52,7 +52,7 @@ public class GoalService {
             final GoalUpdateRequest request
     ) {
         Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
-                .orElseThrow(() -> new NotFoundException("목표를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
 
         goal.updateBasicInfo(request.title(), request.categoryId(), request.iconId());
         goal.changeDate(request.date());
@@ -75,7 +75,8 @@ public class GoalService {
             final Long goalId
     ) {
         Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
-                .orElseThrow(() -> new NotFoundException("목표를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+
         goalRepository.delete(goal);
         return GoalResponse.ofSingle(goal.getId());
     }

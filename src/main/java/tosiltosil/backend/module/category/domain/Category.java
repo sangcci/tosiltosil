@@ -56,4 +56,12 @@ public class Category extends BaseEntity {
                 //.sequence(sequence)
                 .build();
     }
+
+    public void updateBasicInfo(
+            final String title,
+            final String color
+    ) {
+        this.title = title;
+        this.color = color;
+    }
 }
