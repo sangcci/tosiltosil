@@ -22,7 +22,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public Response<Map<String, Object>> localSignUp(
             @RequestPart("memberInfo") @Valid final CreateLocalMemberRequest request,
-            @RequestPart("profileImage") final MultipartFile profileImage
+            @RequestPart(value = "profileImage", required = false) final MultipartFile profileImage
     ) {
         authService.localSignUp(request, profileImage);
         return Response.ok("정상적으로 일반 회원가입 되었습니다.");
