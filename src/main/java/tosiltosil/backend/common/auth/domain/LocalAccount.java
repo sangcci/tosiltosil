@@ -5,10 +5,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import tosiltosil.backend.common.domain.BaseEntity;
 
 import java.util.UUID;
-
-import tosiltosil.backend.common.domain.BaseEntity;
 
 @Entity
 @Getter
@@ -36,11 +35,11 @@ public class LocalAccount extends BaseEntity {
 
     public static LocalAccount of(
             final UUID memberId,
-            final String password
+            final String encryptedPassword
     ) {
         return LocalAccount.builder()
                 .memberId(memberId)
-                .password(password)
+                .password(encryptedPassword)
                 .build();
     }
 }
