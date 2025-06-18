@@ -5,12 +5,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import tosiltosil.backend.common.domain.BaseEntity;
+import tosiltosil.backend.module.member.domain.value.LoginType;
+import tosiltosil.backend.module.member.domain.value.StopwatchStatus;
 
 import java.util.UUID;
-
-import tosiltosil.backend.common.domain.BaseEntity;
-import tosiltosil.backend.module.member.domain.value.StopwatchStatus;
-import tosiltosil.backend.module.member.domain.value.LoginType;
 
 @Entity
 @Getter
