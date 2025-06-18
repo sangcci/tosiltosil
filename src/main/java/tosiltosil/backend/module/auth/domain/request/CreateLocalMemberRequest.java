@@ -4,11 +4,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import tosiltosil.backend.common.auth.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;
 
 import java.util.List;
+import java.util.UUID;
 
 public record CreateLocalMemberRequest(
         @NotBlank(message="이메일을 입력해주세요.")
@@ -46,6 +48,16 @@ public record CreateLocalMemberRequest(
                         profileImageUrl,
                         LoginType.LOCAL,
                         email
+                );
+        }
+
+        public LocalAccount toLocalAccountEntities(
+                final UUID memberId,
+                final String encryptedPassword
+        ) {
+                return LocalAccount.of(
+                        memberId,
+                        encryptedPassword
                 );
         }
 }
