@@ -38,7 +38,7 @@ public record CreateLocalMemberRequest(
 
         List<TermsDetail> terms
 ) {
-        public Member toEntities(
+        public Member toMemberEntities(
                 final String code,
                 final String profileImageUrl
         ) {
