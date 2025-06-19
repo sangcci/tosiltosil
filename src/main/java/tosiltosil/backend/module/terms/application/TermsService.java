@@ -25,7 +25,7 @@ public class TermsService {
     ) {
         termsDetails.forEach(terms -> {
             if (terms.required() && !terms.agreed()) {
-                throw new BadRequestException("필수 동의 약관에 대해 동의하지 않았습니다.");
+                throw new BadRequestException("필수 약관에 대해 동의하지 않았습니다.");
             }
         });
     }
