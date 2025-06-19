@@ -5,12 +5,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import tosiltosil.backend.common.auth.domain.LocalAccount;
-import tosiltosil.backend.common.auth.domain.LocalAccountRepository;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
+import tosiltosil.backend.module.member.domain.LocalAccount;
+import tosiltosil.backend.module.member.domain.LocalAccountRepository;
 import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
+import tosiltosil.backend.module.terms.domain.MemberTerms;
+import tosiltosil.backend.module.terms.domain.request.TermsDetail;
+import tosiltosil.backend.module.terms.infrastructure.MemberTermsJpaRepository;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +25,13 @@ public class AuthService {
 
     private final MemberJpaRepository memberJpaRepository;
     private final LocalAccountRepository localAccountRepository;
+    private final MemberTermsJpaRepository memberTermsJpaRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final int CODE_LENGTH = 6;
     private static final boolean IS_UPPER_CASE = true;
 
     /* TODO
-     * 약관동의 유효성 검증
      * S3 구현 및 ImageURL 가져오기
      * 인증번호 검증
      */
@@ -32,8 +39,10 @@ public class AuthService {
     @Transactional
     public void localSignUp(
             final CreateLocalMemberRequest request,
-            MultipartFile profileImage
+            final MultipartFile profileImage
     ) {
+        validateTerms(request.terms());
+
         String code = generateRandomCode();
         String profileImgUrl = "https://example.com/profile.png"; // S3 구현 후 수정
         String encryptedPassword = passwordEncoder.encode(request.password());
@@ -43,6 +52,28 @@ public class AuthService {
 
         LocalAccount localAccount = request.toLocalAccountEntities(member.getId(), encryptedPassword);
         localAccountRepository.save(localAccount);
+
+        saveTerms(member.getId(), request.terms());
+    }
+
+    private void validateTerms(
+            final List<TermsDetail> termsDetails
+    ) {
+        termsDetails.forEach(terms -> {
+            if (terms.required() && !terms.agreed()) {
+                throw new BadRequestException("필수 동의 약관에 대해 동의하지 않았습니다.");
+            }
+        });
+    }
+
+    private void saveTerms(
+            final UUID memberId,
+            final List<TermsDetail> termsDetails
+    ) {
+        termsDetails.forEach(terms -> {
+            MemberTerms memberTerms = terms.toEntities(memberId);
+            memberTermsJpaRepository.save(memberTerms);
+        });
     }
 
     private String generateRandomCode() {
