@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
+import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.LocalAccountRepository;
 import tosiltosil.backend.module.member.domain.Member;
+import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
 import tosiltosil.backend.module.terms.domain.MemberTerms;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;
@@ -42,6 +44,7 @@ public class AuthService {
             final MultipartFile profileImage
     ) {
         validateTerms(request.terms());
+        validateEmail(request.email(), LoginType.LOCAL);
 
         String code = generateRandomCode();
         String profileImgUrl = "https://example.com/profile.png"; // S3 구현 후 수정
@@ -54,6 +57,11 @@ public class AuthService {
         localAccountRepository.save(localAccount);
 
         saveTerms(member.getId(), request.terms());
+    }
+
+    private void validateEmail(String email, LoginType loginType) {
+        if (memberJpaRepository.findByEmailAndLoginType(email, loginType))
+            throw new ConflictException("이미 등록된 이메일입니다.");
     }
 
     private void validateTerms(
