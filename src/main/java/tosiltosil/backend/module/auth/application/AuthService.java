@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
+import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
 import tosiltosil.backend.module.member.domain.LocalAccount;
@@ -15,8 +16,10 @@ import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
 import tosiltosil.backend.module.terms.domain.MemberTerms;
+import tosiltosil.backend.module.terms.domain.Terms;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;
 import tosiltosil.backend.module.terms.infrastructure.MemberTermsJpaRepository;
+import tosiltosil.backend.module.terms.infrastructure.TermsJpaRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +31,7 @@ public class AuthService {
     private final MemberJpaRepository memberJpaRepository;
     private final LocalAccountRepository localAccountRepository;
     private final MemberTermsJpaRepository memberTermsJpaRepository;
+    private final TermsJpaRepository termsJpaRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final int CODE_LENGTH = 6;
@@ -74,12 +78,18 @@ public class AuthService {
         });
     }
 
+    private Long getTermsId(final TermsDetail termsDetail) {
+        Terms terms = termsJpaRepository.findByTitleAndVersion(termsDetail.title(), termsDetail.version())
+                .orElseThrow(() -> new NotFoundException("약관을 찾을 수 없습니다."));
+        return terms.getId();
+    }
+
     private void saveTerms(
             final UUID memberId,
             final List<TermsDetail> termsDetails
     ) {
         termsDetails.forEach(terms -> {
-            MemberTerms memberTerms = terms.toEntities(memberId);
+            MemberTerms memberTerms = terms.toEntities(memberId, getTermsId(terms));
             memberTermsJpaRepository.save(memberTerms);
         });
     }
