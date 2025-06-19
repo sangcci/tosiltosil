@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.auth.domain;
+package tosiltosil.backend.module.member.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 import tosiltosil.backend.common.domain.BaseEntity;
-import tosiltosil.backend.common.auth.domain.value.SocialProvider;
+import tosiltosil.backend.module.member.domain.value.SocialProvider;
 
 @Entity
 @Getter

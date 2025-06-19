@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.auth.domain;
+package tosiltosil.backend.module.member.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
