@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import tosiltosil.backend.common.auth.domain.LocalAccount;
+import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;

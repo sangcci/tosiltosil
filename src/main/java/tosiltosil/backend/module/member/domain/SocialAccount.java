@@ -5,11 +5,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
-
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.module.member.domain.value.SocialProvider;
+
+import java.util.UUID;
 
 @Entity
 @Getter
