@@ -5,10 +5,9 @@ import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.terms.domain.MemberTerms;
-import tosiltosil.backend.module.terms.domain.Terms;
+import tosiltosil.backend.module.terms.domain.TermsRepository;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;
 import tosiltosil.backend.module.terms.infrastructure.MemberTermsJpaRepository;
-import tosiltosil.backend.module.terms.infrastructure.TermsJpaRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +17,7 @@ import java.util.UUID;
 public class TermsService {
 
     private final MemberTermsJpaRepository memberTermsJpaRepository;
-    private final TermsJpaRepository termsJpaRepository;
+    private final TermsRepository termsRepository;
 
     public void validateTerms(
             final List<TermsDetail> termsDetails
@@ -30,10 +29,12 @@ public class TermsService {
         });
     }
 
-    public Long getTermsId(final TermsDetail termsDetail) {
-        Terms terms = termsJpaRepository.findByTitleAndVersion(termsDetail.title(), termsDetail.version())
+    public Long getTermsVersionId(
+            final String title,
+            final String version
+    ) {
+        return termsRepository.findVersionId(title, version)
                 .orElseThrow(() -> new NotFoundException("약관을 찾을 수 없습니다."));
-        return terms.getId();
     }
 
     public void saveTerms(
@@ -41,7 +42,10 @@ public class TermsService {
             final List<TermsDetail> termsDetails
     ) {
         termsDetails.forEach(terms -> {
-            MemberTerms memberTerms = terms.toEntities(memberId, getTermsId(terms));
+            MemberTerms memberTerms = terms.toEntities(
+                    memberId,
+                    getTermsVersionId(terms.title(), terms.version())
+            );
             memberTermsJpaRepository.save(memberTerms);
         });
     }
