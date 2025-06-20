@@ -23,13 +23,23 @@ public class TermsService {
             final List<TermsDetail> termsDetails
     ) {
         termsDetails.forEach(terms -> {
-            if (terms.required() && !terms.agreed()) {
+            Boolean isRequired = getTermsIsRequired(terms.title(), terms.version());
+
+            if (isRequired && !terms.agreed()) {
                 throw new BadRequestException("필수 약관에 대해 동의하지 않았습니다.");
             }
         });
     }
 
-    public Long getTermsVersionId(
+    private Boolean getTermsIsRequired(
+            final String title,
+            final String version
+    ) {
+        return termsRepository.findTermsIsRequired(title, version)
+                .orElseThrow(() -> new NotFoundException("약관을 찾을 수 없습니다."));
+    }
+
+    private Long getTermsVersionId(
             final String title,
             final String version
     ) {

@@ -13,9 +13,6 @@ public record TermsDetail(
         @NotBlank(message = "버전을 입력해주세요.")
         String version,
 
-        @NotNull(message = "필수 여부를 입력해주세요.")
-        boolean required,
-
         @NotNull(message = "동의 여부를 입력해주세요.")
         boolean agreed
 ) {

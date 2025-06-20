@@ -30,4 +30,20 @@ public class TermsRepositoryImpl implements TermsRepository {
                         .fetchOne()
         );
     }
+
+    @Override
+    public Optional<Boolean> findTermsIsRequired(String title, String version) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(terms.isRequired)
+                        .from(terms)
+                        .join(termsVersion).on(termsVersion.termsId.eq(terms.id))
+                        .where(
+                                terms.title.eq(title),
+                                termsVersion.version.eq(version)
+                        )
+                        .fetchOne()
+        );
+    }
+
 }
