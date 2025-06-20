@@ -1,9 +1,6 @@
 package tosiltosil.backend.module.auth.domain.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.value.LoginType;
@@ -40,6 +37,8 @@ public record CreateLocalMemberRequest(
         @Size(min=2, max=8, message = "닉네임은 2글자 이상, 8글자 이하로 입력해주세요")
         String nickname,
 
+        @NotNull(message = "약관 동의 여부를 입력해주세요.")
+        @Size(min=3, max=3, message = "3개의 약관 동의 항목을 입력해주세요.")
         List<TermsDetail> terms
 ) {
         public Member toMemberEntities(
