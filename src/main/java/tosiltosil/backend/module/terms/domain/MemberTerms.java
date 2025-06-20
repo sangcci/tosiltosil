@@ -21,7 +21,7 @@ public class MemberTerms extends BaseEntity {
     private UUID memberId;
 
     @Column(nullable = false)
-    private Long termsId;
+    private Long termsVersionId;
 
     @Column(nullable = false)
     private boolean isAgreed;
@@ -29,22 +29,22 @@ public class MemberTerms extends BaseEntity {
     @Builder
     private MemberTerms(
             final UUID memberId,
-            final Long termsId,
+            final Long termsVersionId,
             final boolean isAgreed
     ) {
         this.memberId = memberId;
-        this.termsId = termsId;
+        this.termsVersionId = termsVersionId;
         this.isAgreed = isAgreed;
     }
 
     public static MemberTerms of(
             final UUID memberId,
-            final Long termsId,
+            final Long termsVersionId,
             final boolean isAgreed
     ) {
         return MemberTerms.builder()
                 .memberId(memberId)
-                .termsId(termsId)
+                .termsVersionId(termsVersionId)
                 .isAgreed(isAgreed)
                 .build();
     }

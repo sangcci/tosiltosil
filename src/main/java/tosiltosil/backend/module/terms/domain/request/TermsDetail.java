@@ -21,11 +21,11 @@ public record TermsDetail(
 ) {
         public MemberTerms toEntities(
                 final UUID memberId,
-                final Long id
+                final Long termsVersionId
         ) {
                 return MemberTerms.of(
                         memberId,
-                        id,
+                        termsVersionId,
                         agreed
                 );
         }
