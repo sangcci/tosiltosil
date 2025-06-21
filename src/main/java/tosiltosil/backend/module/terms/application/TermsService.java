@@ -2,11 +2,11 @@ package tosiltosil.backend.module.terms.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.terms.domain.MemberTerms;
 import tosiltosil.backend.module.terms.domain.TermsRepository;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;
+import tosiltosil.backend.module.terms.domain.validator.TermsValidator;
 import tosiltosil.backend.module.terms.infrastructure.MemberTermsJpaRepository;
 
 import java.util.List;
@@ -18,25 +18,10 @@ public class TermsService {
 
     private final MemberTermsJpaRepository memberTermsJpaRepository;
     private final TermsRepository termsRepository;
+    private final TermsValidator termsValidator;
 
-    public void validateTerms(
-            final List<TermsDetail> termsDetails
-    ) {
-        termsDetails.forEach(terms -> {
-            Boolean isRequired = getTermsIsRequired(terms.title(), terms.version());
-
-            if (isRequired && !terms.agreed()) {
-                throw new BadRequestException("필수 약관에 대해 동의하지 않았습니다.");
-            }
-        });
-    }
-
-    private Boolean getTermsIsRequired(
-            final String title,
-            final String version
-    ) {
-        return termsRepository.findTermsIsRequired(title, version)
-                .orElseThrow(() -> new NotFoundException("약관을 찾을 수 없습니다."));
+    public void validateTerms(final List<TermsDetail> termsDetails) {
+        termsValidator.validateTerms(termsDetails);
     }
 
     private Long getTermsVersionId(
