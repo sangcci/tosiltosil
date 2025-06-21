@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
+import tosiltosil.backend.module.auth.domain.response.CreateLocalMemberResponse;
 import tosiltosil.backend.module.member.application.MemberService;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.Member;
@@ -26,7 +27,7 @@ public class AuthService {
      */
 
     @Transactional
-    public void localSignUp(
+    public CreateLocalMemberResponse localSignUp(
             final CreateLocalMemberRequest request,
             final MultipartFile profileImage
     ) {
@@ -43,5 +44,7 @@ public class AuthService {
         memberService.saveLocalAccount(localAccount);
 
         termsService.saveTerms(member.getId(), request.terms());
+
+        return CreateLocalMemberResponse.of(member.getNickname());
     }
 }
