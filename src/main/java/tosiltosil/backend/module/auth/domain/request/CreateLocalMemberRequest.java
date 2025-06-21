@@ -26,7 +26,6 @@ public record CreateLocalMemberRequest(
                 regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$",
                 message="비밀번호는 영문, 숫자, 특수문자를 포함하여 8글자 이상으로 입력해주세요."
         )
-        @Size(min=8, message = "비밀번호는 8글자 이상으로 입력해주세요.")
         String password,
 
         @NotBlank(message = "닉네임을 입력해주세요.")
@@ -34,7 +33,6 @@ public record CreateLocalMemberRequest(
                 regexp = "^[가-힣a-zA-Z0-9]{2,8}$",
                 message="닉네임은 한글, 영문, 숫자를 포함하여 2글자 이상 8글자 이하로 입력해주세요."
         )
-        @Size(min=2, max=8, message = "닉네임은 2글자 이상, 8글자 이하로 입력해주세요")
         String nickname,
 
         @NotNull(message = "약관 동의 여부를 입력해주세요.")
