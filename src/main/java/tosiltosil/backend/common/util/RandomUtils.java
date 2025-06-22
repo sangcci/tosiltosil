@@ -1,6 +1,6 @@
 package tosiltosil.backend.common.util;
 
-import java.security.SecureRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 랜덤 유틸
@@ -9,7 +9,6 @@ import java.security.SecureRandom;
  */
 public class RandomUtils {
 
-    private static final SecureRandom secureRandom = new SecureRandom();
     private static final String MIX_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final String NUMBER_CHARACTERS = "0123456789";
 
@@ -21,10 +20,11 @@ public class RandomUtils {
      * @return 대소문자 여부에 따라 랜덤한 숫자 + 영문 조합의 문자열
      */
     public static String generateRandomMixString(int length, boolean isUppercase) {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         StringBuilder sb = new StringBuilder(length);
 
         for (int i = 0; i < length; i++) {
-            int index = secureRandom.nextInt(MIX_CHARACTERS.length());
+            int index = random.nextInt(MIX_CHARACTERS.length());
             sb.append(MIX_CHARACTERS.charAt(index));
         }
 
@@ -38,10 +38,11 @@ public class RandomUtils {
      * @return 랜덤한 숫자로 구성된 문자열
      */
     public static String generateRandomNumberString(int length) {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         StringBuilder sb = new StringBuilder(length);
 
         for (int i = 0; i < length; i++) {
-            int index = secureRandom.nextInt(NUMBER_CHARACTERS.length());
+            int index = random.nextInt(NUMBER_CHARACTERS.length());
             sb.append(NUMBER_CHARACTERS.charAt(index));
         }
 
