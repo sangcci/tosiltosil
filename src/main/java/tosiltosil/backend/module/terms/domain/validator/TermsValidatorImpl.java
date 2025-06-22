@@ -61,7 +61,7 @@ public class TermsValidatorImpl implements TermsValidator {
         Boolean isRequired = getTermsIsRequired(terms.title(), terms.version());
 
         if (isRequired && !terms.agreed()) {
-            throw new BadRequestException(terms.title() + " : 필수 약관에 대해 동의하지 않았습니다.");
+            throw new BadRequestException("필수 약관을 동의하지 않았습니다.");
         }
     }
 

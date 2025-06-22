@@ -33,7 +33,7 @@ public interface AuthApiSpecification {
                                     value = """
                             {
                               "status": 404,
-                              "message": "필수 약관에 대해 동의하지 않았습니다.",
+                              "message": "필수 약관을 동의하지 않았습니다.",
                               "errors": []
                             }
                         """
