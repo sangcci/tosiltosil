@@ -7,6 +7,7 @@ import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.LocalAccountRepository;
 import tosiltosil.backend.module.member.domain.Member;
+import tosiltosil.backend.module.member.domain.MemberRepository;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
 
@@ -15,6 +16,7 @@ import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
 public class MemberService {
 
     private final MemberJpaRepository memberJpaRepository;
+    private final MemberRepository memberRepository;
     private final LocalAccountRepository localAccountRepository;
 
     private static final int CODE_LENGTH = 6;
@@ -33,7 +35,7 @@ public class MemberService {
     }
 
     public void validateEmail(String email, LoginType loginType) {
-        if (memberJpaRepository.findByEmailAndLoginType(email, loginType))
+        if (memberRepository.existsByEmailAndLoginType(email, loginType))
             throw new ConflictException("이미 등록된 이메일입니다.");
     }
 
@@ -48,6 +50,6 @@ public class MemberService {
     }
 
     private boolean isCodeExist(final String code) {
-        return memberJpaRepository.existsByCode(code);
+        return memberRepository.existsByCode(code);
     }
 }

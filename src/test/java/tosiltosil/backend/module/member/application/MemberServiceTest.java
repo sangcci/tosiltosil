@@ -8,8 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.module.member.domain.LocalAccountRepository;
+import tosiltosil.backend.module.member.domain.MemberRepository;
 import tosiltosil.backend.module.member.domain.value.LoginType;
-import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,7 +24,7 @@ class MemberServiceTest {
     private MemberService memberService;
 
     @Mock
-    private MemberJpaRepository memberJpaRepository;
+    private MemberRepository memberRepository;
 
     @Mock
     private LocalAccountRepository localAccountRepository;
@@ -35,7 +35,7 @@ class MemberServiceTest {
         String email = "duplicate@example.com";
         LoginType local = LoginType.LOCAL;
 
-        when(memberJpaRepository.findByEmailAndLoginType(email, local))
+        when(memberRepository.existsByEmailAndLoginType(email, local))
                 .thenReturn(true);
 
         // when & then
@@ -49,7 +49,7 @@ class MemberServiceTest {
     @Test
     void 랜덤_코드_생성_성공() {
         // given
-        when(memberJpaRepository.existsByCode(anyString()))
+        when(memberRepository.existsByCode(anyString()))
                 .thenReturn(false);
 
         // when
@@ -58,13 +58,13 @@ class MemberServiceTest {
         // then
         assertEquals(6, code.length());
 
-        verify(memberJpaRepository).existsByCode(code);
+        verify(memberRepository).existsByCode(code);
     }
 
     @Test
     void 중복_코드로_랜덤_코드_재생성() {
         // given
-        when(memberJpaRepository.existsByCode(anyString()))
+        when(memberRepository.existsByCode(anyString()))
                 .thenReturn(true)
                 .thenReturn(false);
 
@@ -74,6 +74,6 @@ class MemberServiceTest {
         // then
         assertEquals(6, code.length());
 
-        verify(memberJpaRepository, times(2)).existsByCode(anyString());
+        verify(memberRepository, times(2)).existsByCode(anyString());
     }
 }
