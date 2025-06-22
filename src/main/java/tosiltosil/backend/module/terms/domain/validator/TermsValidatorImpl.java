@@ -24,6 +24,7 @@ public class TermsValidatorImpl implements TermsValidator {
         validateDuplicateTerms(termsDetail);
 
         termsDetail.forEach(terms -> {
+            validateRecentVersion(terms);
             validateRequiredTermsAgreed(terms);
             validateTermsExist(terms);
         });
@@ -61,6 +62,18 @@ public class TermsValidatorImpl implements TermsValidator {
 
         if (isRequired && !terms.agreed()) {
             throw new BadRequestException(terms.title() + " : 필수 약관에 대해 동의하지 않았습니다.");
+        }
+    }
+
+    /**
+     * 최신 버전의 약관인지 검증
+     */
+    private void validateRecentVersion(TermsDetail terms) {
+        String lastVersion = termsRepository.findLastVersion(terms.title())
+                .orElseThrow(() -> new NotFoundException("약관을 찾을 수 없습니다."));
+
+        if (!terms.version().equals(lastVersion)) {
+            throw new BadRequestException("최신 버전의 약관이 아닙니다." );
         }
     }
 

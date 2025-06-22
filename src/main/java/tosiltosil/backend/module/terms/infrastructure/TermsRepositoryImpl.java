@@ -55,4 +55,17 @@ public class TermsRepositoryImpl implements TermsRepository {
                 .fetch();
     }
 
+    @Override
+    public Optional<String> findLastVersion(String title) {
+        return Optional.ofNullable(
+                queryFactory
+                .select(termsVersion.version)
+                .from(termsVersion)
+                .join(terms).on(termsVersion.termsId.eq(terms.id))
+                .where(terms.title.eq(title))
+                .orderBy(termsVersion.createdAt.desc())
+                .limit(1)
+                .fetchOne()
+        );
+    }
 }
