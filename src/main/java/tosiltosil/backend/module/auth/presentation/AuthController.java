@@ -3,6 +3,7 @@ package tosiltosil.backend.module.auth.presentation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tosiltosil.backend.common.web.response.Response;
@@ -17,7 +18,7 @@ public class AuthController implements AuthApiSpecification {
 
     private final AuthService authService;
 
-    @PostMapping("/signup/local")
+    @PostMapping(value = "/signup/local", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Response<CreateLocalMemberResponse> localSignUp(
             @RequestPart("memberInfo") @Valid final CreateLocalMemberRequest request,
