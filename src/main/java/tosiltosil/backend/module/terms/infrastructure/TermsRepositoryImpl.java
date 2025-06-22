@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import tosiltosil.backend.module.terms.domain.TermsRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static tosiltosil.backend.module.terms.domain.QTerms.terms;
@@ -44,6 +45,14 @@ public class TermsRepositoryImpl implements TermsRepository {
                         )
                         .fetchOne()
         );
+    }
+
+    @Override
+    public List<String> findTitleList() {
+        return queryFactory
+                .select(terms.title)
+                .from(terms)
+                .fetch();
     }
 
 }

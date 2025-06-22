@@ -8,7 +8,6 @@ import tosiltosil.backend.module.terms.domain.TermsRepository;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;
 
 import java.util.List;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -16,11 +15,9 @@ public class TermsValidatorImpl implements TermsValidator {
 
     private final TermsRepository termsRepository;
 
-    private static final Set<String> REQUIRED_TERMS = Set.of(
-            "termsOfService",
-            "privacyPolicy",
-            "ageConfirmation"
-    );
+    private List<String> loadRequiredTerms() {
+        return termsRepository.findTitleList();
+    }
 
     @Override
     public void validateTerms(List<TermsDetail> termsDetail) {
@@ -36,12 +33,15 @@ public class TermsValidatorImpl implements TermsValidator {
      * 중복된 동의 검증
      */
     private void validateDuplicateTerms(List<TermsDetail> termsDetails) {
+        List<String> requiredTerms = loadRequiredTerms();
+
         long cnt = termsDetails.stream()
                 .map(TermsDetail::title)
                 .distinct()
                 .count();
 
-        if (cnt != REQUIRED_TERMS.size())
+        if (termsDetails.size() == requiredTerms.size() &&
+                cnt != requiredTerms.size())
             throw new BadRequestException("중복된 약관 동의가 존재합니다.");
     }
 
