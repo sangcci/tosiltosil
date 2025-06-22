@@ -10,6 +10,7 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.terms.domain.TermsRepository;
 import tosiltosil.backend.module.terms.domain.request.TermsDetail;
+import tosiltosil.backend.module.terms.domain.validator.TermsValidator;
 import tosiltosil.backend.module.terms.infrastructure.MemberTermsJpaRepository;
 
 import java.util.List;
@@ -32,6 +33,9 @@ class TermsServiceTest {
     @Mock
     private MemberTermsJpaRepository memberTermsJpaRepository;
 
+    @Mock
+    private TermsValidator termsValidator;
+
     private List<TermsDetail> createValidTerms() {
         return List.of(
                 new TermsDetail("termsOfService", "0.1.0", true),
@@ -45,13 +49,12 @@ class TermsServiceTest {
         // given
         List<TermsDetail> terms = createValidTerms();
 
-        terms.forEach(t -> {
-            when(termsRepository.findTermsIsRequired(t.title(), t.version()))
-                    .thenReturn(Optional.of(true));
-        });
+        doNothing().when(termsValidator).validateTerms(terms);
 
         // when & then
         assertDoesNotThrow(() -> termsService.validateTerms(terms));
+
+        verify(termsValidator).validateTerms(terms);
     }
 
     @Test
@@ -82,8 +85,8 @@ class TermsServiceTest {
                 new TermsDetail("ageConfirmation", "0.1.0", true)
         );
 
-        when(termsRepository.findTermsIsRequired("termsOfService", "0.1.0"))
-                .thenReturn(Optional.of(true));
+        doThrow(new BadRequestException("필수 약관에 대해 동의하지 않았습니다."))
+                .when(termsValidator).validateTerms(terms);
 
         // when & then
         BadRequestException exception = assertThrows(
@@ -92,6 +95,7 @@ class TermsServiceTest {
         );
 
         assertEquals("필수 약관에 대해 동의하지 않았습니다.", exception.getMessage());
+        verify(termsValidator).validateTerms(terms);
     }
 
     @Test
@@ -103,8 +107,8 @@ class TermsServiceTest {
                 new TermsDetail("ageConfirmation", "0.1.0", true)
         );
 
-        when(termsRepository.findTermsIsRequired("잘못된_약관", "0.0.1"))
-                .thenReturn(Optional.empty());
+        doThrow(new NotFoundException("약관을 찾을 수 없습니다."))
+                .when(termsValidator).validateTerms(terms);
 
         // when & then
         NotFoundException exception = assertThrows(
@@ -113,5 +117,6 @@ class TermsServiceTest {
         );
 
         assertEquals("약관을 찾을 수 없습니다.", exception.getMessage());
+        verify(termsValidator).validateTerms(terms);
     }
 }
