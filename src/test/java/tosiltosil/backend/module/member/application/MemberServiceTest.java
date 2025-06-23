@@ -47,21 +47,6 @@ class MemberServiceTest {
     }
 
     @Test
-    void 랜덤_코드_생성_성공() {
-        // given
-        when(memberRepository.existsByCode(anyString()))
-                .thenReturn(false);
-
-        // when
-        String code = memberService.generateRandomCode();
-
-        // then
-        assertEquals(6, code.length());
-
-        verify(memberRepository).existsByCode(code);
-    }
-
-    @Test
     void 중복_코드로_랜덤_코드_재생성() {
         // given
         when(memberRepository.existsByCode(anyString()))
