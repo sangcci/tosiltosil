@@ -42,7 +42,6 @@ public record CreateLocalMemberRequest(
 
         @Schema(description = "약관 목록 (termsOfService, privacyPolicy, ageConfirmation)", minLength = 3, maxLength = 3)
         @NotNull(message = "약관 동의 여부를 입력해주세요.")
-        @Size(min=3, max=3, message = "3개의 약관 동의 항목을 입력해주세요.")
         List<TermsDetail> terms
 ) {
         public Member toMemberEntities(

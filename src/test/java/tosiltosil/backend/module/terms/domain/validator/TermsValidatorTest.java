@@ -51,13 +51,32 @@ public class TermsValidatorTest {
     }
 
     @Test
-    void 중복된_약관_예외처리() {
+    void 약관_구성이_일치하지_않을_경우_예외처리() {
         //given
         List<String> termsTitle = List.of("terms1", "terms2");
         when(termsRepository.findTitleList()).thenReturn(termsTitle);
 
         List<TermsDetail> terms = List.of(
                 new TermsDetail("terms1", "0.1.0", true),
+                new TermsDetail("terms3", "0.1.0", true)
+        );
+
+        // when & then
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> termsValidator.validateTerms(terms)
+        );
+
+        assertEquals("약관 항목이 일치하지 않습니다.", exception.getMessage());
+    }
+
+    @Test
+    void 전달된_약관_개수가_DB에_저장된_개수와_다를_경우_예외처리() {
+        //given
+        List<String> termsTitle = List.of("terms1", "terms2");
+        when(termsRepository.findTitleList()).thenReturn(termsTitle);
+
+        List<TermsDetail> terms = List.of(
                 new TermsDetail("terms1", "0.1.0", true)
         );
 
@@ -67,20 +86,20 @@ public class TermsValidatorTest {
                 () -> termsValidator.validateTerms(terms)
         );
 
-        assertEquals("중복된 약관 동의가 존재합니다.", exception.getMessage());
+        assertEquals("전달된 약관의 수가 올바르지 않습니다.", exception.getMessage());
     }
 
     @Test
     void 존재하지_않는_약관_예외처리() {
         //given
-        List<String> termsTitle = List.of("terms");
+        List<String> termsTitle = List.of("terms1");
         when(termsRepository.findTitleList()).thenReturn(termsTitle);
 
         List<TermsDetail> terms = List.of(
-                new TermsDetail("잘못된_약관", "0.1.0", true)
+                new TermsDetail("terms1", "0.1.2", true)
         );
 
-        when(termsRepository.findVersionId("잘못된_약관", "0.1.0")).thenReturn(Optional.empty());
+        when(termsRepository.findVersionId("terms1", "0.1.2")).thenReturn(Optional.empty());
 
         // when & then
         NotFoundException exception = assertThrows(
