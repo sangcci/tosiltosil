@@ -1,6 +1,5 @@
 package tosiltosil.backend.module.terms.infrastructure;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import tosiltosil.backend.module.terms.domain.TermsRepository;
@@ -8,64 +7,29 @@ import tosiltosil.backend.module.terms.domain.TermsRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static tosiltosil.backend.module.terms.domain.QTerms.terms;
-import static tosiltosil.backend.module.terms.domain.QTermsVersion.termsVersion;
-
 @Repository
 @RequiredArgsConstructor
 public class TermsRepositoryImpl implements TermsRepository {
 
-    private final JPAQueryFactory queryFactory;
+    private final TermsDslRepository termsDslRepository;
 
     @Override
     public Optional<Long> findVersionId(String title, String version) {
-        return Optional.ofNullable(
-                queryFactory
-                        .select(termsVersion.id)
-                        .from(termsVersion)
-                        .join(terms).on(termsVersion.termsId.eq(terms.id))
-                        .where(
-                                terms.title.eq(title),
-                                termsVersion.version.eq(version)
-                        )
-                        .fetchOne()
-        );
+        return termsDslRepository.findVersionId(title, version);
     }
 
     @Override
     public Optional<Boolean> findTermsIsRequired(String title, String version) {
-        return Optional.ofNullable(
-                queryFactory
-                        .select(terms.isRequired)
-                        .from(terms)
-                        .join(termsVersion).on(termsVersion.termsId.eq(terms.id))
-                        .where(
-                                terms.title.eq(title),
-                                termsVersion.version.eq(version)
-                        )
-                        .fetchOne()
-        );
+        return termsDslRepository.findTermsIsRequired(title, version);
     }
 
     @Override
     public List<String> findTitleList() {
-        return queryFactory
-                .select(terms.title)
-                .from(terms)
-                .fetch();
+        return termsDslRepository.findTitleList();
     }
 
     @Override
     public Optional<String> findLastVersion(String title) {
-        return Optional.ofNullable(
-                queryFactory
-                .select(termsVersion.version)
-                .from(termsVersion)
-                .join(terms).on(termsVersion.termsId.eq(terms.id))
-                .where(terms.title.eq(title))
-                .orderBy(termsVersion.createdAt.desc())
-                .limit(1)
-                .fetchOne()
-        );
+        return termsDslRepository.findLastVersion(title);
     }
 }
