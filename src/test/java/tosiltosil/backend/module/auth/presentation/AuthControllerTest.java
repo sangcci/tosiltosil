@@ -1,18 +1,15 @@
 package tosiltosil.backend.module.auth.presentation;
 
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import tosiltosil.backend.common.web.handler.GlobalExceptionHandler;
+import tosiltosil.backend.common.config.TestSecurityConfig;
 import tosiltosil.backend.module.auth.application.AuthService;
 
 import java.nio.charset.StandardCharsets;
@@ -22,25 +19,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(AuthController.class)
+@Import(TestSecurityConfig.class)
 public class AuthControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @InjectMocks
-    private AuthController authController;
-
-    @Mock
+    @MockitoBean
     private AuthService authService;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(authController)
-                .setValidator(new LocalValidatorFactoryBean())
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
-    }
 
     @Test
     void 회원가입_정상_요청() throws Exception {
