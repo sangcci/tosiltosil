@@ -14,6 +14,8 @@ import tosiltosil.backend.module.member.application.MemberService;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.terms.application.TermsService;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -38,7 +40,7 @@ class AuthServiceTest {
     private MultipartFile profileImage;
 
     @Test
-    void 중복_이메일_회원가입_실패() {
+    void 이메일_중복_예외가_발생하면_로직을_중지한다() {
         //given
         CreateLocalMemberRequest request = mock(CreateLocalMemberRequest.class);
         String email = "duplicate@example.com";
@@ -55,5 +57,9 @@ class AuthServiceTest {
         );
 
         assertEquals("이미 등록된 이메일입니다.", exception.getMessage());
+        verify(memberService, never()).generateRandomCode();
+        verify(memberService, never()).saveMember(any());
+        verify(memberService, never()).saveLocalAccount(any());
+        verify(termsService, never()).saveTerms(any(UUID.class), any());
     }
 }
