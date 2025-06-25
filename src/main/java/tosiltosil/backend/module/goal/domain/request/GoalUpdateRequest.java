@@ -6,8 +6,7 @@ public record GoalUpdateRequest(
         String title,
         Long iconId,
         Long categoryId,
-        LocalDate date,
-        Long time
+        LocalDate date
 ) {
 
 }

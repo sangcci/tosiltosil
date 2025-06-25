@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -35,14 +36,14 @@ public class Goal extends BaseEntity {
     private String title;
 
     @Column(nullable = false)
-    private Long totalTime;
+    private Duration totalTime;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GoalStatus status;
 
     @Column(nullable = false)
-    private Long duration;
+    private Duration duration;
 
     @Column(nullable = false)
     private int sequence;
@@ -58,9 +59,9 @@ public class Goal extends BaseEntity {
             final UUID memberId,
             final Long categoryId,
             final String title,
-            final Long totalTime,
+            final Duration totalTime,
             final GoalStatus status,
-            final Long duration,
+            final Duration duration,
             final LocalDate date,
             final Long iconId,
             final int sequence
@@ -80,7 +81,7 @@ public class Goal extends BaseEntity {
             final UUID memberId,
             final Long categoryId,
             final String title,
-            final Long totalTime,
+            final Duration totalTime,
             final int sequence,
             final Long iconId,
             final LocalDate date
@@ -91,7 +92,7 @@ public class Goal extends BaseEntity {
                 .title(title)
                 .totalTime(totalTime)
                 .status(GoalStatus.BEFORE_STARTING)
-                .duration(0L)
+                .duration(Duration.ZERO)
                 .sequence(sequence)
                 .iconId(iconId)
                 .date(date)

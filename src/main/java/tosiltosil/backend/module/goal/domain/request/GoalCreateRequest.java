@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.goal.domain.request;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +11,7 @@ public record GoalCreateRequest(
         Long iconId,
         Long categoryId,
         List<LocalDate> dates,
-        Long time
+        Duration time
 ) {
 
     public List<Goal> toEntities(
