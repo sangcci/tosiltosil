@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.auth.domain;
+package tosiltosil.backend.module.member.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

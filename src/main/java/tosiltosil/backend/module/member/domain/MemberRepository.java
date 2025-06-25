@@ -1,10 +1,8 @@
 package tosiltosil.backend.module.member.domain;
 
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.data.jpa.repository.JpaRepository;
+import tosiltosil.backend.module.member.domain.value.LoginType;
 
-public interface MemberRepository extends JpaRepository<Member, UUID> {
-
-    Optional<Member> findByEmail(String email);
+public interface MemberRepository {
+    boolean existsByCode(String code);
+    boolean existsByEmailAndLoginType(String email, LoginType loginType);
 }

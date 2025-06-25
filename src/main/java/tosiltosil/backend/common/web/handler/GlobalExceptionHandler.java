@@ -1,6 +1,5 @@
 package tosiltosil.backend.common.web.handler;
 
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -19,6 +18,8 @@ import tosiltosil.backend.common.logging.domain.ErrorLog;
 import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.web.response.ErrorResponse;
 import tosiltosil.backend.common.web.response.ErrorResponse.ErrorDetailResponse;
+
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
