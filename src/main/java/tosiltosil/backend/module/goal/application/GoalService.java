@@ -6,29 +6,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
-import tosiltosil.backend.module.goal.domain.DailyTotalTime;
-import tosiltosil.backend.module.goal.domain.DailyTotalTimeRepository;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalResponse;
+import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 
 @Service
 @RequiredArgsConstructor
 public class GoalService {
 
     private final GoalRepository goalRepository;
-    private final DailyTotalTimeRepository dailyTotalTimeRepository;
+    private final GoalDomainService goalDomainService;
 
     @Transactional(readOnly = true)
     public void validateCreateGoal(
             final UUID memberId
     ) {
-        DailyTotalTime dailyTotalTime = dailyTotalTimeRepository.findByMemberId(memberId);
-
-        dailyTotalTime.validateDurationUnder24Hours();
+        goalDomainService.validateCreation(memberId);
     }
 
     @Transactional
@@ -36,8 +33,9 @@ public class GoalService {
             final UUID memberId,
             final GoalCreateRequest request
     ) {
-        validateCreateGoal(memberId);
+        goalDomainService.validateCreation(memberId);
         // TODO: 순서 구현
+
         List<Goal> goals = request.toEntities(memberId);
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
                 .map(Goal::getId)

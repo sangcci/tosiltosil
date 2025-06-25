@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.goal.domain;
+package tosiltosil.backend.module.duration.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,15 +51,5 @@ public class DailyTotalTime extends BaseEntity {
                 .time(Duration.ZERO)
                 .date(LocalDate.now().atTime(LocalTime.of(5,0)))
                 .build();
-    }
-
-    /**
-     * 24시간 보다 클 경우 예외 발생
-     */
-    public void validateDurationUnder24Hours() {
-        final Duration max = Duration.ofHours(24);
-        if (time.compareTo(max) >= 0) {
-            throw new IllegalArgumentException("일일 목표 총 시간인 24시간을 초과하여 목표를 생성할 수 없습니다.");
-        }
     }
 }

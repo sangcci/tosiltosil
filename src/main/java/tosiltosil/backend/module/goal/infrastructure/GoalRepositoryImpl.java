@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.goal.infrastructure;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +23,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     @Override
     public Optional<Goal> findByIdAndMemberId(final Long goalId, final UUID memberId) {
         return goalJpaRepository.findByIdAndMemberId(goalId, memberId);
+    }
+
+    @Override
+    public List<Goal> findTodayGoalsByMemberId(final UUID memberId) {
+        return goalJpaRepository.findByMemberIdAndDate(memberId, LocalDate.now());
     }
 
     @Override
