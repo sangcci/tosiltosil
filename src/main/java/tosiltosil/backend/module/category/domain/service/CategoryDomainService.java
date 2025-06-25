@@ -2,10 +2,10 @@ package tosiltosil.backend.module.category.domain.service;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import tosiltosil.backend.module.category.domain.CategoryRepository;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class CategoryDomainService {
 
