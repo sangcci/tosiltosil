@@ -1,13 +1,16 @@
 package tosiltosil.backend.module.stopwatch.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-
 import tosiltosil.backend.common.domain.BaseEntity;
 
 @Entity
@@ -41,5 +44,16 @@ public class Stopwatch extends BaseEntity {
                 .goalId(goalId)
                 .startedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void updateEndAt() {
+        this.endedAt = LocalDateTime.now();
+    }
+
+    public Duration getDuration() {
+        if (this.endedAt == null) {
+            return Duration.ZERO;
+        }
+        return Duration.between(this.startedAt, this.endedAt);
     }
 }
