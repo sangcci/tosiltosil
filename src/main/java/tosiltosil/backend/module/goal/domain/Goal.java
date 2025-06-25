@@ -112,4 +112,28 @@ public class Goal extends BaseEntity {
     public void changeDate(final LocalDate date) {
         this.date = date;
     }
+
+    public void changeStatusToStarted() {
+        if (this.status == GoalStatus.BEFORE_STARTING || this.status == GoalStatus.PAUSED) {
+            this.status = GoalStatus.RUNNING;
+        } else {
+            throw new IllegalStateException("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
+        }
+    }
+
+    public void changeStatusToPaused() {
+        if (this.status == GoalStatus.RUNNING) {
+            this.status = GoalStatus.PAUSED;
+        } else {
+            throw new IllegalStateException("스톱워치가 이미 정지되었습니다.");
+        }
+    }
+
+    public void changeStatusToCompleted() {
+        if (this.status == GoalStatus.RUNNING) {
+            this.status = GoalStatus.COMPLETED;
+        } else {
+            throw new IllegalStateException("실행 중이 아닌 목표는 완료할 수 없습니다.");
+        }
+    }
 }

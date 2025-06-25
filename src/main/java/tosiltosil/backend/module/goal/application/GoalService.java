@@ -78,4 +78,34 @@ public class GoalService {
         goalRepository.delete(goal);
         return GoalResponse.ofSingle(goal.getId());
     }
+
+    public void changeStatusToStarted(
+            final UUID memberId,
+            final Long goalId
+    ) {
+        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
+                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+
+        goal.changeStatusToStarted();
+    }
+
+    public void changeStatusToPaused(
+            final UUID memberId,
+            final Long goalId
+    ) {
+        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
+                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+
+        goal.changeStatusToPaused();
+    }
+
+    public void changeStatusToCompleted(
+            final UUID memberId,
+            final Long goalId
+    ) {
+        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
+                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+
+        goal.changeStatusToCompleted();
+    }
 }
