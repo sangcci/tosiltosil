@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,9 +48,11 @@ class TermsServiceTest {
 
         doNothing().when(termsValidator).validateTerms(validTerms);
 
-        // when & then
-        assertDoesNotThrow(() -> termsService.validateTerms(validTerms));
+        // when
+        Throwable thrown = catchThrowable(() -> termsService.validateTerms(validTerms));
 
+        // then
+        assertThat(thrown).isNull();
         verify(termsValidator).validateTerms(validTerms);
     }
 
@@ -66,13 +68,14 @@ class TermsServiceTest {
         doThrow(new BadRequestException("필수 약관에 대해 동의하지 않았습니다."))
                 .when(termsValidator).validateTerms(invalidTerms);
 
-        // when & then
-        BadRequestException exception = assertThrows(
-                BadRequestException.class,
-                () -> termsService.validateTerms(invalidTerms)
-        );
+        // when
+        Throwable thrown = catchThrowable(() -> termsService.validateTerms(invalidTerms));
 
-        assertEquals("필수 약관에 대해 동의하지 않았습니다.", exception.getMessage());
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("필수 약관에 대해 동의하지 않았습니다.");
+
         verify(termsValidator).validateTerms(invalidTerms);
     }
 

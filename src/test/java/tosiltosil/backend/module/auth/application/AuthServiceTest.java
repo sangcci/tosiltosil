@@ -16,8 +16,7 @@ import tosiltosil.backend.module.terms.application.TermsService;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
@@ -51,12 +50,12 @@ class AuthServiceTest {
                 .when(memberService).validateEmail(email, LoginType.LOCAL);
 
         // when & then
-        ConflictException exception = assertThrows(
-                ConflictException.class,
-                () -> authService.localSignUp(request, profileImage)
-        );
+        Throwable thrown = catchThrowable(() -> authService.localSignUp(request, profileImage));
 
-        assertEquals("이미 등록된 이메일입니다.", exception.getMessage());
+        assertThat(thrown)
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("이미 등록된 이메일입니다.");
+
         verify(memberService, never()).generateRandomCode();
         verify(memberService, never()).saveMember(any());
         verify(memberService, never()).saveLocalAccount(any());

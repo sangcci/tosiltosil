@@ -13,7 +13,7 @@ import tosiltosil.backend.module.terms.domain.request.TermsDetail;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -46,8 +46,11 @@ public class TermsValidatorTest {
         when(termsRepository.findTermsIsRequired("terms1", "0.1.0")).thenReturn(Optional.of(true));
         when(termsRepository.findTermsIsRequired("terms2", "0.1.0")).thenReturn(Optional.of(true));
 
-        // when & then
-        assertDoesNotThrow(() -> termsValidator.validateTerms(validTerms));
+        // when
+        Throwable thrown = catchThrowable(() -> termsValidator.validateTerms(validTerms));
+
+        // then
+        assertThat(thrown).isNull();
     }
 
     @Test
@@ -61,13 +64,13 @@ public class TermsValidatorTest {
                 new TermsDetail("terms3", "0.1.0", true)
         );
 
-        // when & then
-        BadRequestException exception = assertThrows(
-                BadRequestException.class,
-                () -> termsValidator.validateTerms(terms)
-        );
+        // when
+        Throwable thrown = catchThrowable(() -> termsValidator.validateTerms(terms));
 
-        assertEquals("약관 항목이 일치하지 않습니다.", exception.getMessage());
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("약관 항목이 일치하지 않습니다.");
     }
 
     @Test
@@ -80,13 +83,13 @@ public class TermsValidatorTest {
                 new TermsDetail("terms1", "0.1.0", true)
         );
 
-        // when & then
-        BadRequestException exception = assertThrows(
-                BadRequestException.class,
-                () -> termsValidator.validateTerms(terms)
-        );
+        // when
+        Throwable thrown = catchThrowable(() -> termsValidator.validateTerms(terms));
 
-        assertEquals("전달된 약관의 수가 올바르지 않습니다.", exception.getMessage());
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("전달된 약관의 수가 올바르지 않습니다.");
     }
 
     @Test
@@ -101,13 +104,13 @@ public class TermsValidatorTest {
 
         when(termsRepository.findVersionId("terms1", "0.1.2")).thenReturn(Optional.empty());
 
-        // when & then
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> termsValidator.validateTerms(terms)
-        );
+        // when
+        Throwable thrown = catchThrowable(() -> termsValidator.validateTerms(terms));
 
-        assertEquals("약관을 찾을 수 없습니다.", exception.getMessage());
+        // then
+        assertThat(thrown)
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("약관을 찾을 수 없습니다.");
     }
 
     @Test
@@ -123,13 +126,13 @@ public class TermsValidatorTest {
         when(termsRepository.findVersionId(anyString(), anyString())).thenReturn(Optional.of(1L));
         when(termsRepository.findLastVersion("terms1")).thenReturn(Optional.of("0.3.0"));
 
-        // when & then
-        BadRequestException exception = assertThrows(
-                BadRequestException.class,
-                () -> termsValidator.validateTerms(terms)
-        );
+        // when
+        Throwable thrown = catchThrowable(() -> termsValidator.validateTerms(terms));
 
-        assertEquals("최신 버전의 약관이 아닙니다.", exception.getMessage());
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("최신 버전의 약관이 아닙니다.");
     }
 
     @Test
@@ -146,12 +149,12 @@ public class TermsValidatorTest {
         when(termsRepository.findLastVersion(anyString())).thenReturn(Optional.of("0.1.0"));
         when(termsRepository.findTermsIsRequired(anyString(), anyString())).thenReturn(Optional.of(true));
 
-        // when & then
-        BadRequestException exception = assertThrows(
-                BadRequestException.class,
-                () -> termsValidator.validateTerms(terms)
-        );
+        // when
+        Throwable thrown = catchThrowable(() -> termsValidator.validateTerms(terms));
 
-        assertEquals("필수 약관을 동의하지 않았습니다.", exception.getMessage());
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("필수 약관을 동의하지 않았습니다.");
     }
 }

@@ -11,8 +11,7 @@ import tosiltosil.backend.module.member.domain.LocalAccountRepository;
 import tosiltosil.backend.module.member.domain.MemberRepository;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -39,11 +38,11 @@ class MemberServiceTest {
                 .thenReturn(true);
 
         // when & then
-        ConflictException exception = assertThrows(
-                ConflictException.class,
-                () -> memberService.validateEmail(email, local));
+        Throwable thrown = catchThrowable(() -> memberService.validateEmail(email, local));
 
-        assertEquals("이미 등록된 이메일입니다.", exception.getMessage());
+        assertThat(thrown)
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("이미 등록된 이메일입니다.");
     }
 
     @Test
@@ -57,7 +56,7 @@ class MemberServiceTest {
         String code = memberService.generateRandomCode();
 
         // then
-        assertEquals(6, code.length());
+        assertThat(code).hasSize(6);
 
         verify(memberRepository, times(2)).existsByCode(anyString());
     }
