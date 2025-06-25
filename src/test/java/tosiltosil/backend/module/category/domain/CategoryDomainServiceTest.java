@@ -24,22 +24,22 @@ class CategoryDomainServiceTest {
 
     @Test
     void 카테고리_생성_시_10개_미만이면_성공한다() {
-        // Given
+        // given
         UUID memberId = UUID.randomUUID();
         when(categoryRepository.countByMemberId(memberId)).thenReturn(9L);
 
-        // When & Then
+        // when & then
         assertThatCode(() -> categoryDomainService.validateCategoryCreation(memberId))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void 카테고리_생성_시_10개_이상이면_실패한다() {
-        // Given
+        // given
         UUID memberId = UUID.randomUUID();
         when(categoryRepository.countByMemberId(memberId)).thenReturn(10L);
 
-        // When & Then
+        // when & then
         assertThatThrownBy(() -> categoryDomainService.validateCategoryCreation(memberId))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("생성 제한을 넘어 카테고리를 생성할 수 없습니다.");
