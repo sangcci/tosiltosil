@@ -19,7 +19,7 @@ import tosiltosil.backend.common.domain.BaseEntity;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DailyTotalTime extends BaseEntity {
+public class DailyDuration extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class DailyTotalTime extends BaseEntity {
     private LocalDateTime date;
 
     @Builder
-    private DailyTotalTime(final UUID memberId, final Duration time, final LocalDateTime date) {
+    private DailyDuration(final UUID memberId, final Duration time, final LocalDateTime date) {
         this.memberId = memberId;
         this.time = time;
         this.date = date;
@@ -45,8 +45,8 @@ public class DailyTotalTime extends BaseEntity {
      * 오전 5시 기준 new day
      * 누적 시간은 0, 날짜는 오늘 날짜 + 오전 5시 고정
      */
-    public static DailyTotalTime of(final UUID memberId) {
-        return DailyTotalTime.builder()
+    public static DailyDuration of(final UUID memberId) {
+        return DailyDuration.builder()
                 .memberId(memberId)
                 .time(Duration.ZERO)
                 .date(LocalDate.now().atTime(LocalTime.of(5,0)))
