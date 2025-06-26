@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +42,7 @@ class CategoryDomainServiceTest {
 
         // when & then
         assertThatThrownBy(() -> categoryDomainService.validateCategoryCreation(memberId))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("생성 제한을 넘어 카테고리를 생성할 수 없습니다.");
     }
 }

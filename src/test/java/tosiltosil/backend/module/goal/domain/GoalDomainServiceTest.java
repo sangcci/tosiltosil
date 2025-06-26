@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +38,7 @@ class GoalDomainServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> goalDomainService.validateCreation(memberId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("일일 목표 총 시간인 24시간을 초과하여 목표를 생성할 수 없습니다.");
     }
 
@@ -68,7 +69,7 @@ class GoalDomainServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> goalDomainService.validateCreation(memberId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("일일 목표 총 시간인 24시간을 초과하여 목표를 생성할 수 없습니다.");
     }
 

@@ -116,8 +116,8 @@ public class Goal extends BaseEntity {
 
     private static void validateDate(final LocalDate date) {
         LocalDate today = LocalDate.now();
-        if (date.isAfter(today)) {
-            throw new BadRequestException("날짜는 오늘 이전이어야 합니다.");
+        if (date.isBefore(today)) {
+            throw new BadRequestException("날짜는 오늘 이후여야 합니다.");
         }
     }
 

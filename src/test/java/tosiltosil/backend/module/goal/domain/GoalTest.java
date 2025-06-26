@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -46,7 +47,7 @@ class GoalTest {
         
         // when & then
         assertThatThrownBy(goal::changeStatusToStarted)
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessage("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
     }
 
@@ -58,7 +59,7 @@ class GoalTest {
         
         // when & then
         assertThatThrownBy(goal::changeStatusToStarted)
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessage("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
     }
 
@@ -83,7 +84,7 @@ class GoalTest {
         
         // when & then
         assertThatThrownBy(goal::changeStatusToPaused)
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessage("스톱워치가 이미 정지되었습니다.");
     }
 
@@ -95,7 +96,7 @@ class GoalTest {
         
         // when & then
         assertThatThrownBy(goal::changeStatusToPaused)
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessage("스톱워치가 이미 정지되었습니다.");
     }
 

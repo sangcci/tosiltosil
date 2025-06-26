@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.goal.application;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class GoalService {
                 .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
 
         goal.updateBasicInfo(request.title(), request.categoryId(), request.iconId());
-        goal.changeDate(request.date());
+        goal.changeDate(LocalDate.parse(request.date()));
 
         return GoalResponse.ofSingle(goal.getId());
     }
