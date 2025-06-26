@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public interface GoalApiSpecification {
 
-    @Tag(name = "GET", description = "목표 생성 검증")
+    @Tag(name = "Goal", description = "목표 생성 검증")
     @Operation(summary = "목표 생성 검증", description = "목표 생성 가능 여부를 확인합니다.")
     @ApiResponses({
             @ApiResponse(
@@ -67,7 +67,7 @@ public interface GoalApiSpecification {
     })
     Response<GoalCreateValidateResponse> validateCreateGoal(UUID memberId);
 
-    @Tag(name = "POST", description = "목표 생성")
+    @Tag(name = "Goal", description = "목표 생성")
     @Operation(summary = "목표 생성", description = "새로운 목표를 생성합니다.")
     @ApiResponses({
             @ApiResponse(
@@ -115,7 +115,7 @@ public interface GoalApiSpecification {
     })
     Response<GoalResponse> createGoal(UUID memberId, GoalCreateRequest request);
 
-    @Tag(name = "PATCH", description = "목표 수정")
+    @Tag(name = "Goal", description = "목표 수정")
     @Operation(summary = "목표 수정", description = "기존 목표의 정보를 수정합니다.")
     @ApiResponses({
             @ApiResponse(
@@ -163,7 +163,7 @@ public interface GoalApiSpecification {
     })
     Response<GoalResponse> updateGoal(UUID memberId, Long goalId, GoalUpdateRequest request);
 
-    @Tag(name = "PATCH", description = "목표 순서 변경")
+    @Tag(name = "Goal", description = "목표 순서 변경")
     @Operation(summary = "목표 순서 변경", description = "목표의 순서를 변경합니다.")
     @ApiResponses({
             @ApiResponse(
@@ -211,7 +211,7 @@ public interface GoalApiSpecification {
     })
     void changeGoalSequence(UUID memberId, Long goalId, GoalSequenceChangeRequest request);
 
-    @Tag(name = "DELETE", description = "목표 삭제")
+    @Tag(name = "Goal", description = "목표 삭제")
     @Operation(summary = "목표 삭제", description = "목표를 삭제합니다.")
     @ApiResponses({
             @ApiResponse(

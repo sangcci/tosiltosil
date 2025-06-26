@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public interface CategoryApiSpecification {
 
-    @Tag(name = "POST", description = "카테고리 생성")
+    @Tag(name = "Category", description = "카테고리 생성")
     @Operation(summary = "카테고리 생성", description = "새로운 카테고리를 생성합니다.")
     @ApiResponses({
             @ApiResponse(
@@ -66,7 +66,7 @@ public interface CategoryApiSpecification {
     })
     Response<CategoryResponse> createGoal(UUID memberId, CategoryCreateRequest request);
 
-    @Tag(name = "PATCH", description = "카테고리 수정")
+    @Tag(name = "Category", description = "카테고리 수정")
     @Operation(summary = "카테고리 수정", description = "기존 카테고리의 정보를 수정합니다.")
     @ApiResponses({
             @ApiResponse(
@@ -114,7 +114,7 @@ public interface CategoryApiSpecification {
     })
     Response<CategoryResponse> updateGoal(UUID memberId, Long categoryId, CategoryUpdateRequest request);
 
-    @Tag(name = "PATCH", description = "카테고리 순서 변경")
+    @Tag(name = "Category", description = "카테고리 순서 변경")
     @Operation(summary = "카테고리 순서 변경", description = "카테고리의 순서를 변경합니다.")
     @ApiResponses({
             @ApiResponse(
@@ -162,7 +162,7 @@ public interface CategoryApiSpecification {
     })
     void changeCategorySequence(UUID memberId, Long categoryId, CategorySequenceChangeRequest request);
 
-    @Tag(name = "DELETE", description = "카테고리 삭제")
+    @Tag(name = "Category", description = "카테고리 삭제")
     @Operation(summary = "카테고리 삭제", description = "카테고리를 삭제합니다.")
     @ApiResponses({
             @ApiResponse(
