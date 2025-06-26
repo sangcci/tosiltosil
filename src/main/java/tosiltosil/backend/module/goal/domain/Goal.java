@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
@@ -87,6 +88,8 @@ public class Goal extends BaseEntity {
             final Long iconId,
             final LocalDate date
     ) {
+        validateTotalTime(totalTime);
+        validateDate(date);
         return Goal.builder()
                 .memberId(memberId)
                 .categoryId(categoryId)
@@ -100,6 +103,24 @@ public class Goal extends BaseEntity {
                 .build();
     }
 
+    private static void validateTotalTime(final Duration totalTime) {
+        Duration oneMinute = Duration.ofMinutes(1);
+        Duration twentyFourHours = Duration.ofHours(24);
+
+        if (totalTime.isNegative() || totalTime.isZero() ||
+                totalTime.compareTo(oneMinute) < 0 ||
+                totalTime.compareTo(twentyFourHours) >= 0) {
+            throw new BadRequestException("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다");
+        }
+    }
+
+    private static void validateDate(final LocalDate date) {
+        LocalDate today = LocalDate.now();
+        if (date.isAfter(today)) {
+            throw new BadRequestException("날짜는 오늘 이전이어야 합니다.");
+        }
+    }
+
     public void updateBasicInfo(
             final String title,
             final Long categoryId,
@@ -111,6 +132,7 @@ public class Goal extends BaseEntity {
     }
 
     public void changeDate(final LocalDate date) {
+        validateDate(date);
         this.date = date;
     }
 

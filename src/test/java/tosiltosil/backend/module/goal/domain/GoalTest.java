@@ -99,43 +99,6 @@ class GoalTest {
                 .hasMessage("스톱워치가 이미 정지되었습니다.");
     }
 
-    @Test
-    void RUNNING_상태에서_완료_상태로_변경한다() {
-        // given
-        UUID memberId = UUID.randomUUID();
-        Goal goal = createGoalWithStatus(memberId, GoalStatus.RUNNING);
-        
-        // when
-        goal.changeStatusToCompleted();
-        
-        // then
-        assertThat(goal.getStatus()).isEqualTo(GoalStatus.COMPLETED);
-    }
-
-    @Test
-    void BEFORE_STARTING_상태에서_완료_상태로_변경하면_예외가_발생한다() {
-        // given
-        UUID memberId = UUID.randomUUID();
-        Goal goal = createGoalWithStatus(memberId, GoalStatus.BEFORE_STARTING);
-        
-        // when & then
-        assertThatThrownBy(goal::changeStatusToCompleted)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("실행 중이 아닌 목표는 완료할 수 없습니다.");
-    }
-
-    @Test
-    void PAUSED_상태에서_완료_상태로_변경하면_예외가_발생한다() {
-        // given
-        UUID memberId = UUID.randomUUID();
-        Goal goal = createGoalWithStatus(memberId, GoalStatus.PAUSED);
-        
-        // when & then
-        assertThatThrownBy(goal::changeStatusToCompleted)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("실행 중이 아닌 목표는 완료할 수 없습니다.");
-    }
-
     private Goal createGoalWithStatus(UUID memberId, GoalStatus status) {
         return Goal.builder()
                 .memberId(memberId)

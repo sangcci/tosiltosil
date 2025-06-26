@@ -13,11 +13,12 @@ import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 @RestController
 @RequestMapping("/api/v1/goals")
 @RequiredArgsConstructor
-public class StopwatchController {
+public class StopwatchController implements StopwatchApiSpecification {
 
     private final StopwatchService stopwatchService;
 
     @PostMapping("/{goalId}/stopwatch/start")
+    @Override
     public Response<Void> startStopwatch(
             @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId,
             final UUID memberId
@@ -27,6 +28,7 @@ public class StopwatchController {
     }
 
     @PostMapping("/{goalId}/stopwatch/pause")
+    @Override
     public Response<Void> pauseStopwatch(
             @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId,
             final UUID memberId
