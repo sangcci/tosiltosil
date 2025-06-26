@@ -3,6 +3,7 @@ package tosiltosil.backend.module.category.domain.service;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.domain.CategoryRepository;
 
 @Component
@@ -16,7 +17,7 @@ public class CategoryDomainService {
     public void validateCategoryCreation(final UUID memberId) {
         Long count = categoryRepository.countByMemberId(memberId);
         if (count >= MAX_CATEGORIES_PER_MEMBER) {
-            throw new IllegalStateException("생성 제한을 넘어 카테고리를 생성할 수 없습니다.");
+            throw new BadRequestException("생성 제한을 넘어 카테고리를 생성할 수 없습니다.");
         }
     }
 }

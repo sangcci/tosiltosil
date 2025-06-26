@@ -5,6 +5,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.duration.application.DurationService;
 import tosiltosil.backend.module.goal.application.GoalService;
@@ -51,30 +52,13 @@ public class StopwatchService {
 
         // 스탑워치 끝 시각 업데이트
         Stopwatch stopwatch = stopwatchRepository.findLatestByGoalId(goalId)
-                .orElseThrow(() -> new IllegalArgumentException("스톱워치 데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("스톱워치 데이터가 존재하지 않습니다."));
         stopwatch.updateEndAt();
 
         // 오늘 총 진행 시간 업데이트
         Duration updatedTodayDuration = durationService.updateTodayDuration(memberId, stopwatch.getDuration());
 
         // 스탑워치 정지 메세지 전송 + 목표 진행 시간 업데이트
-        Events.raise(
-                StopwatchPausedEvent.of(memberId, goalId, stopwatch, updatedTodayDuration)
-        );
-    }
-
-    public void completeStopwatch(
-            final UUID memberId,
-            final Long goalId
-    ) {
-        goalService.changeStatusToCompleted(memberId, goalId);
-
-        Stopwatch stopwatch = stopwatchRepository.findLatestByGoalId(goalId)
-                .orElseThrow(() -> new IllegalArgumentException("스톱워치 데이터가 존재하지 않습니다."));
-        stopwatch.updateEndAt();
-
-        Duration updatedTodayDuration = durationService.updateTodayDuration(memberId, stopwatch.getDuration());
-
         Events.raise(
                 StopwatchPausedEvent.of(memberId, goalId, stopwatch, updatedTodayDuration)
         );

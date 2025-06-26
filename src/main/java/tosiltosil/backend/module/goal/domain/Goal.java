@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
+import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @Entity
@@ -117,7 +118,7 @@ public class Goal extends BaseEntity {
         if (this.status == GoalStatus.BEFORE_STARTING || this.status == GoalStatus.PAUSED) {
             this.status = GoalStatus.RUNNING;
         } else {
-            throw new IllegalStateException("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
+            throw new ConflictException("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
         }
     }
 
@@ -125,15 +126,7 @@ public class Goal extends BaseEntity {
         if (this.status == GoalStatus.RUNNING) {
             this.status = GoalStatus.PAUSED;
         } else {
-            throw new IllegalStateException("스톱워치가 이미 정지되었습니다.");
-        }
-    }
-
-    public void changeStatusToCompleted() {
-        if (this.status == GoalStatus.RUNNING) {
-            this.status = GoalStatus.COMPLETED;
-        } else {
-            throw new IllegalStateException("실행 중이 아닌 목표는 완료할 수 없습니다.");
+            throw new ConflictException("스톱워치가 이미 정지되었습니다.");
         }
     }
 

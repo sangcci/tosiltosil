@@ -105,17 +105,6 @@ public class GoalService {
         goal.changeStatusToPaused();
     }
 
-    @Transactional
-    public void changeStatusToCompleted(
-            final UUID memberId,
-            final Long goalId
-    ) {
-        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
-                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
-
-        goal.changeStatusToCompleted();
-    }
-
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void addDuration(final StopwatchPausedEvent event) {
         Goal goal = goalRepository.findById(event.goalId())
