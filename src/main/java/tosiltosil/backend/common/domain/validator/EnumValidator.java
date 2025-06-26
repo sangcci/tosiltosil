@@ -4,12 +4,12 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
 
-public class EnumValidator implements ConstraintValidator<Enum, String> {
+public class EnumValidator implements ConstraintValidator<IsEnum, String> {
 
     private Class<? extends java.lang.Enum<?>> enumClass;
 
     @Override
-    public void initialize(final Enum constraintAnnotation) {
+    public void initialize(final IsEnum constraintAnnotation) {
         this.enumClass = constraintAnnotation.enumClass();
     }
 

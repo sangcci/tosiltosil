@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = EnumValidator.class)
-public @interface Enum {
+public @interface IsEnum {
 
     String message() default "파라미터 값이 유효하지 않습니다.";
     Class<?>[] groups() default {};
