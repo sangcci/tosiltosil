@@ -5,7 +5,6 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import tosiltosil.backend.common.domain.exception.CustomException;
-import tosiltosil.backend.common.domain.exception.ErrorCode;
 import tosiltosil.backend.common.logging.domain.ErrorLog;
 import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.web.response.ErrorResponse;
@@ -17,12 +16,12 @@ public class GlobalWebSocketExceptionHandler {
     @MessageExceptionHandler(CustomException.class)
     @SendToUser("/queue/errors")
     public ErrorResponse handleCustomException(final CustomException e) {
-        ErrorCode errorCode = e.getErrorCode();
+        String message = e.getMessage();
 
-        InfoLog infoLog = InfoLog.of(errorCode.message());
+        InfoLog infoLog = InfoLog.of(message);
         infoLog.writeLog();
 
-        return ErrorResponse.of(400, errorCode.message());
+        return ErrorResponse.of(400, message);
     }
 
     @MessageExceptionHandler(Exception.class)

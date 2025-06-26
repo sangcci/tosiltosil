@@ -13,7 +13,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tosiltosil.backend.common.domain.exception.CustomException;
-import tosiltosil.backend.common.domain.exception.ErrorCode;
 import tosiltosil.backend.common.logging.domain.ErrorLog;
 import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.web.response.ErrorResponse;
@@ -147,13 +146,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorResponse> handleCustomException(final CustomException e) {
-        ErrorCode errorCode = e.getErrorCode();
+        int status = e.getStatus();
+        String message = e.getMessage();
 
-        InfoLog infoLog = InfoLog.of(errorCode.message());
+        InfoLog infoLog = InfoLog.of(message);
         infoLog.writeLog();
 
-        return ResponseEntity.status(errorCode.status())
-                .body(ErrorResponse.of(errorCode.status(), errorCode.message()));
+        return ResponseEntity.status(status)
+                .body(ErrorResponse.of(status, message));
     }
 
     /**

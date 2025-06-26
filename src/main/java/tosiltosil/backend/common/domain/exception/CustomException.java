@@ -1,10 +1,14 @@
 package tosiltosil.backend.common.domain.exception;
 
+import lombok.Getter;
+
+@Getter
 public abstract class CustomException extends RuntimeException {
 
-    protected CustomException(final ErrorCode errorCode) {
-        super("%s".formatted(errorCode.message()));
-    }
+    private final int status;
 
-    public abstract ErrorCode getErrorCode();
+    protected CustomException(final int status, final String message) {
+        super(message);
+        this.status = status;
+    }
 }
