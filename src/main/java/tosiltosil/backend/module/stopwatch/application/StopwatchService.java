@@ -10,7 +10,8 @@ import tosiltosil.backend.module.duration.application.DurationService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.stopwatch.domain.Stopwatch;
 import tosiltosil.backend.module.stopwatch.domain.StopwatchRepository;
-import tosiltosil.backend.module.stopwatch.domain.event.StopwatchStatusChangedEvent;
+import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
+import tosiltosil.backend.module.stopwatch.domain.event.StopwatchStartedEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -25,29 +26,41 @@ public class StopwatchService {
             final UUID memberId,
             final Long goalId
     ) {
+        // START 가능한지 여부 검증
         goalService.changeStatusToStarted(memberId, goalId);
 
+        // 스탑워치 새로운 기록 생성
         Stopwatch stopwatch = Stopwatch.of(goalId);
         stopwatchRepository.save(stopwatch);
 
+        // 오늘 총 진행 시간 가져오기 - 방금 시작된 스톱워치 시간은 제외
         Duration todayDuration = durationService.getTodayDuration(memberId);
 
-        Events.raise(StopwatchStatusChangedEvent.of(memberId, "STARTED", stopwatch.getStartedAt(), todayDuration));
+        // 스탑워치 정지 메세지 전송
+        Events.raise(
+                StopwatchStartedEvent.of(memberId, stopwatch, todayDuration)
+        );
     }
 
     public void pauseStopwatch(
             final UUID memberId,
             final Long goalId
     ) {
+        // PAUSE 가능한지 여부 검증
         goalService.changeStatusToPaused(memberId, goalId);
 
+        // 스탑워치 끝 시각 업데이트
         Stopwatch stopwatch = stopwatchRepository.findLatestByGoalId(goalId)
                 .orElseThrow(() -> new IllegalArgumentException("스톱워치 데이터가 존재하지 않습니다."));
         stopwatch.updateEndAt();
 
+        // 오늘 총 진행 시간 업데이트
         Duration updatedTodayDuration = durationService.updateTodayDuration(memberId, stopwatch.getDuration());
 
-        Events.raise(StopwatchStatusChangedEvent.of(memberId, "PAUSED", stopwatch.getStartedAt(), updatedTodayDuration));
+        // 스탑워치 정지 메세지 전송 + 목표 진행 시간 업데이트
+        Events.raise(
+                StopwatchPausedEvent.of(memberId, goalId, stopwatch, updatedTodayDuration)
+        );
     }
 
     public void completeStopwatch(
@@ -62,6 +75,8 @@ public class StopwatchService {
 
         Duration updatedTodayDuration = durationService.updateTodayDuration(memberId, stopwatch.getDuration());
 
-        Events.raise(StopwatchStatusChangedEvent.of(memberId, "COMPLETED", stopwatch.getStartedAt(), updatedTodayDuration));
+        Events.raise(
+                StopwatchPausedEvent.of(memberId, goalId, stopwatch, updatedTodayDuration)
+        );
     }
 }

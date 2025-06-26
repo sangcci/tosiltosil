@@ -136,4 +136,8 @@ public class Goal extends BaseEntity {
             throw new IllegalStateException("실행 중이 아닌 목표는 완료할 수 없습니다.");
         }
     }
+
+    public void addDuration(final Duration addedDuration) {
+        this.duration = this.duration.plus(addedDuration);
+    }
 }

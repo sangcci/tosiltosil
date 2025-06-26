@@ -1,10 +1,13 @@
 package tosiltosil.backend.module.goal.application;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
@@ -13,6 +16,7 @@ import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalResponse;
 import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
+import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +83,7 @@ public class GoalService {
         return GoalResponse.ofSingle(goal.getId());
     }
 
+    @Transactional
     public void changeStatusToStarted(
             final UUID memberId,
             final Long goalId
@@ -89,6 +94,7 @@ public class GoalService {
         goal.changeStatusToStarted();
     }
 
+    @Transactional
     public void changeStatusToPaused(
             final UUID memberId,
             final Long goalId
@@ -99,6 +105,7 @@ public class GoalService {
         goal.changeStatusToPaused();
     }
 
+    @Transactional
     public void changeStatusToCompleted(
             final UUID memberId,
             final Long goalId
@@ -107,5 +114,14 @@ public class GoalService {
                 .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
 
         goal.changeStatusToCompleted();
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void addDuration(final StopwatchPausedEvent event) {
+        Goal goal = goalRepository.findById(event.goalId())
+                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+
+        Duration addedDuration = Duration.between(event.startTime(), event.endTime());
+        goal.addDuration(addedDuration);
     }
 }
