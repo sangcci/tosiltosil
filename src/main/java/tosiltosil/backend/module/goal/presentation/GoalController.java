@@ -23,11 +23,12 @@ import tosiltosil.backend.module.goal.domain.response.GoalResponse;
 @RestController
 @RequestMapping("/api/v1/goals")
 @RequiredArgsConstructor
-public class GoalController {
+public class GoalController implements GoalApiSpecification {
 
     private final GoalService goalService;
 
     @GetMapping("/verify-create")
+    @Override
     public Response<GoalCreateValidateResponse> validateCreateGoal(
             final UUID memberId
     ) {
@@ -36,6 +37,7 @@ public class GoalController {
     }
 
     @PostMapping
+    @Override
     public Response<GoalResponse> createGoal(
             final UUID memberId,
             @RequestBody @Valid final GoalCreateRequest request
@@ -45,6 +47,7 @@ public class GoalController {
     }
 
     @PatchMapping("/{goalId}")
+    @Override
     public Response<GoalResponse> updateGoal(
             final UUID memberId,
             @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId,
@@ -55,6 +58,7 @@ public class GoalController {
     }
 
     @PatchMapping("/{goalId}/change-order")
+    @Override
     public void changeGoalSequence(
             final UUID memberId,
             @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId,
@@ -64,6 +68,7 @@ public class GoalController {
     }
 
     @DeleteMapping("/{goalId}")
+    @Override
     public Response<GoalResponse> deleteGoal(
             final UUID memberId,
             @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId

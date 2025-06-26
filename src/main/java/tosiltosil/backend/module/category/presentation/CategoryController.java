@@ -21,11 +21,12 @@ import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryApiSpecification {
 
     private final CategoryService categoryService;
 
     @PostMapping
+    @Override
     public Response<CategoryResponse> createGoal(
             final UUID memberId,
             @RequestBody @Valid final CategoryCreateRequest request
@@ -35,6 +36,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}")
+    @Override
     public Response<CategoryResponse> updateGoal(
             final UUID memberId,
             @PathVariable @NotNull(message = "카테고리 ID가 유효하지 않습니다. 카테고리 ID 숫자를 입력해야 합니다.") final Long categoryId,
@@ -45,6 +47,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}/change-order")
+    @Override
     public void changeCategorySequence(
             final UUID memberId,
             @PathVariable @NotNull(message = "카테고리 ID가 유효하지 않습니다. 카테고리 ID 숫자를 입력해야 합니다.") final Long categoryId,
@@ -54,6 +57,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
+    @Override
     public Response<CategoryResponse> deleteGoal(
             final UUID memberId,
             @PathVariable @NotNull(message = "카테고리 ID가 유효하지 않습니다. 카테고리 ID 숫자를 입력해야 합니다.") final Long categoryId
