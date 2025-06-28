@@ -6,7 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import tosiltosil.backend.common.auth.domain.TokenType;
+import tosiltosil.backend.common.auth.domain.value.TokenType;
 import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;

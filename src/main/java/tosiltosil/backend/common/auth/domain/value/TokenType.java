@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.auth.domain;
+package tosiltosil.backend.common.auth.domain.value;
 
 public enum TokenType {
     ACCESS,

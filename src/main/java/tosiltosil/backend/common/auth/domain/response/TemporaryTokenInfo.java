@@ -1,7 +1,7 @@
 package tosiltosil.backend.common.auth.domain.response;
 
 import io.jsonwebtoken.Claims;
-import tosiltosil.backend.common.auth.domain.TokenType;
+import tosiltosil.backend.common.auth.domain.value.TokenType;
 
 public record TemporaryTokenInfo(
         String key,
