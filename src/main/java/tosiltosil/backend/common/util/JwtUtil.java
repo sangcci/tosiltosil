@@ -6,10 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tosiltosil.backend.common.auth.domain.response.*;
 import tosiltosil.backend.common.auth.domain.value.TokenType;
-import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
-import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
-import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.common.properties.JwtProperties;
 
@@ -54,13 +52,23 @@ public class JwtUtil {
     public AccessTokenInfo parseAccessToken(String token) throws ExpiredJwtException {
         Claims claims = getClaims(token, generateAccessSecretKey());
         validateTokenType(TokenType.ACCESS.name(), claims);
-        return AccessTokenInfo.from(claims);
+        return AccessTokenInfo.from(token, claims);
     }
 
     public RefreshTokenInfo parseRefreshToken(String token) throws ExpiredJwtException {
         Claims claims = getClaims(token, generateRefreshSecretKey());
         validateTokenType(TokenType.REFRESH.name(), claims);
-        return RefreshTokenInfo.from(claims);
+        return RefreshTokenInfo.from(token, claims);
+    }
+
+    public Long getRefreshTokenExpiration(String token) {
+        Claims claims = getClaims(token, generateRefreshSecretKey());
+        return claims.getExpiration().getTime();
+    }
+
+    public Long getTemporaryTokenExpiration(String token) {
+        Claims claims = getClaims(token, generateTemporarySecretKey());
+        return claims.getExpiration().getTime();
     }
 
     private Claims getClaims(String token, SecretKey secretKey) {
