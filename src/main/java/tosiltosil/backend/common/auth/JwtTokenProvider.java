@@ -1,6 +1,7 @@
 package tosiltosil.backend.common.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
@@ -12,6 +13,7 @@ import tosiltosil.backend.module.auth.infrastructure.RefreshTokenRedisRepository
 
 import java.util.UUID;
 
+@Service
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
@@ -65,11 +67,12 @@ public class JwtTokenProvider {
     }
 
     public AccessTokenInfo retrieveAccessToken(String accessToken) {
-        try {
-            return jwtUtil.parseAccessToken(accessToken);
-        } catch (Exception e) {
-            return null;
-        }
+        AccessTokenInfo token = jwtUtil.parseAccessToken(accessToken);
+
+        if (token == null)
+            throw new UnauthorizedException("유효하지 않은 엑세스 토큰입니다.");
+
+        return token;
     }
 
     public RefreshTokenInfo retrieveRefreshToken(String refreshToken) {
@@ -77,7 +80,7 @@ public class JwtTokenProvider {
         String redisToken = getRefreshTokenFromRedis(tokenInfo.memberId());
 
         if (redisToken == null || !redisToken.equals(tokenInfo.token())) {
-            throw new UnauthorizedException("올바르지 않은 리프레시 토큰입니다.");
+            throw new UnauthorizedException("유효하지 않은 리프레시 토큰입니다.");
         }
 
         return tokenInfo;
