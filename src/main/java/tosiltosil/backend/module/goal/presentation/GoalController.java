@@ -1,7 +1,6 @@
 package tosiltosil.backend.module.goal.presentation;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +27,6 @@ public class GoalController implements GoalApiSpecification {
     private final GoalService goalService;
 
     @GetMapping("/verify-create")
-    @Override
     public Response<GoalCreateValidateResponse> validateCreateGoal(
             final UUID memberId
     ) {
@@ -37,7 +35,6 @@ public class GoalController implements GoalApiSpecification {
     }
 
     @PostMapping
-    @Override
     public Response<GoalResponse> createGoal(
             final UUID memberId,
             @RequestBody @Valid final GoalCreateRequest request
@@ -47,10 +44,9 @@ public class GoalController implements GoalApiSpecification {
     }
 
     @PatchMapping("/{goalId}")
-    @Override
     public Response<GoalResponse> updateGoal(
             final UUID memberId,
-            @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId,
+            @PathVariable final Long goalId,
             @RequestBody @Valid final GoalUpdateRequest request
     ) {
         GoalResponse response = goalService.updateGoal(memberId, goalId, request);
@@ -58,20 +54,18 @@ public class GoalController implements GoalApiSpecification {
     }
 
     @PatchMapping("/{goalId}/change-order")
-    @Override
     public void changeGoalSequence(
             final UUID memberId,
-            @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId,
+            @PathVariable final Long goalId,
             @RequestBody @Valid final GoalSequenceChangeRequest request
     ) {
         goalService.changeSequence(memberId, goalId, request);
     }
 
     @DeleteMapping("/{goalId}")
-    @Override
     public Response<GoalResponse> deleteGoal(
             final UUID memberId,
-            @PathVariable @NotNull(message = "목표 ID가 유효하지 않습니다. 목표 ID 숫자를 입력해야 합니다.") final Long goalId
+            @PathVariable final Long goalId
     ) {
         GoalResponse response = goalService.deleteGoal(memberId, goalId);
         return Response.ok("목표가 정상적으로 삭제되었습니다.", response);

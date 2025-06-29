@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.UUID;
 import tosiltosil.backend.common.web.response.ErrorResponse;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
@@ -14,8 +15,6 @@ import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalCreateValidateResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalResponse;
-
-import java.util.UUID;
 
 public interface GoalApiSpecification {
 

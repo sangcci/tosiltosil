@@ -1,7 +1,6 @@
 package tosiltosil.backend.module.category.presentation;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,7 +38,7 @@ public class CategoryController implements CategoryApiSpecification {
     @Override
     public Response<CategoryResponse> updateGoal(
             final UUID memberId,
-            @PathVariable @NotNull(message = "카테고리 ID가 유효하지 않습니다. 카테고리 ID 숫자를 입력해야 합니다.") final Long categoryId,
+            @PathVariable final Long categoryId,
             @RequestBody @Valid final CategoryUpdateRequest request
     ) {
         CategoryResponse response = categoryService.updateCategory(memberId, categoryId, request);
@@ -50,7 +49,7 @@ public class CategoryController implements CategoryApiSpecification {
     @Override
     public void changeCategorySequence(
             final UUID memberId,
-            @PathVariable @NotNull(message = "카테고리 ID가 유효하지 않습니다. 카테고리 ID 숫자를 입력해야 합니다.") final Long categoryId,
+            @PathVariable final Long categoryId,
             @RequestBody @Valid final CategorySequenceChangeRequest request
     ) {
         categoryService.changeSequence(memberId, categoryId, request);
@@ -60,7 +59,7 @@ public class CategoryController implements CategoryApiSpecification {
     @Override
     public Response<CategoryResponse> deleteGoal(
             final UUID memberId,
-            @PathVariable @NotNull(message = "카테고리 ID가 유효하지 않습니다. 카테고리 ID 숫자를 입력해야 합니다.") final Long categoryId
+            @PathVariable final Long categoryId
     ) {
         CategoryResponse response = categoryService.deleteCategory(memberId, categoryId);
         return Response.ok("카테고리가 정상적으로 삭제되었습니다.", response);
