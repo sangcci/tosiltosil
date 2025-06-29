@@ -17,6 +17,9 @@ public class DateValidator implements ConstraintValidator<IsDate, String> {
 
     @Override
     public boolean isValid(final String value, final ConstraintValidatorContext context) {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
         try {
             LocalDate.parse(value, DateTimeFormatter.ofPattern(this.pattern));
         } catch (DateTimeParseException e) {
