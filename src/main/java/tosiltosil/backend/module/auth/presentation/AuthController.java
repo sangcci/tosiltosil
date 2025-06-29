@@ -4,12 +4,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.auth.application.AuthService;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
+import tosiltosil.backend.module.auth.domain.request.LocalLoginRequest;
 import tosiltosil.backend.module.auth.domain.response.CreateLocalMemberResponse;
+import tosiltosil.backend.module.auth.domain.response.LocalLoginResponse;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -26,5 +29,17 @@ public class AuthController implements AuthApiSpecification {
     ) {
         CreateLocalMemberResponse response = authService.localSignUp(request, profileImage);
         return Response.create("정상적으로 일반 회원가입 되었습니다.", response);
+    }
+
+    @PostMapping("/login/local")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Response<LocalLoginResponse>> localLogin(
+            @Valid @RequestBody final LocalLoginRequest request
+    ) {
+        LocalLoginResponse response = authService.localLogin(request);
+        return ResponseEntity
+                .ok()
+                .headers(response.headers())
+                .body(Response.ok("정상적으로 로그인 되었습니다.", response));
     }
 }
