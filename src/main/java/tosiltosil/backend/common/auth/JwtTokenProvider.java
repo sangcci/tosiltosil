@@ -1,13 +1,14 @@
 package tosiltosil.backend.common.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
-import tosiltosil.backend.common.util.JwtUtil;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
+import tosiltosil.backend.common.util.JwtUtil;
 import tosiltosil.backend.module.auth.infrastructure.EmailRedisRepository;
 import tosiltosil.backend.module.auth.infrastructure.RefreshTokenRedisRepository;
 
@@ -67,23 +68,31 @@ public class JwtTokenProvider {
     }
 
     public AccessTokenInfo retrieveAccessToken(String accessToken) {
-        AccessTokenInfo token = jwtUtil.parseAccessToken(accessToken);
+        try {
+            AccessTokenInfo token = jwtUtil.parseAccessToken(accessToken);
 
-        if (token == null)
-            throw new UnauthorizedException("유효하지 않은 엑세스 토큰입니다.");
+            if (token == null)
+                throw new UnauthorizedException("유효하지 않은 엑세스 토큰입니다.");
 
-        return token;
+            return token;
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException("만료된 엑세스 토큰입니다.");
+        }
     }
 
     public RefreshTokenInfo retrieveRefreshToken(String refreshToken) {
-        RefreshTokenInfo tokenInfo = jwtUtil.parseRefreshToken(refreshToken);
-        String redisToken = getRefreshTokenFromRedis(tokenInfo.memberId());
+        try {
+            RefreshTokenInfo tokenInfo = jwtUtil.parseRefreshToken(refreshToken);
+            String redisToken = getRefreshTokenFromRedis(tokenInfo.memberId());
 
-        if (redisToken == null || !redisToken.equals(tokenInfo.token())) {
-            throw new UnauthorizedException("유효하지 않은 리프레시 토큰입니다.");
+            if (redisToken == null || !redisToken.equals(tokenInfo.token())) {
+                throw new UnauthorizedException("유효하지 않은 리프레시 토큰입니다.");
+            }
+
+            return tokenInfo;
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException("만료된 리프레시 토큰입니다.");
         }
-
-        return tokenInfo;
     }
 
     public String saveEmailToRedis(String email) {
