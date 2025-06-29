@@ -1,10 +1,10 @@
 package tosiltosil.backend.common.auth.domain.response;
 
 public record TokenPair(
-        String accessTokenInfo,
-        String refreshTokenInfo
+        String accessToken,
+        String refreshToken
 ) {
-    public static TokenPair of(String accessTokenInfo, String refreshTokenInfo) {
-        return new TokenPair(accessTokenInfo, refreshTokenInfo);
+    public static TokenPair of(String accessToken, String refreshToken) {
+        return new TokenPair(accessToken, refreshToken);
     }
 }
