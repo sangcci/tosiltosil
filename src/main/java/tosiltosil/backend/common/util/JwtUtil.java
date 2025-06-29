@@ -115,15 +115,15 @@ public class JwtUtil {
     }
 
     private SecretKey generateTemporarySecretKey() {
-        return generateSecretKey(jwtProperties.temporaryTokenSecret());
+        return generateSecretKey(jwtProperties.secret().temporary());
     }
 
     private SecretKey generateAccessSecretKey() {
-        return generateSecretKey(jwtProperties.accessTokenSecret());
+        return generateSecretKey(jwtProperties.secret().access());
     }
 
     private SecretKey generateRefreshSecretKey() {
-        return generateSecretKey(jwtProperties.refreshTokenSecret());
+        return generateSecretKey(jwtProperties.secret().refresh());
     }
 
     private void validateTokenType(String validTokenType, Claims claims) {
