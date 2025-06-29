@@ -25,10 +25,10 @@ public class JwtUtil {
     private static final String TOKEN_TYPE = "type";
     private static final String CACHE_KEY = "cacheKey";
 
-    public String generateTemporaryToken(UUID memberId, String cacheKey) {
+    public String generateTemporaryToken(String cacheKey) {
         Date issuedAt = new Date();
         Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.expiration().temporary());
-        return buildTemporaryToken(memberId, cacheKey, issuedAt, expiredAt);
+        return buildTemporaryToken(cacheKey, issuedAt, expiredAt);
     }
 
     public String generateAccessToken(UUID memberId) {
@@ -79,10 +79,9 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    private String buildTemporaryToken(UUID memberId, String cacheKey, Date issuedAt, Date expiredAt) {
+    private String buildTemporaryToken(String cacheKey, Date issuedAt, Date expiredAt) {
         return Jwts.builder()
                 .issuedAt(issuedAt)
-                .subject(memberId.toString())
                 .expiration(expiredAt)
                 .claim(CACHE_KEY, cacheKey)
                 .claim(TOKEN_TYPE, TokenType.TEMPORARY.name())
