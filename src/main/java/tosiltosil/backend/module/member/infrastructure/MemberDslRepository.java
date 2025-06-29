@@ -3,7 +3,10 @@ package tosiltosil.backend.module.member.infrastructure;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.value.LoginType;
+
+import java.util.Optional;
 
 import static tosiltosil.backend.module.member.domain.QMember.member;
 
@@ -31,5 +34,14 @@ public class MemberDslRepository {
                         member.loginType.eq(loginType)
                 )
                 .fetchFirst() != null;
+    }
+
+    public Optional<Member> findByEmail(String email) {
+        return Optional.ofNullable(
+                queryFactory
+                .selectFrom(member)
+                .where(member.email.eq(email))
+                .fetchOne()
+        );
     }
 }
