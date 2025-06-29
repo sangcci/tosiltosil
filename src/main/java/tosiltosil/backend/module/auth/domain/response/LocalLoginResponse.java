@@ -2,7 +2,6 @@ package tosiltosil.backend.module.auth.domain.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.http.HttpHeaders;
 
 import java.util.UUID;
 
@@ -11,13 +10,17 @@ public record LocalLoginResponse(
         UUID memberId,
 
         @JsonIgnore
-        HttpHeaders headers
+        String accessToken,
+
+        @JsonIgnore
+        String refreshToken
 
         ) {
     public static LocalLoginResponse of(
             final UUID memberId,
-            final HttpHeaders headers
+            final String accessToken,
+            final String refreshToken
     ) {
-        return new LocalLoginResponse(memberId, headers);
+        return new LocalLoginResponse(memberId, accessToken, refreshToken);
     }
 }

@@ -1,7 +1,6 @@
 package tosiltosil.backend.module.auth.application;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,9 +67,7 @@ public class AuthService {
         validatePassword(request.password(), memberId);
 
         TokenPair authTokens = jwtTokenProvider.createTokenPair(memberId);
-        HttpHeaders headers = cookieUtil.generateAccessAndRefreshTokenCookies(authTokens.accessToken(), authTokens.refreshToken());
-
-        return LocalLoginResponse.of(memberId, headers);
+        return LocalLoginResponse.of(memberId, authTokens.accessToken(), authTokens.refreshToken());
     }
 
     private void validatePassword(

@@ -2,11 +2,13 @@ package tosiltosil.backend.module.auth.presentation;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.auth.application.AuthService;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
@@ -20,6 +22,7 @@ import tosiltosil.backend.module.auth.domain.response.LocalLoginResponse;
 public class AuthController implements AuthApiSpecification {
 
     private final AuthService authService;
+    private final CookieUtil cookieUtil;
 
     @PostMapping(value = "/signup/local", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -32,14 +35,15 @@ public class AuthController implements AuthApiSpecification {
     }
 
     @PostMapping("/login/local")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Response<LocalLoginResponse>> localLogin(
             @Valid @RequestBody final LocalLoginRequest request
     ) {
         LocalLoginResponse response = authService.localLogin(request);
+        HttpHeaders headers = cookieUtil.generateAccessAndRefreshTokenCookies(response.accessToken(), response.refreshToken());
         return ResponseEntity
                 .ok()
-                .headers(response.headers())
+                .headers(headers)
                 .body(Response.ok("정상적으로 로그인 되었습니다.", response));
     }
 }
