@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.duration.infrastructure;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ public class DurationRepositoryImpl implements DurationRepository {
     private final DurationRedisRepository durationRedisRepository;
 
     @Override
-    public DailyDuration findByMemberId(final UUID memberId) {
+    public Optional<DailyDuration> findByMemberId(final UUID memberId) {
         return durationJpaRepository.findByMemberId(memberId);
     }
 

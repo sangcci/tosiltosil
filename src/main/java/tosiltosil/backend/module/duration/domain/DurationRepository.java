@@ -1,11 +1,12 @@
 package tosiltosil.backend.module.duration.domain;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface DurationRepository {
 
-    DailyDuration findByMemberId(UUID memberId);
+    Optional<DailyDuration> findByMemberId(UUID memberId);
 
     Duration findTodayDuration(UUID memberId);
 
