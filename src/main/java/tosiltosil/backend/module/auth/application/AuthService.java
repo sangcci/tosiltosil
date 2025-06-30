@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
-import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
 import tosiltosil.backend.module.auth.domain.request.LocalLoginRequest;
 import tosiltosil.backend.module.auth.domain.response.CreateLocalMemberResponse;
@@ -28,7 +27,6 @@ public class AuthService {
     private final MemberService memberService;
     private final TermsService termsService;
     private final PasswordEncoder passwordEncoder;
-    private final CookieUtil cookieUtil;
     private final JwtTokenProvider jwtTokenProvider;
 
     /* TODO
@@ -78,6 +76,5 @@ public class AuthService {
 
         if (!passwordEncoder.matches(password, encryptPassword))
             throw new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다.");
-
     }
 }

@@ -11,7 +11,6 @@ import tosiltosil.backend.module.member.domain.LocalAccountRepository;
 import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.MemberRepository;
 import tosiltosil.backend.module.member.domain.value.LoginType;
-import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
 
 import java.util.UUID;
 
