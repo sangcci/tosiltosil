@@ -1,4 +1,4 @@
-package tosiltosil.backend.common.util;
+package tosiltosil.backend.common.auth.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

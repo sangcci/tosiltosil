@@ -8,7 +8,7 @@ import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
-import tosiltosil.backend.common.util.JwtUtil;
+import tosiltosil.backend.common.auth.util.JwtUtil;
 import tosiltosil.backend.module.auth.infrastructure.EmailRedisRepository;
 import tosiltosil.backend.module.auth.infrastructure.RefreshTokenRedisRepository;
 
