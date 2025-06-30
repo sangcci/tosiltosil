@@ -11,7 +11,7 @@ public record TemporaryTokenInfo(
 ) {
     public static TemporaryTokenInfo from(Claims claims) {
         return new TemporaryTokenInfo(
-                claims.get("key", UUID.class),
+                UUID.fromString(claims.get("cacheKey", String.class)),
                 TokenType.valueOf(claims.get("type", String.class))
         );
     }
