@@ -16,6 +16,8 @@ import tosiltosil.backend.module.auth.domain.request.LocalLoginRequest;
 import tosiltosil.backend.module.auth.domain.response.CreateLocalMemberResponse;
 import tosiltosil.backend.module.auth.domain.response.LocalLoginResponse;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -45,5 +47,17 @@ public class AuthController implements AuthApiSpecification {
                 .ok()
                 .headers(headers)
                 .body(Response.ok("정상적으로 로그인 되었습니다.", response));
+    }
+
+    @GetMapping("/reissue")
+    public ResponseEntity<Response<Map<String, Object>>> reissueAccessToken(
+            @CookieValue(name = "refresh-token") final String refreshToken
+    ) {
+        String accessToken = authService.reissueAccessToken(refreshToken);
+        HttpHeaders headers = cookieUtil.generateAccessTokenCookies(accessToken);
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(Response.ok("정상적으로 엑세스 토큰을 재발급했습니다."));
     }
 }

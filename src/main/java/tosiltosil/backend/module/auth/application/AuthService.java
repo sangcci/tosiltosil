@@ -56,6 +56,7 @@ public class AuthService {
         return CreateLocalMemberResponse.of(member.getNickname());
     }
 
+    @Transactional
     public LocalLoginResponse localLogin(
             final LocalLoginRequest request
     ) {
@@ -66,6 +67,11 @@ public class AuthService {
 
         TokenPair authTokens = jwtTokenProvider.createTokenPair(memberId);
         return LocalLoginResponse.of(memberId, authTokens.accessToken(), authTokens.refreshToken());
+    }
+
+    @Transactional
+    public String reissueAccessToken(String refreshToken) {
+        return jwtTokenProvider.reissueAccessToken(refreshToken);
     }
 
     private void validatePassword(
