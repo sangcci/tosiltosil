@@ -25,7 +25,7 @@ public class JwtTokenProvider {
     private static final long RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000L; // 24시간 (하루)
 
     public String createTemporaryToken(String email) {
-        String cacheKey = saveEmailToRedis(email);
+        UUID cacheKey = saveEmailToRedis(email);
         return jwtUtil.generateTemporaryToken(cacheKey);
     }
 
@@ -95,7 +95,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String saveEmailToRedis(String email) {
+    public UUID saveEmailToRedis(String email) {
         UUID cacheKey = UUID.fromString(email);
 
         Long expiration = jwtUtil.getTemporaryTokenExpiration(email);
@@ -104,7 +104,7 @@ public class JwtTokenProvider {
 
         emailRedisRepository.save(cacheKey, email, ttl);
 
-        return cacheKey.toString();
+        return cacheKey;
     }
 
     public void saveRefreshTokenToRedis(UUID memberId, String refreshToken) {

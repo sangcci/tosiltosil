@@ -6,9 +6,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import tosiltosil.backend.common.auth.domain.response.*;
+import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
+import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
+import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.auth.domain.value.TokenType;
-import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.common.properties.JwtProperties;
 
 import javax.crypto.SecretKey;
@@ -25,7 +26,7 @@ public class JwtUtil {
     private static final String TOKEN_TYPE = "type";
     private static final String CACHE_KEY = "cacheKey";
 
-    public String generateTemporaryToken(String cacheKey) {
+    public String generateTemporaryToken(UUID cacheKey) {
         Date issuedAt = new Date();
         Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.expiration().temporary());
         return buildTemporaryToken(cacheKey, issuedAt, expiredAt);
@@ -45,19 +46,16 @@ public class JwtUtil {
 
     public TemporaryTokenInfo parseTemporaryToken(String token) throws ExpiredJwtException {
         Claims claims = getClaims(token, generateTemporarySecretKey());
-        validateTokenType(TokenType.TEMPORARY.name(), claims);
         return TemporaryTokenInfo.from(claims);
     }
 
     public AccessTokenInfo parseAccessToken(String token) throws ExpiredJwtException {
         Claims claims = getClaims(token, generateAccessSecretKey());
-        validateTokenType(TokenType.ACCESS.name(), claims);
         return AccessTokenInfo.from(token, claims);
     }
 
     public RefreshTokenInfo parseRefreshToken(String token) throws ExpiredJwtException {
         Claims claims = getClaims(token, generateRefreshSecretKey());
-        validateTokenType(TokenType.REFRESH.name(), claims);
         return RefreshTokenInfo.from(token, claims);
     }
 
@@ -79,7 +77,7 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    private String buildTemporaryToken(String cacheKey, Date issuedAt, Date expiredAt) {
+    private String buildTemporaryToken(UUID cacheKey, Date issuedAt, Date expiredAt) {
         return Jwts.builder()
                 .issuedAt(issuedAt)
                 .expiration(expiredAt)
@@ -123,12 +121,5 @@ public class JwtUtil {
 
     private SecretKey generateRefreshSecretKey() {
         return generateSecretKey(jwtProperties.secretKey().refresh());
-    }
-
-    private void validateTokenType(String validTokenType, Claims claims) {
-        String tokenType = claims.get(TOKEN_TYPE, String.class);
-
-        if(tokenType == null || !tokenType.equals(validTokenType))
-            throw new UnauthorizedException("잘못된 Type의 토큰입니다.");
     }
 }
