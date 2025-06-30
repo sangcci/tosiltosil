@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.auth.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,8 +24,8 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -161,5 +162,21 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors[0].reason").value("비밀번호는 영문, 숫자, 특수문자를 포함하여 8글자 이상으로 입력해주세요."));
+    }
+
+    @Test
+    void 엑세스_토큰_재발급() throws Exception {
+        // given
+        String newAccessToken = "access-token";
+        String refreshToken = "refresh-token";
+
+        given(authService.reissueAccessToken(refreshToken)).willReturn(newAccessToken);
+        given(cookieUtil.generateAccessTokenCookies(newAccessToken)).willReturn(new HttpHeaders());
+
+        // when & then
+        mockMvc.perform(get("/api/v1/auth/reissue")
+                .cookie(new Cookie("refresh-token", refreshToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("정상적으로 엑세스 토큰을 재발급했습니다."));
     }
 }
