@@ -64,7 +64,7 @@ public interface CategoryApiSpecification {
                     )
             )
     })
-    Response<CategoryResponse> createGoal(UUID memberId, CategoryCreateRequest request);
+    Response<CategoryResponse> createCategory(UUID memberId, CategoryCreateRequest request);
 
     @Tag(name = "Category", description = "카테고리 수정")
     @Operation(summary = "카테고리 수정", description = "기존 카테고리의 정보를 수정합니다.")
@@ -112,7 +112,7 @@ public interface CategoryApiSpecification {
                     )
             )
     })
-    Response<CategoryResponse> updateGoal(UUID memberId, Long categoryId, CategoryUpdateRequest request);
+    Response<CategoryResponse> updateCategory(UUID memberId, Long categoryId, CategoryUpdateRequest request);
 
     @Tag(name = "Category", description = "카테고리 순서 변경")
     @Operation(summary = "카테고리 순서 변경", description = "카테고리의 순서를 변경합니다.")
@@ -208,5 +208,5 @@ public interface CategoryApiSpecification {
                     )
             )
     })
-    Response<CategoryResponse> deleteGoal(UUID memberId, Long categoryId);
+    Response<CategoryResponse> deleteCategory(UUID memberId, Long categoryId);
 }

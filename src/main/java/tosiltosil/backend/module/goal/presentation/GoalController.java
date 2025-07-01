@@ -3,12 +3,14 @@ package tosiltosil.backend.module.goal.presentation;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.application.GoalService;
@@ -25,7 +27,9 @@ public class GoalController implements GoalApiSpecification {
     private final GoalService goalService;
 
 
+    @Override
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Response<GoalResponse> createGoal(
             final UUID memberId,
             @RequestBody @Valid final GoalCreateRequest request
@@ -34,6 +38,7 @@ public class GoalController implements GoalApiSpecification {
         return Response.create("목표가 정상적으로 생성되었습니다.", response);
     }
 
+    @Override
     @PatchMapping("/{goalId}")
     public Response<GoalResponse> updateGoal(
             final UUID memberId,
@@ -44,6 +49,7 @@ public class GoalController implements GoalApiSpecification {
         return Response.ok("목표가 정상적으로 수정되었습니다.", response);
     }
 
+    @Override
     @PatchMapping("/{goalId}/change-order")
     public void changeGoalSequence(
             final UUID memberId,
@@ -53,6 +59,7 @@ public class GoalController implements GoalApiSpecification {
         goalService.changeSequence(memberId, goalId, request);
     }
 
+    @Override
     @DeleteMapping("/{goalId}")
     public Response<GoalResponse> deleteGoal(
             final UUID memberId,
