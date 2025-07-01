@@ -1,6 +1,5 @@
 package tosiltosil.backend.module.stopwatch.domain.event;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -8,11 +7,9 @@ import tosiltosil.backend.module.stopwatch.domain.Stopwatch;
 
 public record StopwatchPausedEvent(
         UUID memberId,
-        @JsonIgnore
         Long goalId,
         String type,
         LocalDateTime startTime,
-        @JsonIgnore
         LocalDateTime endTime,
         Duration totalTime
 ) {
