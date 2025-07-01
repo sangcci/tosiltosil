@@ -107,7 +107,7 @@ public class Goal extends BaseEntity {
         Duration oneMinute = Duration.ofMinutes(1);
         Duration twentyFourHours = Duration.ofHours(24);
 
-        if (totalTime.isNegative() || totalTime.isZero() ||
+        if (totalTime.isNegative() ||
                 totalTime.compareTo(oneMinute) < 0 ||
                 totalTime.compareTo(twentyFourHours) >= 0) {
             throw new BadRequestException("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다");
