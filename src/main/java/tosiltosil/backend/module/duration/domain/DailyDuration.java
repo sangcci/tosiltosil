@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "UniqueMemberIdAndDate", columnNames = {"memberId", "date"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DailyDuration extends BaseEntity {
@@ -25,7 +28,7 @@ public class DailyDuration extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    @Column(nullable = false, columnDefinition = "BINARY(16)")
     private UUID memberId;
 
     @Column(nullable = false)
