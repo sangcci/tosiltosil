@@ -2,7 +2,7 @@ package tosiltosil.backend.module.category.application;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.category.domain.Category;
@@ -13,7 +13,7 @@ import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CategoryService {
 
@@ -41,8 +41,8 @@ public class CategoryService {
             final Long categoryId,
             final CategoryUpdateRequest request
     ) {
-        Category category = categoryRepository.findByIdAndMemberId(categoryId, memberId)
-                .orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
+        category.validateIsMine(memberId);
 
         category.updateBasicInfo(request.title(), request.color());
 
@@ -63,8 +63,8 @@ public class CategoryService {
             final UUID memberId,
             final Long categoryId
     ) {
-        Category category = categoryRepository.findByIdAndMemberId(categoryId, memberId)
-                .orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
+        category.validateIsMine(memberId);
 
         categoryRepository.delete(category);
         return CategoryResponse.of(category.getId());
