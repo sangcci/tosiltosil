@@ -21,11 +21,6 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public Optional<Goal> findByIdAndMemberId(final Long goalId, final UUID memberId) {
-        return goalJpaRepository.findByIdAndMemberId(goalId, memberId);
-    }
-
-    @Override
     public List<Goal> findTodayGoalsByMemberId(final UUID memberId) {
         return goalJpaRepository.findByMemberIdAndDate(memberId, LocalDate.now());
     }

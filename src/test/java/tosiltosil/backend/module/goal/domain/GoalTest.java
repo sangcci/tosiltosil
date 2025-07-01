@@ -8,10 +8,24 @@ import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import tosiltosil.backend.common.domain.exception.ConflictException;
+import tosiltosil.backend.common.domain.exception.ForbiddenException;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @SuppressWarnings("NonAsciiCharacters")
 class GoalTest {
+
+    @Test
+    void 자신의_목표가_아니면_예외_발생() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        UUID differentMemberId = UUID.randomUUID();
+        Goal goal = createGoalWithStatus(memberId, GoalStatus.BEFORE_STARTING);
+
+        // when & then
+        assertThatThrownBy(() -> goal.validateIsMine(differentMemberId))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("해당 목표에 접근할 권한이 없습니다.");
+    }
 
     @Test
     void BEFORE_STARTING_상태에서_시작_상태로_변경한다() {

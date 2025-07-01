@@ -8,8 +8,6 @@ public interface GoalRepository {
 
     Optional<Goal> findById(Long goalId);
 
-    Optional<Goal> findByIdAndMemberId(Long goalId, UUID memberId);
-
     List<Goal> findTodayGoalsByMemberId(UUID memberId);
 
     Goal save(Goal goal);

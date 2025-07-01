@@ -44,8 +44,8 @@ public class GoalService {
             final Long goalId,
             final GoalUpdateRequest request
     ) {
-        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
-                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        goal.validateIsMine(memberId);
 
         goal.updateBasicInfo(request.title(), request.categoryId(), request.iconId());
         goal.changeDate(LocalDate.parse(request.date()));
@@ -67,8 +67,8 @@ public class GoalService {
             final UUID memberId,
             final Long goalId
     ) {
-        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
-                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        goal.validateIsMine(memberId);
 
         goalRepository.delete(goal);
         return GoalResponse.ofSingle(goal.getId());
@@ -79,8 +79,8 @@ public class GoalService {
             final UUID memberId,
             final Long goalId
     ) {
-        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
-                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        goal.validateIsMine(memberId);
 
         goal.changeStatusToStarted();
     }
@@ -90,8 +90,8 @@ public class GoalService {
             final UUID memberId,
             final Long goalId
     ) {
-        Goal goal = goalRepository.findByIdAndMemberId(goalId, memberId)
-                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        goal.validateIsMine(memberId);
 
         goal.changeStatusToPaused();
     }

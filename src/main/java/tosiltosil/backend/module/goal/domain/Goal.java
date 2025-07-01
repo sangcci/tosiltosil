@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
+import tosiltosil.backend.common.domain.exception.ForbiddenException;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @Entity
@@ -118,6 +120,12 @@ public class Goal extends BaseEntity {
         LocalDate today = LocalDate.now();
         if (date.isBefore(today)) {
             throw new BadRequestException("날짜는 오늘 이후여야 합니다.");
+        }
+    }
+
+    public void validateIsMine(final UUID memberId) {
+        if (!Objects.equals(this.memberId, memberId)) {
+            throw new ForbiddenException("해당 목표에 접근할 권한이 없습니다.");
         }
     }
 
