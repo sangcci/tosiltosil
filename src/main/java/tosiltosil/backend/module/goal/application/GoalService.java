@@ -16,7 +16,6 @@ import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalResponse;
-import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 
 @Service
@@ -24,21 +23,12 @@ import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 public class GoalService {
 
     private final GoalRepository goalRepository;
-    private final GoalDomainService goalDomainService;
-
-    @Transactional(readOnly = true)
-    public void validateCreateGoal(
-            final UUID memberId
-    ) {
-        goalDomainService.validateCreation(memberId);
-    }
 
     @Transactional
     public GoalResponse createGoal(
             final UUID memberId,
             final GoalCreateRequest request
     ) {
-        goalDomainService.validateCreation(memberId);
         // TODO: 순서 구현
 
         List<Goal> goals = request.toEntities(memberId);

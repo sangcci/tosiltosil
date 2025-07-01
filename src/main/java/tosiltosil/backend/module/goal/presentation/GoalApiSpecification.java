@@ -13,58 +13,9 @@ import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalCreateValidateResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalResponse;
 
 public interface GoalApiSpecification {
-
-    @Tag(name = "Goal", description = "목표 생성 검증")
-    @Operation(summary = "목표 생성 검증", description = "목표 생성 가능 여부를 확인합니다.")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "목표 생성 검증 완료"
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "목표 생성 불가",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "목표 생성 제한",
-                                    summary = "목표 생성 제한에 걸렸을 때의 응답",
-                                    value = """
-                            {
-                              "status": 400,
-                              "message": "목표 생성 제한에 도달했습니다.",
-                              "errors": []
-                            }
-                        """
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "회원을 찾을 수 없음",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "회원 없음",
-                                    summary = "회원 정보가 존재하지 않을 때의 응답",
-                                    value = """
-                            {
-                              "status": 404,
-                              "message": "회원을 찾을 수 없습니다.",
-                              "errors": []
-                            }
-                        """
-                            )
-                    )
-            )
-    })
-    Response<GoalCreateValidateResponse> validateCreateGoal(UUID memberId);
 
     @Tag(name = "Goal", description = "목표 생성")
     @Operation(summary = "목표 생성", description = "새로운 목표를 생성합니다.")
