@@ -1,6 +1,7 @@
 package tosiltosil.backend.common.auth;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
@@ -9,8 +10,8 @@ import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.auth.util.JwtUtil;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
-import tosiltosil.backend.module.auth.infrastructure.RefreshTokenRedisRepository;
 import tosiltosil.backend.module.auth.infrastructure.TemporaryTokenRedisRepository;
+import tosiltosil.backend.module.auth.infrastructure.RefreshTokenRedisRepository;
 
 import java.util.UUID;
 
@@ -30,61 +31,43 @@ public class JwtTokenProvider {
         return temporaryToken;
     }
 
-    public String reissueAccessToken(String refreshToken) {
-        RefreshTokenInfo tokenInfo = retrieveRefreshToken(refreshToken);
-        return createAccessToken(tokenInfo.memberId());
-    }
-
-    public TokenPair reissueAllToken(String accessToken, String refreshToken) {
-
-        RefreshTokenInfo tokenInfo = retrieveRefreshToken(refreshToken);
-        UUID memberId = tokenInfo.memberId();
-
-        long now = System.currentTimeMillis();
-        long expiration = getRefreshTokenExpirationTime(refreshToken);
-
-        if (expiration - now < RENEWAL_THRESHOLD) {
-            deleteRefreshTokenFromRedis(memberId);
-            return createTokenPair(memberId);
-        }
-
+    public TokenPair createTokens(UUID memberId) {
+        String newRefreshToken = createRefreshToken(memberId);
         String newAccessToken = createAccessToken(memberId);
-        return TokenPair.of(newAccessToken, refreshToken);
+        return TokenPair.of(newAccessToken, newRefreshToken);
     }
 
-    public TokenPair createTokenPair(UUID memberId) {
-        String accessToken = createAccessToken(memberId);
-        String refreshToken = createRefreshToken(memberId);
-        return TokenPair.of(accessToken, refreshToken);
+    public TokenPair reissueTokens(String refreshToken) {
+        RefreshTokenInfo refreshTokenInfo = retrieveRefreshToken(refreshToken);
+        return createTokens(refreshTokenInfo.memberId());
     }
 
     public TemporaryTokenInfo retrieveTemporaryToken(String temporaryToken) {
+        try {
+            TemporaryTokenInfo tokenInfo = jwtUtil.parseTemporaryToken(temporaryToken);
+            String redisToken = getTemporaryTokenFromRedis(tokenInfo.email());
 
-        TemporaryTokenInfo tokenInfo = jwtUtil.parseTemporaryToken(temporaryToken);
-        String redisToken = getTemporaryTokenFromRedis(tokenInfo.email());
+            if (redisToken == null || !redisToken.equals(tokenInfo.email()) ) {
+                deleteTemporaryTokenFromRedis(tokenInfo.email());
+                throw new UnauthorizedException("유효하지 않은 토큰입니다.");
+            }
 
-        if (redisToken == null) {
-            throw new UnauthorizedException("올바르지 않은 임시 토큰입니다.");
+            return tokenInfo;
+
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException("토큰이 만료되었습니다.");
+        } catch (MalformedJwtException e) {
+            throw new UnauthorizedException("잘못된 형식의 토큰입니다.");
         }
-
-        if (!redisToken.equals(tokenInfo.email())) {
-            deleteTemporaryTokenFromRedis(tokenInfo.email());
-            throw new UnauthorizedException("유효하지 않은 임시 토큰입니다.");
-        }
-
-        return tokenInfo;
     }
 
     public AccessTokenInfo retrieveAccessToken(String accessToken) {
         try {
-            AccessTokenInfo token = jwtUtil.parseAccessToken(accessToken);
-
-            if (token == null)
-                throw new UnauthorizedException("유효하지 않은 엑세스 토큰입니다.");
-
-            return token;
+            return jwtUtil.parseAccessToken(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException("만료된 엑세스 토큰입니다.");
+            throw new UnauthorizedException("토큰이 만료되었습니다.");
+        } catch (MalformedJwtException e) {
+            throw new UnauthorizedException("잘못된 형식의 토큰입니다.");
         }
     }
 
@@ -94,21 +77,16 @@ public class JwtTokenProvider {
             String redisToken = getRefreshTokenFromRedis(tokenInfo.memberId());
 
             if (redisToken == null || !redisToken.equals(tokenInfo.token())) {
+                deleteRefreshTokenFromRedis(tokenInfo.memberId());
                 throw new UnauthorizedException("유효하지 않은 리프레시 토큰입니다.");
             }
 
             return tokenInfo;
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException("만료된 리프레시 토큰입니다.");
+        } catch (MalformedJwtException e) {
+            throw new UnauthorizedException("잘못된 형식의 토큰입니다.");
         }
-    }
-
-    public void saveRefreshTokenToRedis(UUID memberId, String refreshToken) {
-        Long expiration = jwtUtil.getRefreshTokenExpiration(refreshToken);
-        long now = System.currentTimeMillis();
-        long ttl = expiration - now;
-
-        refreshTokenRedisRepository.save(memberId, refreshToken, ttl);
     }
 
     private String createAccessToken(UUID memberId)  {
@@ -130,6 +108,14 @@ public class JwtTokenProvider {
         long ttl = expiration - System.currentTimeMillis();
 
         temporaryTokenRedisRepository.save(email, temporaryToken, ttl);
+    }
+
+    private void saveRefreshTokenToRedis(UUID memberId, String refreshToken) {
+        Long expiration = jwtUtil.getRefreshTokenExpiration(refreshToken);
+        long now = System.currentTimeMillis();
+        long ttl = expiration - now;
+
+        refreshTokenRedisRepository.save(memberId, refreshToken, ttl);
     }
 
     private String getTemporaryTokenFromRedis(String email) {
