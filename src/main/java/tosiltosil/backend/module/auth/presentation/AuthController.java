@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.auth.application.AuthService;
@@ -50,14 +51,17 @@ public class AuthController implements AuthApiSpecification {
     }
 
     @GetMapping("/reissue")
-    public ResponseEntity<Response<Map<String, Object>>> reissueAccessToken(
+    public ResponseEntity<Response<Map<String, Object>>> reissueTokens(
             @CookieValue(name = "refresh-token") final String refreshToken
     ) {
-        String accessToken = authService.reissueAccessToken(refreshToken);
-        HttpHeaders headers = cookieUtil.generateAccessTokenCookies(accessToken);
+        TokenPair reissuedTokens = authService.reissueTokens(refreshToken);
+        String newAccessToken = reissuedTokens.accessToken();
+        String newRefreshToken = reissuedTokens.refreshToken();
+
+        HttpHeaders headers = cookieUtil.generateAccessAndRefreshTokenCookies(newAccessToken, newRefreshToken);
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(Response.ok("정상적으로 엑세스 토큰을 재발급했습니다."));
+                .body(Response.ok("정상적으로 토큰을 재발급했습니다."));
     }
 }

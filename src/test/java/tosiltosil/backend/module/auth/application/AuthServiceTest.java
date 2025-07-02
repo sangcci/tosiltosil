@@ -54,7 +54,7 @@ class AuthServiceTest {
         when(memberService.findByEmail(email)).thenReturn(member);
         when(memberService.findPasswordByMemberId(memberId)).thenReturn(encryptedPassword);
         when(passwordEncoder.matches(request.password(), encryptedPassword)).thenReturn(true);
-        when(jwtTokenProvider.createTokenPair(memberId)).thenReturn(tokenPair);
+        when(jwtTokenProvider.createTokens(memberId)).thenReturn(tokenPair);
 
         // when
         LocalLoginResponse response = authService.localLogin(request);

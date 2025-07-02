@@ -151,13 +151,13 @@ public interface AuthApiSpecification {
 
     @Tag(name = "Auth", description = "인증 관련 API")
     @Operation(
-            summary = "Access Token 재발급",
-            description = "Refresh Token을 받아 새로운 Access Token을 재발급합니다."
+            summary = "Access & Refresh Token 재발급",
+            description = "Refresh Token을 받아 새로운 Access Token과 Refresh Token을 재발급합니다."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "정상적으로 엑세스 토큰을 재발급했습니다.",
+                    description = "정상적으로 토큰을 재발급했습니다.",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Response.class),
@@ -166,7 +166,7 @@ public interface AuthApiSpecification {
                                     value = """
                 {
                   "status": 200,
-                  "message": "정상적으로 엑세스 토큰을 재발급했습니다.",
+                  "message": "정상적으로 토큰을 재발급했습니다.",
                   "data": {}
                 }
                 """
@@ -185,7 +185,7 @@ public interface AuthApiSpecification {
                                     value = """
                 {
                   "status": 401,
-                  "message": "유효하지 않은 리프레시 토큰입니다.",
+                  "message": "유효하지 않은 토큰입니다.",
                   "errors": []
                 }
                 """
@@ -231,7 +231,7 @@ public interface AuthApiSpecification {
                     )
             )
     })
-    public ResponseEntity<Response<Map<String, Object>>> reissueAccessToken(
+    public ResponseEntity<Response<Map<String, Object>>> reissueTokens(
             @Parameter(hidden = true)
             @CookieValue(name = "refresh-token") final String refreshToken
     );

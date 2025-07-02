@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.config.TestSecurityConfig;
 import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.module.auth.application.AuthService;
@@ -165,18 +166,29 @@ public class AuthControllerTest {
     }
 
     @Test
-    void 엑세스_토큰_재발급() throws Exception {
+    void 엑세스와_리프레시_토큰_재발급() throws Exception {
         // given
-        String newAccessToken = "access-token";
-        String refreshToken = "refresh-token";
+        String exRefreshToken = "ex-refresh-token";
+        String newAccessToken = "new-access-token";
+        String newRefreshToken = "new-refresh-token";
+        TokenPair tokenPair = new TokenPair(newAccessToken, newRefreshToken);
 
-        given(authService.reissueAccessToken(refreshToken)).willReturn(newAccessToken);
-        given(cookieUtil.generateAccessTokenCookies(newAccessToken)).willReturn(new HttpHeaders());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, "access-token=new-access-token; Path=/; HttpOnly");
+        headers.add(HttpHeaders.SET_COOKIE, "refresh-token=new-refresh-token; Path=/; HttpOnly");
+
+        given(authService.reissueTokens(exRefreshToken)).willReturn(tokenPair);
+        given(cookieUtil.generateAccessAndRefreshTokenCookies(newAccessToken, newRefreshToken))
+                .willReturn(headers);
 
         // when & then
         mockMvc.perform(get("/api/v1/auth/reissue")
-                .cookie(new Cookie("refresh-token", refreshToken)))
+                        .cookie(new Cookie("refresh-token", exRefreshToken)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("정상적으로 엑세스 토큰을 재발급했습니다."));
+                .andExpect(header().stringValues(HttpHeaders.SET_COOKIE,
+                        "access-token=new-access-token; Path=/; HttpOnly",
+                        "refresh-token=new-refresh-token; Path=/; HttpOnly"))
+                .andExpect(jsonPath("$.message").value("정상적으로 토큰을 재발급했습니다."))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 }

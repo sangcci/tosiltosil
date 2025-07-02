@@ -65,13 +65,13 @@ public class AuthService {
 
         validatePassword(request.password(), memberId);
 
-        TokenPair authTokens = jwtTokenProvider.createTokenPair(memberId);
+        TokenPair authTokens = jwtTokenProvider.createTokens(memberId);
         return LocalLoginResponse.of(memberId, authTokens.accessToken(), authTokens.refreshToken());
     }
 
     @Transactional
-    public String reissueAccessToken(String refreshToken) {
-        return jwtTokenProvider.reissueAccessToken(refreshToken);
+    public TokenPair reissueTokens(String refreshToken) {
+        return jwtTokenProvider.reissueTokens(refreshToken);
     }
 
     private void validatePassword(

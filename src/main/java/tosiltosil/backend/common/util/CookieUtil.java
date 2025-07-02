@@ -29,16 +29,6 @@ public class CookieUtil {
         return headers;
     }
 
-    public HttpHeaders generateAccessTokenCookies(String accessToken) {
-        String accessCookieName = jwtProperties.cookie().name().access();
-        long accessTtl = jwtProperties.expiration().access();
-        ResponseCookie accessTokenCookie = generateCookie(accessCookieName, accessToken, accessTtl);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        return headers;
-    }
-
     public HttpHeaders generateTemporaryTokenCookies(String temporaryToken) {
         String temporaryCookieName = jwtProperties.cookie().name().temporary();
         long temporaryTtl = jwtProperties.expiration().temporary();
