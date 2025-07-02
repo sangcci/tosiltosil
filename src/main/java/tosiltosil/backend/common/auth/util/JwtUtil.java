@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
-import tosiltosil.backend.common.auth.domain.value.TokenType;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -38,8 +37,6 @@ public class JwtUtil {
 
     @Value("${jwt.expiration.refresh}")
     private long refreshTokenExpiration;
-
-    private static final String TOKEN_TYPE = "type";
 
     public String generateTemporaryToken(String email) {
         Date issuedAt = new Date();
@@ -97,7 +94,6 @@ public class JwtUtil {
                 .issuedAt(issuedAt)
                 .expiration(expiredAt)
                 .subject(email)
-                .claim(TOKEN_TYPE, TokenType.TEMPORARY.name())
                 .signWith(generateTemporarySecretKey())
                 .compact();
     }
@@ -107,7 +103,6 @@ public class JwtUtil {
                 .issuedAt(issuedAt)
                 .expiration(expiredAt)
                 .subject(memberId.toString())
-                .claim(TOKEN_TYPE, TokenType.ACCESS.name())
                 .signWith(generateAccessSecretKey())
                 .compact();
     }
@@ -117,7 +112,6 @@ public class JwtUtil {
                 .issuedAt(issuedAt)
                 .expiration(expiredAt)
                 .subject(memberId.toString())
-                .claim(TOKEN_TYPE, TokenType.REFRESH.name())
                 .signWith(generateRefreshSecretKey())
                 .compact();
     }
