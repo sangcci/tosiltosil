@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +33,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final String ACCESS_TOKEN_COOKIE_NAME = "access_token";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
-    private static final String TEMPORARY_TOKEN_COOKIE_NAME = "temporary_token";
 
     @Override
     protected void doFilterInternal(
@@ -40,21 +40,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String accessToken = extractAccessTokenFromCookie(request);
         String refreshToken = extractRefreshTokenFromCookie(request);
-        String temporaryToken = extractTemporaryTokenFromCookie(request);
 
-        if (accessToken == null || refreshToken == null || temporaryToken == null) {
+        if (accessToken == null || refreshToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            // RT기 유효한지 확인 (null 이면 만료됨)
+            // RT가 유효한지 확인 (null 이면 만료됨)
             RefreshTokenInfo refreshTokenInfo = jwtTokenProvider.retrieveRefreshToken(refreshToken);
 
             // AT가 유효한 경우 다음 필터로 넘어감
             setAuthenticationToContext(refreshTokenInfo.memberId());
             filterChain.doFilter(request, response);
 
+            return;
         } catch (UnauthorizedException e) {
             // RT 만료된 경우 AT & RT 재발급
             TokenPair reissuedTokenPair = jwtTokenProvider.reissueAllToken(accessToken, refreshToken);
@@ -65,7 +65,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             AccessTokenInfo accessTokenInfo = jwtTokenProvider.retrieveAccessToken(reissuedAccessToken);
 
             // 쿠키에 저장
-            cookieUtil.generateAccessAndRefreshTokenCookies(reissuedAccessToken, reissuedRefreshToken);
+            HttpHeaders headers = cookieUtil.generateAccessAndRefreshTokenCookies(reissuedAccessToken, reissuedRefreshToken);
+            headers.forEach((name, values) ->
+                    values.forEach(value -> response.addHeader(name, value)));
 
             setAuthenticationToContext(accessTokenInfo.memberId());
         }
@@ -89,12 +91,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
         return Optional.ofNullable(WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME))
-                .map(Cookie::getValue)
-                .orElse(null);
-    }
-
-    private String extractTemporaryTokenFromCookie(HttpServletRequest request) {
-        return Optional.ofNullable(WebUtils.getCookie(request, TEMPORARY_TOKEN_COOKIE_NAME))
                 .map(Cookie::getValue)
                 .orElse(null);
     }
