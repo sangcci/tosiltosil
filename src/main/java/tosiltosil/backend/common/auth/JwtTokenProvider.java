@@ -54,7 +54,7 @@ public class JwtTokenProvider {
 
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException("토큰이 만료되었습니다.");
-        } catch (MalformedJwtException e) {
+        } catch (MalformedJwtException | IllegalArgumentException e) {
             throw new UnauthorizedException("잘못된 형식의 토큰입니다.");
         }
     }
@@ -64,7 +64,7 @@ public class JwtTokenProvider {
             return jwtUtil.parseAccessToken(accessToken);
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException("토큰이 만료되었습니다.");
-        } catch (MalformedJwtException e) {
+        } catch (MalformedJwtException | IllegalArgumentException e) {
             throw new UnauthorizedException("잘못된 형식의 토큰입니다.");
         }
     }
@@ -82,7 +82,7 @@ public class JwtTokenProvider {
             return tokenInfo;
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException("만료된 리프레시 토큰입니다.");
-        } catch (MalformedJwtException e) {
+        } catch (MalformedJwtException | IllegalArgumentException e) {
             throw new UnauthorizedException("잘못된 형식의 토큰입니다.");
         }
     }
