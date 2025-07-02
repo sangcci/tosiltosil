@@ -46,12 +46,12 @@ public class SecurityConfig {
                         // h2
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthFilter(jwtTokenProvider, cookieUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(JwtTokenProvider jwtTokenProvider, CookieUtil cookieUtil) {
+    public JwtAuthFilter jwtAuthFilter() {
         return new JwtAuthFilter(jwtTokenProvider, cookieUtil);
     }
 
