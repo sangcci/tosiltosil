@@ -6,5 +6,4 @@ import tosiltosil.backend.module.member.domain.Member;
 import java.util.UUID;
 
 public interface MemberJpaRepository extends JpaRepository<Member, UUID> {
-
 }

@@ -5,13 +5,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import tosiltosil.backend.common.auth.JwtTokenProvider;
+import tosiltosil.backend.common.auth.domain.response.TokenPair;
+import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
+import tosiltosil.backend.module.auth.domain.request.LocalLoginRequest;
 import tosiltosil.backend.module.auth.domain.response.CreateLocalMemberResponse;
+import tosiltosil.backend.module.auth.domain.response.LocalLoginResponse;
 import tosiltosil.backend.module.member.application.MemberService;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.terms.application.TermsService;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +27,7 @@ public class AuthService {
     private final MemberService memberService;
     private final TermsService termsService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /* TODO
      * S3 구현 및 ImageURL 가져오기
@@ -46,5 +54,33 @@ public class AuthService {
         termsService.saveTerms(member.getId(), request.terms());
 
         return CreateLocalMemberResponse.of(member.getNickname());
+    }
+
+    @Transactional
+    public LocalLoginResponse localLogin(
+            final LocalLoginRequest request
+    ) {
+        Member member = memberService.findByEmail(request.email());
+        UUID memberId = member.getId();
+
+        validatePassword(request.password(), memberId);
+
+        TokenPair authTokens = jwtTokenProvider.createTokens(memberId);
+        return LocalLoginResponse.of(memberId, authTokens.accessToken(), authTokens.refreshToken());
+    }
+
+    @Transactional
+    public TokenPair reissueTokens(String refreshToken) {
+        return jwtTokenProvider.reissueTokens(refreshToken);
+    }
+
+    private void validatePassword(
+            final String password,
+            final UUID memberId
+    ) {
+        String encryptPassword = memberService.findPasswordByMemberId(memberId);
+
+        if (!passwordEncoder.matches(password, encryptPassword))
+            throw new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
 }

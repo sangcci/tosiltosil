@@ -2,20 +2,22 @@ package tosiltosil.backend.module.member.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.ConflictException;
+import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.LocalAccountRepository;
 import tosiltosil.backend.module.member.domain.Member;
 import tosiltosil.backend.module.member.domain.MemberRepository;
 import tosiltosil.backend.module.member.domain.value.LoginType;
-import tosiltosil.backend.module.member.infrastructure.MemberJpaRepository;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberJpaRepository memberJpaRepository;
     private final MemberRepository memberRepository;
     private final LocalAccountRepository localAccountRepository;
 
@@ -25,7 +27,7 @@ public class MemberService {
     public void saveMember(
             final Member member
     ) {
-        memberJpaRepository.save(member);
+        memberRepository.save(member);
     }
 
     public void saveLocalAccount(
@@ -47,6 +49,18 @@ public class MemberService {
         } while (isCodeExist(code));
 
         return code;
+    }
+
+    @Transactional
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다."));
+    }
+
+    @Transactional
+    public String findPasswordByMemberId(UUID memberId) {
+        return localAccountRepository.findPasswordByMemberId(memberId)
+                .orElseThrow(() -> new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다."));
     }
 
     private boolean isCodeExist(final String code) {
