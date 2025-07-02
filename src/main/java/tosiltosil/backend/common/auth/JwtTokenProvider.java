@@ -96,7 +96,7 @@ public class JwtTokenProvider {
     }
 
     public UUID saveEmailToRedis(String email) {
-        UUID cacheKey = UUID.fromString(email);
+        UUID cacheKey = UUID.randomUUID() ;
 
         Long expiration = jwtUtil.getTemporaryTokenExpiration(email);
         long now = System.currentTimeMillis();
