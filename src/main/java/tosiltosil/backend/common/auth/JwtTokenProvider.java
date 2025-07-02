@@ -7,10 +7,10 @@ import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
-import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.common.auth.util.JwtUtil;
-import tosiltosil.backend.module.auth.infrastructure.EmailRedisRepository;
+import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.module.auth.infrastructure.RefreshTokenRedisRepository;
+import tosiltosil.backend.module.auth.infrastructure.TemporaryTokenRedisRepository;
 
 import java.util.UUID;
 
@@ -20,13 +20,14 @@ public class JwtTokenProvider {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
-    private final EmailRedisRepository emailRedisRepository;
+    private final TemporaryTokenRedisRepository temporaryTokenRedisRepository;
 
     private static final long RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000L; // 24시간 (하루)
 
     public String createTemporaryToken(String email) {
-        UUID cacheKey = saveEmailToRedis(email);
-        return jwtUtil.generateTemporaryToken(cacheKey);
+        String temporaryToken = jwtUtil.generateTemporaryToken(email);
+        saveTemporaryTokenToRedis(email, temporaryToken);
+        return temporaryToken;
     }
 
     public String reissueAccessToken(String refreshToken) {
@@ -57,14 +58,21 @@ public class JwtTokenProvider {
         return TokenPair.of(accessToken, refreshToken);
     }
 
-    public String retrieveEmail(String temporaryToken) {
+    public TemporaryTokenInfo retrieveTemporaryToken(String temporaryToken) {
+
         TemporaryTokenInfo tokenInfo = jwtUtil.parseTemporaryToken(temporaryToken);
-        String email = getEmailFromRedis(tokenInfo.key());
+        String redisToken = getTemporaryTokenFromRedis(tokenInfo.email());
 
-        if (email == null)
-            throw new UnauthorizedException("올바르지 않은 임의 토큰입니다.");
+        if (redisToken == null) {
+            throw new UnauthorizedException("올바르지 않은 임시 토큰입니다.");
+        }
 
-        return email;
+        if (!redisToken.equals(tokenInfo.email())) {
+            deleteTemporaryTokenFromRedis(tokenInfo.email());
+            throw new UnauthorizedException("유효하지 않은 임시 토큰입니다.");
+        }
+
+        return tokenInfo;
     }
 
     public AccessTokenInfo retrieveAccessToken(String accessToken) {
@@ -95,18 +103,6 @@ public class JwtTokenProvider {
         }
     }
 
-    public UUID saveEmailToRedis(String email) {
-        UUID cacheKey = UUID.randomUUID() ;
-
-        Long expiration = jwtUtil.getTemporaryTokenExpiration(email);
-        long now = System.currentTimeMillis();
-        long ttl = expiration - now;
-
-        emailRedisRepository.save(cacheKey, email, ttl);
-
-        return cacheKey;
-    }
-
     public void saveRefreshTokenToRedis(UUID memberId, String refreshToken) {
         Long expiration = jwtUtil.getRefreshTokenExpiration(refreshToken);
         long now = System.currentTimeMillis();
@@ -129,16 +125,23 @@ public class JwtTokenProvider {
         return jwtUtil.getRefreshTokenExpiration(refreshToken);
     }
 
-    private String getEmailFromRedis(UUID cacheKey) {
-        return emailRedisRepository.get(cacheKey);
+    private void saveTemporaryTokenToRedis(String email, String temporaryToken) {
+        Long expiration = jwtUtil.getTemporaryTokenExpiration(temporaryToken);
+        long ttl = expiration - System.currentTimeMillis();
+
+        temporaryTokenRedisRepository.save(email, temporaryToken, ttl);
+    }
+
+    private String getTemporaryTokenFromRedis(String email) {
+        return temporaryTokenRedisRepository.get(email);
     }
 
     private String getRefreshTokenFromRedis(UUID memberId) {
         return refreshTokenRedisRepository.get(memberId);
     }
 
-    private void deleteEmailFromRedis(UUID cacheKey) {
-        emailRedisRepository.delete(cacheKey);
+    private void deleteTemporaryTokenFromRedis(String email) {
+        temporaryTokenRedisRepository.delete(email);
     }
 
     private void deleteRefreshTokenFromRedis(UUID memberId) {

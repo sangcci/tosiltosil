@@ -26,10 +26,10 @@ public class JwtUtil {
     private static final String TOKEN_TYPE = "type";
     private static final String CACHE_KEY = "cacheKey";
 
-    public String generateTemporaryToken(UUID cacheKey) {
+    public String generateTemporaryToken(String email) {
         Date issuedAt = new Date();
         Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.expiration().temporary());
-        return buildTemporaryToken(cacheKey, issuedAt, expiredAt);
+        return buildTemporaryToken(email, issuedAt, expiredAt);
     }
 
     public String generateAccessToken(UUID memberId) {
@@ -46,7 +46,7 @@ public class JwtUtil {
 
     public TemporaryTokenInfo parseTemporaryToken(String token) throws ExpiredJwtException {
         Claims claims = getClaims(token, generateTemporarySecretKey());
-        return TemporaryTokenInfo.from(claims);
+        return TemporaryTokenInfo.from(token, claims);
     }
 
     public AccessTokenInfo parseAccessToken(String token) throws ExpiredJwtException {
@@ -77,11 +77,11 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    private String buildTemporaryToken(UUID cacheKey, Date issuedAt, Date expiredAt) {
+    private String buildTemporaryToken(String email, Date issuedAt, Date expiredAt) {
         return Jwts.builder()
                 .issuedAt(issuedAt)
                 .expiration(expiredAt)
-                .claim(CACHE_KEY, cacheKey)
+                .subject(email)
                 .claim(TOKEN_TYPE, TokenType.TEMPORARY.name())
                 .signWith(generateTemporarySecretKey())
                 .compact();
