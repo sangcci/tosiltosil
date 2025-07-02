@@ -99,21 +99,20 @@ public class JwtTokenProvider {
         return refreshToken;
     }
 
-    private Long getRefreshTokenExpirationTime(String refreshToken) {
-        return jwtUtil.getRefreshTokenExpiration(refreshToken);
+    private long calculateTtl(long expiration) {
+        return expiration - System.currentTimeMillis();
     }
 
     private void saveTemporaryTokenToRedis(String email, String temporaryToken) {
         Long expiration = jwtUtil.getTemporaryTokenExpiration(temporaryToken);
-        long ttl = expiration - System.currentTimeMillis();
+        long ttl = calculateTtl(expiration);
 
         temporaryTokenRedisRepository.save(email, temporaryToken, ttl);
     }
 
     private void saveRefreshTokenToRedis(UUID memberId, String refreshToken) {
         Long expiration = jwtUtil.getRefreshTokenExpiration(refreshToken);
-        long now = System.currentTimeMillis();
-        long ttl = expiration - now;
+        long ttl = calculateTtl(expiration);
 
         refreshTokenRedisRepository.save(memberId, refreshToken, ttl);
     }
