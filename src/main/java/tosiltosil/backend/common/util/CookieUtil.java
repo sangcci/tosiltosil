@@ -39,6 +39,24 @@ public class CookieUtil {
         return headers;
     }
 
+    public HttpHeaders deleteAccessAndRefreshCookies () {
+        String accessCookieName = jwtProperties.cookie().name().access();
+        String refreshCookieName = jwtProperties.cookie().name().refresh();
+
+        HttpHeaders headers = new HttpHeaders();
+        deleteCookie(accessCookieName, headers);
+        deleteCookie(refreshCookieName, headers);
+
+        return headers;
+    }
+
+    public HttpHeaders deleteTemporaryCookies () {
+        String temporaryCookieName = jwtProperties.cookie().name().temporary();
+        HttpHeaders headers = new HttpHeaders();
+
+        return deleteCookie(temporaryCookieName, headers);
+    }
+
     private ResponseCookie generateCookie(String name, String value, long maxAge) {
         String sameSite = jwtProperties.cookie().sameSite();
         boolean secure = jwtProperties.cookie().secure();
@@ -50,5 +68,16 @@ public class CookieUtil {
                         .path("/")
                         .maxAge(maxAge)
                         .build();
+    }
+
+    private HttpHeaders deleteCookie(String name, HttpHeaders headers) {
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .build();
+
+        headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
+        return headers;
     }
 }

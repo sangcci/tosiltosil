@@ -13,10 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
-import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.auth.AuthDetails;
-import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
-import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
+import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.common.util.CookieUtil;
@@ -47,33 +45,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         try {
-            // RT가 유효한지 확인 (null 이면 만료됨)
-            RefreshTokenInfo refreshTokenInfo = jwtTokenProvider.retrieveRefreshToken(refreshToken);
-
-            // AT가 유효한 경우 다음 필터로 넘어감
-            setAuthenticationToContext(refreshTokenInfo.memberId());
-            filterChain.doFilter(request, response);
-
-            return;
-        } catch (UnauthorizedException e) {
-            // RT 만료된 경우 AT & RT 재발급
-            TokenPair reissuedTokenPair = jwtTokenProvider.reissueAllToken(accessToken, refreshToken);
+            // AT & RT 재발급
+            TokenPair reissuedTokenPair = jwtTokenProvider.reissueTokens(refreshToken);
             String reissuedAccessToken = reissuedTokenPair.accessToken();
             String reissuedRefreshToken = reissuedTokenPair.refreshToken();
-
-            // memberId을 추출하기 위함
-            AccessTokenInfo accessTokenInfo = jwtTokenProvider.retrieveAccessToken(reissuedAccessToken);
 
             // 쿠키에 저장
             HttpHeaders headers = cookieUtil.generateAccessAndRefreshTokenCookies(reissuedAccessToken, reissuedRefreshToken);
             headers.forEach((name, values) ->
                     values.forEach(value -> response.addHeader(name, value)));
 
-            setAuthenticationToContext(accessTokenInfo.memberId());
+            // memberId을 추출하기 위함
+            UUID memberId = jwtTokenProvider.retrieveAccessToken(reissuedAccessToken).memberId();
+            setAuthenticationToContext(memberId);
+        } catch (UnauthorizedException e) {
+            // 예외가 발생하면 AT & RT 쿠키 삭제
+            HttpHeaders deleteHeaders = cookieUtil.deleteAccessAndRefreshCookies();
+
+            deleteHeaders.forEach((name, values) ->
+                    values.forEach(value -> response.addHeader(name, value)));
+
+            throw e;
         }
 
         filterChain.doFilter(request, response);
-
     }
 
     private void setAuthenticationToContext(UUID memberId) {
