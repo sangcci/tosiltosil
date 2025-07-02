@@ -14,7 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.auth.filter.JwtAuthFilter;
 import tosiltosil.backend.common.util.CookieUtil;
@@ -46,7 +46,7 @@ public class SecurityConfig {
                         // h2
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
-                .addFilterAfter(jwtAuthFilter(jwtTokenProvider, cookieUtil), SecurityContextHolderFilter.class)
+                .addFilterBefore(jwtAuthFilter(jwtTokenProvider, cookieUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
