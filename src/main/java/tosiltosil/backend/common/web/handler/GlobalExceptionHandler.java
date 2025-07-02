@@ -51,14 +51,13 @@ public class GlobalExceptionHandler {
 
     /**
      * 바인딩 시 타입 불일치 예외 처리
-     * - enum type 일치하지 않아 binding 못할 경우 발생
-     * - 주로 @RequestParam enum으로 binding 못했을 경우 발생
+     * - @RequestParam, @PathVariable 타입 불일치 시 발생
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ErrorResponse handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
         ErrorDetailResponse errorDetailResponse = ErrorDetailResponse.of(
-                null,
+                e.getValue() == null ? "null" : e.getValue().toString(),
                 e.getName(),
                 e.getMessage()
         );

@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.category.domain;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 import tosiltosil.backend.common.domain.BaseEntity;
+import tosiltosil.backend.common.domain.exception.ForbiddenException;
 
 @Entity
 @Getter
@@ -46,14 +48,28 @@ public class Category extends BaseEntity {
     public static Category of(
             final UUID memberId,
             final String title,
-            final String color,
-            final int sequence
+            final String color
+            //final int sequence
     ) {
         return Category.builder()
                 .memberId(memberId)
                 .title(title)
                 .color(color)
-                .sequence(sequence)
+                .sequence(0)
                 .build();
+    }
+
+    public void validateIsMine(final UUID memberId) {
+        if (!Objects.equals(this.memberId, memberId)) {
+            throw new ForbiddenException("해당 카테고리에 접근할 권한이 없습니다.");
+        }
+    }
+
+    public void updateBasicInfo(
+            final String title,
+            final String color
+    ) {
+        this.title = title;
+        this.color = color;
     }
 }
