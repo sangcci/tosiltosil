@@ -23,8 +23,6 @@ public class JwtTokenProvider {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final TemporaryTokenRedisRepository temporaryTokenRedisRepository;
 
-    private static final long RENEWAL_THRESHOLD = 24 * 60 * 60 * 1000L; // 24시간 (하루)
-
     public String createTemporaryToken(String email) {
         String temporaryToken = jwtUtil.generateTemporaryToken(email);
         saveTemporaryTokenToRedis(email, temporaryToken);
@@ -47,7 +45,7 @@ public class JwtTokenProvider {
             TemporaryTokenInfo tokenInfo = jwtUtil.parseTemporaryToken(temporaryToken);
             String redisToken = getTemporaryTokenFromRedis(tokenInfo.email());
 
-            if (redisToken == null || !redisToken.equals(tokenInfo.email()) ) {
+            if (redisToken == null || !redisToken.equals(tokenInfo.token())) {
                 deleteTemporaryTokenFromRedis(tokenInfo.email());
                 throw new UnauthorizedException("유효하지 않은 토큰입니다.");
             }
