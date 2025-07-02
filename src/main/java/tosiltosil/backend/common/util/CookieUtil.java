@@ -1,24 +1,41 @@
 package tosiltosil.backend.common.util;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import tosiltosil.backend.common.properties.JwtProperties;
 
 @Component
 @RequiredArgsConstructor
 public class CookieUtil {
 
-    private final JwtProperties jwtProperties;
+    @Value("${jwt.cookie.name.access}")
+    private String accessCookieName;
+
+    @Value("${jwt.cookie.name.refresh}")
+    private String refreshCookieName;
+
+    @Value("${jwt.cookie.name.temporary}")
+    private String temporaryCookieName;
+
+    @Value("${jwt.expiration.access}")
+    private long accessTtl;
+
+    @Value("${jwt.expiration.refresh}")
+    private long refreshTtl;
+
+    @Value("${jwt.expiration.temporary}")
+    private long temporaryTtl;
+
+    @Value("${jwt.cookie.secure}")
+    private boolean secure;
+
+    @Value("${jwt.cookie.same-site}")
+    private String sameSite;
+
 
     public HttpHeaders generateAccessAndRefreshTokenCookies(String accessToken, String refreshToken) {
-        String accessCookieName = jwtProperties.cookie().name().access();
-        long accessTtl = jwtProperties.expiration().access();
-
-        String refreshCookieName = jwtProperties.cookie().name().refresh();
-        long refreshTtl = jwtProperties.expiration().refresh();
-
         ResponseCookie accessTokenCookie = generateCookie(accessCookieName, accessToken, accessTtl);
         ResponseCookie refreshTokenCookie = generateCookie(refreshCookieName, refreshToken, refreshTtl);
 
@@ -30,8 +47,6 @@ public class CookieUtil {
     }
 
     public HttpHeaders generateTemporaryTokenCookies(String temporaryToken) {
-        String temporaryCookieName = jwtProperties.cookie().name().temporary();
-        long temporaryTtl = jwtProperties.expiration().temporary();
         ResponseCookie temporaryTokenCookie = generateCookie(temporaryCookieName, temporaryToken, temporaryTtl);
 
         HttpHeaders headers = new HttpHeaders();
@@ -40,27 +55,19 @@ public class CookieUtil {
     }
 
     public HttpHeaders deleteAccessAndRefreshCookies () {
-        String accessCookieName = jwtProperties.cookie().name().access();
-        String refreshCookieName = jwtProperties.cookie().name().refresh();
-
         HttpHeaders headers = new HttpHeaders();
         deleteCookie(accessCookieName, headers);
         deleteCookie(refreshCookieName, headers);
-
         return headers;
     }
 
     public HttpHeaders deleteTemporaryCookies () {
-        String temporaryCookieName = jwtProperties.cookie().name().temporary();
         HttpHeaders headers = new HttpHeaders();
-
-        return deleteCookie(temporaryCookieName, headers);
+        deleteCookie(temporaryCookieName, headers);
+        return headers;
     }
 
     private ResponseCookie generateCookie(String name, String value, long maxAge) {
-        String sameSite = jwtProperties.cookie().sameSite();
-        boolean secure = jwtProperties.cookie().secure();
-
         return ResponseCookie.from(name, value)
                         .httpOnly(true)
                         .secure(secure)
@@ -70,14 +77,15 @@ public class CookieUtil {
                         .build();
     }
 
-    private HttpHeaders deleteCookie(String name, HttpHeaders headers) {
+    private void deleteCookie(String name, HttpHeaders headers) {
         ResponseCookie cookie = ResponseCookie.from(name, "")
                 .path("/")
                 .maxAge(0)
                 .httpOnly(true)
+                .secure(secure)
+                .sameSite(sameSite)
                 .build();
 
         headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
-        return headers;
     }
 }

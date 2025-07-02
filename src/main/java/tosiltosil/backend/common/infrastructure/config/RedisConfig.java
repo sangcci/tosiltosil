@@ -1,6 +1,7 @@
 package tosiltosil.backend.common.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -11,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import tosiltosil.backend.common.properties.RedisProperties;
 
 import java.time.Duration;
 
@@ -20,7 +20,11 @@ import java.time.Duration;
 @Configuration
 public class RedisConfig {
 
-    private final RedisProperties redisProperties;
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
@@ -43,7 +47,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisConfig =
-                new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
+                new RedisStandaloneConfiguration(redisHost, redisPort);
 
         LettuceClientConfiguration clientConfig =
                 LettuceClientConfiguration.builder()

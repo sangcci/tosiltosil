@@ -5,12 +5,12 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tosiltosil.backend.common.auth.domain.response.AccessTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.RefreshTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.auth.domain.value.TokenType;
-import tosiltosil.backend.common.properties.JwtProperties;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -21,26 +21,41 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    private final JwtProperties jwtProperties;
+    @Value("${jwt.secret-key.temporary}")
+    private String temporaryTokenKey;
+
+    @Value("${jwt.secret-key.access}")
+    private String accessTokenKey;
+
+    @Value("${jwt.secret-key.refresh}")
+    private String refreshTokenKey;
+
+    @Value("${jwt.expiration.temporary}")
+    private long temporaryTokenExpiration;
+
+    @Value("${jwt.expiration.access}")
+    private long accessTokenExpiration;
+
+    @Value("${jwt.expiration.refresh}")
+    private long refreshTokenExpiration;
 
     private static final String TOKEN_TYPE = "type";
-    private static final String CACHE_KEY = "cacheKey";
 
     public String generateTemporaryToken(String email) {
         Date issuedAt = new Date();
-        Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.expiration().temporary());
+        Date expiredAt = new Date(issuedAt.getTime() + temporaryTokenExpiration);
         return buildTemporaryToken(email, issuedAt, expiredAt);
     }
 
     public String generateAccessToken(UUID memberId) {
         Date issuedAt = new Date();
-        Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.expiration().access());
+        Date expiredAt = new Date(issuedAt.getTime() + accessTokenExpiration);
         return buildAccessToken(memberId, issuedAt, expiredAt);
     }
 
     public String generateRefreshToken(UUID memberId) {
         Date issuedAt = new Date();
-        Date expiredAt = new Date(issuedAt.getTime() + jwtProperties.expiration().refresh());
+        Date expiredAt = new Date(issuedAt.getTime() + refreshTokenExpiration);
         return buildRefreshToken(memberId, issuedAt, expiredAt);
     }
 
@@ -112,14 +127,14 @@ public class JwtUtil {
     }
 
     private SecretKey generateTemporarySecretKey() {
-        return generateSecretKey(jwtProperties.secretKey().temporary());
+        return generateSecretKey(temporaryTokenKey);
     }
 
     private SecretKey generateAccessSecretKey() {
-        return generateSecretKey(jwtProperties.secretKey().access());
+        return generateSecretKey(accessTokenKey);
     }
 
     private SecretKey generateRefreshSecretKey() {
-        return generateSecretKey(jwtProperties.secretKey().refresh());
+        return generateSecretKey(refreshTokenKey);
     }
 }
