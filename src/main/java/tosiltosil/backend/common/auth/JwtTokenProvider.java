@@ -76,12 +76,12 @@ public class JwtTokenProvider {
 
             if (redisToken == null || !redisToken.equals(tokenInfo.token())) {
                 deleteRefreshTokenFromRedis(tokenInfo.memberId());
-                throw new UnauthorizedException("유효하지 않은 리프레시 토큰입니다.");
+                throw new UnauthorizedException("유효하지 않은 토큰입니다.");
             }
 
             return tokenInfo;
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException("만료된 리프레시 토큰입니다.");
+            throw new UnauthorizedException("토큰이 만료되었습니다.");
         } catch (MalformedJwtException | IllegalArgumentException e) {
             throw new UnauthorizedException("잘못된 형식의 토큰입니다.");
         }

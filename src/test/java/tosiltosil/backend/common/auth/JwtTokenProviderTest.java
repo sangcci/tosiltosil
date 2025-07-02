@@ -79,7 +79,7 @@ public class JwtTokenProviderTest {
         // when & then
         assertThatThrownBy(() -> jwtTokenProvider.retrieveRefreshToken(validRefreshToken))
                 .isInstanceOf(UnauthorizedException.class)
-                .hasMessage("유효하지 않은 리프레시 토큰입니다.");
+                .hasMessage("유효하지 않은 토큰입니다.");
     }
 
 /* 엑세스 토큰의 만료 기한을 짧게 수정해야 되기 때문에 해당 테스트는 테스트 통과 확인 후 주석 처리했습니다.
@@ -99,7 +99,7 @@ public class JwtTokenProviderTest {
  */
 
     @Test
-    void 잘못된_형식의_엑세스_토큰울_파싱하면_401_에러를_반환한다() {
+    void 잘못된_형식의_엑세스_토큰을_파싱하면_401_에러를_반환한다() {
         // given
         String invalidAccessToken = "this.is.not.a.valid.access-token";
 
