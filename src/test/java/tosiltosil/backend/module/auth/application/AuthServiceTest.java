@@ -52,7 +52,7 @@ class AuthServiceTest {
         TokenPair tokenPair = new TokenPair("access-token", "refresh-token");
 
         when(memberService.findByEmail(email)).thenReturn(member);
-        when(memberService.getPassword(memberId)).thenReturn(encryptedPassword);
+        when(memberService.findPasswordByMemberId(memberId)).thenReturn(encryptedPassword);
         when(passwordEncoder.matches(request.password(), encryptedPassword)).thenReturn(true);
         when(jwtTokenProvider.createTokenPair(memberId)).thenReturn(tokenPair);
 

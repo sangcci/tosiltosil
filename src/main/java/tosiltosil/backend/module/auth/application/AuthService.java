@@ -78,7 +78,7 @@ public class AuthService {
             final String password,
             final UUID memberId
     ) {
-        String encryptPassword = memberService.getPassword(memberId);
+        String encryptPassword = memberService.findPasswordByMemberId(memberId);
 
         if (!passwordEncoder.matches(password, encryptPassword))
             throw new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다.");

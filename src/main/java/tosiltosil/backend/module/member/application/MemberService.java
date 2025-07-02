@@ -58,8 +58,9 @@ public class MemberService {
     }
 
     @Transactional
-    public String getPassword(UUID memberId) {
-        return localAccountRepository.getPassword(memberId);
+    public String findPasswordByMemberId(UUID memberId) {
+        return localAccountRepository.findPasswordByMemberId(memberId)
+                .orElseThrow(() -> new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다."));
     }
 
     private boolean isCodeExist(final String code) {

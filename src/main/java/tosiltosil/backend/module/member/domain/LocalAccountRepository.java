@@ -1,8 +1,9 @@
 package tosiltosil.backend.module.member.domain;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface LocalAccountRepository{
-    String getPassword(UUID memberId);
+    Optional<String> findPasswordByMemberId(UUID memberId);
     void save(LocalAccount localAccount);
 }

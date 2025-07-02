@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.LocalAccountRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -15,13 +16,13 @@ public class LocalAccountRepositoryImpl implements LocalAccountRepository {
     private final LocalAccountDslRepository localAccountDslRepository;
 
     @Override
-    public String getPassword(UUID memberId) {
-        return localAccountDslRepository.getPassword(memberId);
+    public Optional<String> findPasswordByMemberId(UUID memberId) {
+        return localAccountDslRepository.findPasswordByMemberId(memberId);
     }
 
     @Override
-    public void save(LocalAccount LocalAccount) {
-        localAccountJpaRepository.save(LocalAccount);
+    public void save(LocalAccount localAccount) {
+        localAccountJpaRepository.save(localAccount);
     }
 
 }
