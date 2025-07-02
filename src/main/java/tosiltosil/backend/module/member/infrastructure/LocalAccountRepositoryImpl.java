@@ -12,7 +12,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LocalAccountRepositoryImpl implements LocalAccountRepository {
 
-    private final localAccountJpaRepository localAccountJpaRepository;
+    private final LocalAccountJpaRepository localAccountJpaRepository;
     private final LocalAccountDslRepository localAccountDslRepository;
 
     @Override
