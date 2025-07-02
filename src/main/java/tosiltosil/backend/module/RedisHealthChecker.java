@@ -32,20 +32,7 @@ public class RedisHealthChecker {
             InfoLog infoLog = InfoLog.of("Redis 서버 정상 동작 확인 (응답: " + pingResult + ")");
             infoLog.writeLog();
 
-            // 간단한 읽기/쓰기 테스트
-            connection.set("health_check".getBytes(), "ok".getBytes());
-            byte[] value = connection.get("health_check".getBytes());
-            connection.del("health_check".getBytes());
-
-            if (value != null && "ok".equals(new String(value))) {
-                infoLog = InfoLog.of("Redis 읽기/쓰기 테스트 성공");
-                infoLog.writeLog();
-
-                return true;
-            } else {
-                InfoLog.of("Redis 읽기/쓰기 테스트 실패");
-                return false;
-            }
+            return "PONG".equals(pingResult);
 
         } catch (Exception e) {
             ErrorLog errorLog = ErrorLog.of("Redis 연결 실패", e);
