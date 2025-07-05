@@ -23,9 +23,10 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tosiltosil.backend.module.goal.presentation.GoalController;
 import tosiltosil.backend.support.RestDocsTestSupport.RestDocsTestConfig;
 
-@WebMvcTest(GoalController.class)
+@WebMvcTest(controllers = GoalController.class)
 @AutoConfigureRestDocs
 @Import(RestDocsTestConfig.class)
+@WithMockCustomUser
 public abstract class RestDocsTestSupport {
 
     @Autowired
