@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import tosiltosil.backend.common.auth.annotation.LoginMember;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
@@ -31,7 +32,7 @@ public class GoalController implements GoalApiSpecification {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Response<GoalIdsResponse> createGoal(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @RequestBody @Valid final GoalCreateRequest request
     ) {
         GoalIdsResponse response = goalService.createGoal(memberId, request);
@@ -41,7 +42,7 @@ public class GoalController implements GoalApiSpecification {
     @Override
     @PatchMapping("/{goalId}")
     public Response<GoalIdResponse> updateGoal(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @PathVariable final Long goalId,
             @RequestBody @Valid final GoalUpdateRequest request
     ) {
@@ -52,7 +53,7 @@ public class GoalController implements GoalApiSpecification {
     @Override
     @PatchMapping("/{goalId}/change-order")
     public void changeGoalSequence(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @PathVariable final Long goalId,
             @RequestBody @Valid final GoalSequenceChangeRequest request
     ) {
@@ -62,7 +63,7 @@ public class GoalController implements GoalApiSpecification {
     @Override
     @DeleteMapping("/{goalId}")
     public Response<GoalIdResponse> deleteGoal(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @PathVariable final Long goalId
     ) {
         GoalIdResponse response = goalService.deleteGoal(memberId, goalId);
