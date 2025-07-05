@@ -1,0 +1,66 @@
+= 목표 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:snippets: {snippets}
+
+== 목표 생성
+
+=== Request
+
+include::{snippets}/goal-controller-rest-docs-test/목표_생성하기/http-request.adoc[]
+
+=== Request Fields
+
+include::{snippets}/goal-controller-rest-docs-test/목표_생성하기/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/goal-controller-rest-docs-test/목표_생성하기/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-controller-rest-docs-test/목표_생성하기/response-fields.adoc[]
+
+== 목표 수정
+
+=== Request
+
+include::{snippets}/goal-controller-rest-docs-test/목표_수정하기/http-request.adoc[]
+
+=== Path Parameters
+
+include::{snippets}/goal-controller-rest-docs-test/목표_수정하기/path-parameters.adoc[]
+
+=== Request Fields
+
+include::{snippets}/goal-controller-rest-docs-test/목표_수정하기/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/goal-controller-rest-docs-test/목표_수정하기/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/goal-controller-rest-docs-test/목표_수정하기/response-fields.adoc[]
+
+== 목표 삭제
+
+=== Request
+
+include::{snippets}/goal-controller-rest-docs-test/목표_삭제하기/http-request.adoc[]
+
+=== Path Parameters
+
+include::{snippets}/goal-controller-rest-docs-test/목표_삭제하기/path-parameters.adoc[]
+
+=== Response
+
+include::{snippets}/goal-controller-rest-docs-test/목표_삭제하기/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-controller-rest-docs-test/목표_삭제하기/response-fields.adoc[]
