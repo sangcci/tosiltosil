@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,8 +30,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieUtil cookieUtil;
 
-    private static final String ACCESS_TOKEN_COOKIE_NAME = "access_token";
-    private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+    @Value("${jwt.cookie.name.access}")
+    private String ACCESS_TOKEN_COOKIE_NAME;
+
+    @Value("${jwt.cookie.name.refresh}")
+    private String REFRESH_TOKEN_COOKIE_NAME;
 
     @Override
     protected void doFilterInternal(
