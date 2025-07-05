@@ -26,6 +26,7 @@ import tosiltosil.backend.support.RestDocsTestSupport.RestDocsTestConfig;
 @WebMvcTest(GoalController.class)
 @AutoConfigureRestDocs
 @Import(RestDocsTestConfig.class)
+@WithMockCustomUser
 public abstract class RestDocsTestSupport {
 
     @Autowired
