@@ -13,7 +13,8 @@ import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 
 public interface GoalApiSpecification {
 
@@ -63,7 +64,7 @@ public interface GoalApiSpecification {
                     )
             )
     })
-    Response<GoalResponse> createGoal(UUID memberId, GoalCreateRequest request);
+    Response<GoalIdsResponse> createGoal(UUID memberId, GoalCreateRequest request);
 
     @Tag(name = "Goal", description = "목표 수정")
     @Operation(summary = "목표 수정", description = "기존 목표의 정보를 수정합니다.")
@@ -111,7 +112,7 @@ public interface GoalApiSpecification {
                     )
             )
     })
-    Response<GoalResponse> updateGoal(UUID memberId, Long goalId, GoalUpdateRequest request);
+    Response<GoalIdResponse> updateGoal(UUID memberId, Long goalId, GoalUpdateRequest request);
 
     @Tag(name = "Goal", description = "목표 순서 변경")
     @Operation(summary = "목표 순서 변경", description = "목표의 순서를 변경합니다.")
@@ -207,5 +208,5 @@ public interface GoalApiSpecification {
                     )
             )
     })
-    Response<GoalResponse> deleteGoal(UUID memberId, Long goalId);
+    Response<GoalIdResponse> deleteGoal(UUID memberId, Long goalId);
 }

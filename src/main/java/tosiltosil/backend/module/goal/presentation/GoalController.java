@@ -17,7 +17,8 @@ import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 
 @RestController
 @RequestMapping("/api/v1/goals")
@@ -26,26 +27,25 @@ public class GoalController implements GoalApiSpecification {
 
     private final GoalService goalService;
 
-
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Response<GoalResponse> createGoal(
+    public Response<GoalIdsResponse> createGoal(
             final UUID memberId,
             @RequestBody @Valid final GoalCreateRequest request
     ) {
-        GoalResponse response = goalService.createGoal(memberId, request);
+        GoalIdsResponse response = goalService.createGoal(memberId, request);
         return Response.create("목표가 정상적으로 생성되었습니다.", response);
     }
 
     @Override
     @PatchMapping("/{goalId}")
-    public Response<GoalResponse> updateGoal(
+    public Response<GoalIdResponse> updateGoal(
             final UUID memberId,
             @PathVariable final Long goalId,
             @RequestBody @Valid final GoalUpdateRequest request
     ) {
-        GoalResponse response = goalService.updateGoal(memberId, goalId, request);
+        GoalIdResponse response = goalService.updateGoal(memberId, goalId, request);
         return Response.ok("목표가 정상적으로 수정되었습니다.", response);
     }
 
@@ -61,11 +61,11 @@ public class GoalController implements GoalApiSpecification {
 
     @Override
     @DeleteMapping("/{goalId}")
-    public Response<GoalResponse> deleteGoal(
+    public Response<GoalIdResponse> deleteGoal(
             final UUID memberId,
             @PathVariable final Long goalId
     ) {
-        GoalResponse response = goalService.deleteGoal(memberId, goalId);
+        GoalIdResponse response = goalService.deleteGoal(memberId, goalId);
         return Response.ok("목표가 정상적으로 삭제되었습니다.", response);
     }
 }
