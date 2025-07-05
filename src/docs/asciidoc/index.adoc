@@ -1,0 +1,120 @@
+= TOSILTOSIL API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:snippets: {snippets}
+
+== Overview
+
+토실토실 어플리케이션 API 문서입니다.
+
+=== Success Response 공통 포맷
+
+...
+
+=== Error Response 공통 포맷
+
+모든 에러 Response 기본 포맷입니다.
+
+==== Common
+
+기본 에러 형식입니다.
+
+[source,json]
+----
+{
+  "message": "에러 메세지",
+  "errors": [ ]
+}
+----
+
+==== Details
+
+에러 발생 기점 및 이유를 자세히 설명합니다.
+
+주로 잘못된 입력 검증 시(Input Validation) 나타냅니다.
+
+[source,json]
+----
+{
+  "message": "Error message",
+  "errors": [
+    {
+      "field": "필드 이름",
+      "value" : "잘못 입력된 값",
+      "reason": "에러 원인"
+    }
+  ]
+}
+----
+
+== Authentication
+
+=== 일반 로그인
+
+==== Request
+
+include::{snippets}/auth-controller-rest-docs-test/정상_로그인_테스트/http-request.adoc[]
+
+==== Request Fields
+
+include::{snippets}/auth-controller-rest-docs-test/정상_로그인_테스트/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/auth-controller-rest-docs-test/정상_로그인_테스트/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/auth-controller-rest-docs-test/정상_로그인_테스트/response-fields.adoc[]
+
+==== Response Headers
+
+include::{snippets}/auth-controller-rest-docs-test/정상_로그인_테스트/response-headers.adoc[]
+
+=== Login Error Responses
+
+==== 잘못된 이메일 포맷 (400)
+
+===== Request
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_잘못된_이메일_형식_문서화/http-request.adoc[]
+
+===== Response
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_잘못된_이메일_형식_문서화/http-response.adoc[]
+
+===== Response Fields
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_잘못된_이메일_형식_문서화/response-fields.adoc[]
+
+==== 잘못된 패스워드 포맷 (400)
+
+===== Request
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_비밀번호_형식_오류_문서화/http-request.adoc[]
+
+===== Response
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_비밀번호_형식_오류_문서화/http-response.adoc[]
+
+===== Response Fields
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_비밀번호_형식_오류_문서화/response-fields.adoc[]
+
+==== 인증 실패 (401)
+
+===== Request
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_잘못된_인증정보_문서화/http-request.adoc[]
+
+===== Response
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_잘못된_인증정보_문서화/http-response.adoc[]
+
+===== Response Fields
+
+include::{snippets}/auth-controller-rest-docs-test/로그인_실패_잘못된_인증정보_문서화/response-fields.adoc[]
