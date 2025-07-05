@@ -15,6 +15,10 @@ public class AuthDetails implements UserDetails {
 
     private final UUID memberId;
 
+    public UUID getMemberId() {
+        return memberId;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
