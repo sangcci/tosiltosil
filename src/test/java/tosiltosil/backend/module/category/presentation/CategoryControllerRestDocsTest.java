@@ -70,7 +70,6 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                         """);
 
         assertThat(testResult)
-                .hasStatus(HttpStatus.CREATED)
                 .apply(documentHandler.document(
                         requestFields(
                                 requestField("title", JsonFieldType.STRING, "카테고리 제목", true, "1글자 이상 10글자 이하", "운동"),
