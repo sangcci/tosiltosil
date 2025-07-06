@@ -24,11 +24,10 @@ import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 @RestController
 @RequestMapping("/api/v1/goals")
 @RequiredArgsConstructor
-public class GoalController implements GoalApiSpecification {
+public class GoalController {
 
     private final GoalService goalService;
 
-    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Response<GoalIdsResponse> createGoal(
@@ -39,7 +38,6 @@ public class GoalController implements GoalApiSpecification {
         return Response.create("목표가 정상적으로 생성되었습니다.", response);
     }
 
-    @Override
     @PatchMapping("/{goalId}")
     public Response<GoalIdResponse> updateGoal(
             @LoginMember final UUID memberId,
@@ -50,7 +48,6 @@ public class GoalController implements GoalApiSpecification {
         return Response.ok("목표가 정상적으로 수정되었습니다.", response);
     }
 
-    @Override
     @PatchMapping("/{goalId}/change-order")
     public void changeGoalSequence(
             @LoginMember final UUID memberId,
@@ -60,7 +57,6 @@ public class GoalController implements GoalApiSpecification {
         goalService.changeSequence(memberId, goalId, request);
     }
 
-    @Override
     @DeleteMapping("/{goalId}")
     public Response<GoalIdResponse> deleteGoal(
             @LoginMember final UUID memberId,
