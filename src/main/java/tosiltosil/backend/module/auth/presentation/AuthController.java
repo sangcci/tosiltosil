@@ -30,10 +30,11 @@ public class AuthController {
     @PostMapping(value = "/signup/local", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Response<CreateLocalMemberResponse> localSignUp(
+            @CookieValue(name = "temporary-token") final String temporaryToken,
             @RequestPart("memberInfo") @Valid final CreateLocalMemberRequest request,
             @RequestPart(value = "profileImage", required = false) final MultipartFile profileImage
     ) {
-        CreateLocalMemberResponse response = authService.localSignUp(request, profileImage);
+        CreateLocalMemberResponse response = authService.localSignUp(temporaryToken, request, profileImage);
         return Response.create("정상적으로 일반 회원가입 되었습니다.", response);
     }
 

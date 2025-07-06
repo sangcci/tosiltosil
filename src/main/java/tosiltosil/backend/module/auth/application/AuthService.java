@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
+import tosiltosil.backend.common.auth.domain.response.TemporaryTokenInfo;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.module.auth.domain.request.CreateLocalMemberRequest;
@@ -31,20 +32,22 @@ public class AuthService {
 
     /* TODO
      * S3 구현 및 ImageURL 가져오기
-     * 인증번호 검증
      */
 
     @Transactional
     public CreateLocalMemberResponse localSignUp(
+            final String temporaryToken,
             final CreateLocalMemberRequest request,
             final MultipartFile profileImage
     ) {
         termsService.validateTerms(request.terms());
-        memberService.validateEmail(request.email(), LoginType.LOCAL);
+
+        String email = getEmailFromRedis(temporaryToken);
+        memberService.validateEmail(email, LoginType.LOCAL);
 
         String code = memberService.generateRandomCode();
         String profileImgUrl = "https://example.com/profile.png"; // S3 구현 후 수정
-        Member member = request.toMemberEntities(code, profileImgUrl);
+        Member member = request.toMemberEntities(email, code, profileImgUrl);
         memberService.saveMember(member);
 
         String encryptedPassword = passwordEncoder.encode(request.password());
@@ -82,5 +85,10 @@ public class AuthService {
 
         if (!passwordEncoder.matches(password, encryptPassword))
             throw new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다.");
+    }
+
+    private String getEmailFromRedis(String temporaryToken) {
+        TemporaryTokenInfo temporaryTokenInfo = jwtTokenProvider.retrieveTemporaryToken(temporaryToken);
+        return temporaryTokenInfo.email();
     }
 }
