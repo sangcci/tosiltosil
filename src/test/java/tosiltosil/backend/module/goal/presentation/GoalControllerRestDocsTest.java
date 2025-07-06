@@ -343,7 +343,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
-                                responseField("message", JsonFieldType.STRING, "응답 메세지", "목표가 정상적으로 수정되었습니다."),
+                                responseField("message", JsonFieldType.STRING, "응답 메세지", "목표가 정상적으로 삭제되었습니다."),
                                 responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
                                 responseField("data.goalId", JsonFieldType.NUMBER, "삭제된 목표 ID", "1")
                         )
