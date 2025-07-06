@@ -2,10 +2,15 @@ package tosiltosil.backend.module.email.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
+import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
+import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
+import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
 import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
+import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
 import tosiltosil.backend.module.email.domain.response.EmailSendResponse;
 import tosiltosil.backend.module.email.infrastructure.AuthNumberRedisRepository;
 import tosiltosil.backend.module.email.infrastructure.EmailAuthRedisRepository;
@@ -23,11 +28,13 @@ public class EmailService {
     private final AuthNumberRedisRepository authNumberRedisRepository;
     private final EmailAuthRedisRepository emailAuthRedisRepository;
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private static final int INITIAL_SEND_COUNT = 1;
     private static final int INITIAL_FAIL_COUNT = 0;
     private static final long AUTH_NUMBER_TTL_SECONDS = 300L;
     private static final int MAX_SEND_COUNT = 5;
+    private static final int MAX_AUTH_COUNT = 5;
     private static final int CODE_LENGTH = 6;
     private static final boolean IS_UPPER_CASE = true;
 
@@ -49,6 +56,19 @@ public class EmailService {
         // TODO : 이메일 전송
 
         return EmailSendResponse.of(request.email(), currentClientId);
+    }
+
+    public EmailAuthResponse verifyEmailAuth(
+            final UUID clientId,
+            final EmailAuthRequest request
+    ) {
+        int failCount = validateAndGetAuthFailCount(clientId);
+
+        validateAuthNumber(clientId, request.email(), request.authNumber(), failCount);
+
+        deleteAuthNumber(request.email());
+
+        return generateTemporaryToken(request.email());
     }
 
     private UUID generateAndSaveNewClientId() {
@@ -73,7 +93,41 @@ public class EmailService {
         return authNumber;
     }
 
+    private int validateAndGetAuthFailCount(UUID clientId) {
+        EmailAuthMeta emailAuthMeta = emailAuthRedisRepository.get(clientId);
+
+        int failCount = emailAuthMeta.authFailCount();
+
+        if (failCount >= MAX_AUTH_COUNT) {
+            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+        }
+        return failCount;
+    }
+
     private void validateDuplicatedEmail(String email) {
         memberService.validateEmail(email, LOCAL);
+    }
+
+    private void validateAuthNumber(UUID clientId, String email, String authNumber, int failCount) {
+        String savedAuthNumber = authNumberRedisRepository.get(email)
+                .orElseThrow(() -> new NotFoundException("인증번호 데이터를 찾을 수 없습니다."));
+
+        if (!savedAuthNumber.equals(authNumber)) {
+            increaseFailCount(clientId);
+            throw new InvalidEmailCodeException(++failCount);
+        }
+    }
+
+    private void increaseFailCount(UUID clientId) {
+        emailAuthRedisRepository.increaseFailCount(clientId);
+    }
+
+    private void deleteAuthNumber(String email) {
+        authNumberRedisRepository.delete(email);
+    }
+
+    private EmailAuthResponse generateTemporaryToken(String email) {
+        String temporaryToken = jwtTokenProvider.createTemporaryToken(email);
+        return EmailAuthResponse.of(temporaryToken);
     }
 }
