@@ -9,6 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: tosiltosil-db
+          MYSQL_USER: sa
+        ports:
+          - 3306:3306
+
       redis:
         image: redis:latest
         ports:
