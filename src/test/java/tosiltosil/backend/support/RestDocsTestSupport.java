@@ -62,7 +62,6 @@ public abstract class RestDocsTestSupport {
         FieldDescriptor fieldDescriptor = fieldWithPath(jsonPath)
                 .type(type)
                 .description(description)
-                .optional()
                 .attributes(key("constraint").value(constraint))
                 .attributes(key("example").value(example));
         return optional ? fieldDescriptor.optional() : fieldDescriptor;
