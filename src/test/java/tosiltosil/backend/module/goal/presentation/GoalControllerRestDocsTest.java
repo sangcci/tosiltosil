@@ -38,7 +38,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
     private CategoryService categoryService;
 
     @Test
-    void 목표_생성하기() throws Exception {
+    void 목표_생성하기() {
         // given
         String request = """
                     {
@@ -166,7 +166,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 목표_수정하기() throws Exception {
+    void 목표_수정하기() {
         // given
         Long goalId = 1L;
         String request = """
@@ -225,7 +225,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 목표_수정_시_날짜_검증에_실패() throws Exception {
+    void 목표_수정_시_날짜_검증에_실패() {
         // given
         Long goalId = 1L;
         String request = """
@@ -264,7 +264,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 목표_수정_시_시간_검증에_실패() throws Exception {
+    void 목표_수정_시_시간_검증에_실패() {
         // given
         Long goalId = 1L;
         String request = """
@@ -303,7 +303,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 목표_삭제하기() throws Exception {
+    void 목표_삭제하기() {
         // given
         Long goalId = 1L;
         String request = """

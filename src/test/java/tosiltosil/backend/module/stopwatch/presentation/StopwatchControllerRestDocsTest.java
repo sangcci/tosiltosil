@@ -132,7 +132,7 @@ class StopwatchControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 스톱워치_정지_시_이미_정지된_목표일_때_검증에_실패() throws Exception {
+    void 스톱워치_정지_시_이미_정지된_목표일_때_검증에_실패() {
         // given
         Long goalId = 1L;
 
