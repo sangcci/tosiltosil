@@ -25,6 +25,14 @@ Response Fields
 
 include::{snippets}/goal-controller-rest-docs-test/목표_생성하기/response-fields.adoc[]
 
+==== 목표 시간 검증 실패 (400)
+
+include::{snippets}/goal-controller-rest-docs-test/목표_생성_시_시간_검증에_실패/response-body.adoc[]
+
+==== 목표 날짜 검증 실패 (400)
+
+include::{snippets}/goal-controller-rest-docs-test/목표_생성_시_날짜_검증에_실패/response-body.adoc[]
+
 === 목표 수정
 
 ==== Request
@@ -46,6 +54,14 @@ include::{snippets}/goal-controller-rest-docs-test/목표_수정하기/http-resp
 Response Fields
 
 include::{snippets}/goal-controller-rest-docs-test/목표_수정하기/response-fields.adoc[]
+
+==== 목표 날짜 검증 실패 (400)
+
+include::{snippets}/goal-controller-rest-docs-test/목표_수정_시_날짜_검증에_실패/response-body.adoc[]
+
+==== 목표 시간 검증 실패 (400)
+
+include::{snippets}/goal-controller-rest-docs-test/목표_수정_시_시간_검증에_실패/response-body.adoc[]
 
 === 목표 삭제
 

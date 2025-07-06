@@ -15,11 +15,14 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
+import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 import tosiltosil.backend.support.RestDocsTestSupport;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -27,6 +30,12 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
     private GoalService goalService;
+
+    @MockitoBean
+    private StopwatchService stopwatchService;
+
+    @MockitoBean
+    private CategoryService categoryService;
 
     @Test
     void 목표_생성하기() throws Exception {
@@ -82,6 +91,78 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.goalIds", JsonFieldType.ARRAY, "생성된 목표 ID 목록", "[1, 2]")
                         )
                 ));
+    }
+
+    @Test
+    void 목표_생성_시_시간_검증에_실패() {
+        // given
+        String request = """
+                    {
+                        "title": "운동하기",
+                        "iconId": 1,
+                        "categoryId": 1,
+                        "dates": ["2025-07-06", "2025-07-07"],
+                        "time": "PT0H"
+                    }
+                """;
+        given(goalService.createGoal(any(UUID.class), any(GoalCreateRequest.class)))
+                .willThrow(new BadRequestException("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다."));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/goals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 400,
+                                "message": "시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다.",
+                                "errors": [ ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
+
+    @Test
+    void 목표_생성_시_날짜_검증에_실패() {
+        // given
+        String request = """
+                    {
+                        "title": "운동하기",
+                        "iconId": 1,
+                        "categoryId": 1,
+                        "dates": ["2025-07-01", "2025-07-02"],
+                        "time": "PT1H30M"
+                    }
+                """;
+        given(goalService.createGoal(any(UUID.class), any(GoalCreateRequest.class)))
+                .willThrow(new BadRequestException("날짜는 오늘 이후여야 합니다."));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/goals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 400,
+                                "message": "날짜는 오늘 이후여야 합니다.",
+                                "errors": [ ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
     }
 
     @Test
@@ -141,6 +222,84 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.goalId", JsonFieldType.NUMBER, "목표 ID", "1")
                         )
                 ));
+    }
+
+    @Test
+    void 목표_수정_시_날짜_검증에_실패() throws Exception {
+        // given
+        Long goalId = 1L;
+        String request = """
+                    {
+                        "title": "공부하기",
+                        "iconId": 1,
+                        "categoryId": 1,
+                        "date": "2025-07-01",
+                        "time": "PT01H30M"
+                    }
+                """;
+        
+        given(goalService.updateGoal(any(UUID.class), any(Long.class), any(GoalUpdateRequest.class)))
+                .willThrow(new BadRequestException("날짜는 오늘 이후여야 합니다."));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.patch()
+                .uri("/api/v1/goals/{goalId}", goalId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 400,
+                                "message": "날짜는 오늘 이후여야 합니다.",
+                                "errors": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
+
+    @Test
+    void 목표_수정_시_시간_검증에_실패() throws Exception {
+        // given
+        Long goalId = 1L;
+        String request = """
+                    {
+                        "title": "공부하기",
+                        "iconId": 1,
+                        "categoryId": 1,
+                        "date": "2025-07-10",
+                        "time": "PT0H"
+                    }
+                """;
+        
+        given(goalService.updateGoal(any(UUID.class), any(Long.class), any(GoalUpdateRequest.class)))
+                .willThrow(new BadRequestException("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다"));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.patch()
+                .uri("/api/v1/goals/{goalId}", goalId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 400,
+                                "message": "시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다",
+                                "errors": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
     }
 
     @Test

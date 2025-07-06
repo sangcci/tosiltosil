@@ -11,7 +11,34 @@
 
 === Success Response
 
-...
+[source,json]
+----
+{
+  "status": 200,
+  "message": "OK",
+  "data": {
+    "property1": "값1",
+    "property2": "값2"
+  }
+}
+----
+
+==== 성공 상태 코드 종류
+
+[cols="1,1,3", options="header"]
+|===
+|상태 코드|이름|설명
+
+|200
+|OK
+|요청 성공
+
+|201
+|Created
+|리소스 생성 성공
+|===
+
+
 
 === Error Response
 
@@ -51,4 +78,63 @@
 }
 ----
 
-include::goal.adoc[]
+==== 에러 상태 코드 종류
+
+- 각 도메인 예외 문서에 400 input 파라미터 형식 검증 예외는 제외했습니다.
+- 각 도메인 예외 문서에 404, 403 에러는 제외했습니다.
+
+[cols="1,1,3,2", options="header"]
+|===
+|상태 코드|이름|설명|발생 조건
+
+|400
+|Bad Request
+|잘못된 요청
+|• 파라미터 유효성 검증 실패 +
+• 파라미터 타입 불일치 +
+• 필수 파라미터 누락 +
+• 비즈니스 로직 검증 실패 +
+• 이메일 인증번호 오류
+
+|401
+|Unauthorized
+|인증 실패
+|• 인증 토큰이 없거나 유효하지 않음 +
+• 로그인이 필요한 요청
+
+|403
+|Forbidden
+|권한 없음
+|• 리소스에 대한 접근 권한이 없음 +
+• 본인 소유가 아닌 데이터 접근 시도
+
+|404
+|Not Found
+|리소스를 찾을 수 없음
+|• 존재하지 않는 API 엔드포인트 호출 +
+• 존재하지 않는 리소스(목표, 카테고리 등) 요청 +
+• 존재하지 않는 정적 리소스 요청
+
+|405
+|Method Not Allowed
+|지원하지 않는 HTTP 메서드
+|• 해당 엔드포인트에서 지원하지 않는 HTTP 메서드 사용
+
+|409
+|Conflict
+|리소스 상태 충돌
+|• 현재 리소스 상태와 요청이 충돌
+
+|500
+|Internal Server Error
+|서버 내부 오류
+|• 예상하지 못한 서버 오류 발생
+|===
+
+
+[.lead]
+include::{docdir}/goal.adoc[]
+
+include::{docdir}/category.adoc[]
+
+include::{docdir}/stopwatch.adoc[]
