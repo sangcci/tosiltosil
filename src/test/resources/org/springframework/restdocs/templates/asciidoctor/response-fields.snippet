@@ -1,0 +1,11 @@
+|===
+|Field|Type|Description|Example
+
+{{#fields}}
+|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{description}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#example}}{{.}}{{/example}}{{^example}}-{{/example}}{{/tableCellContent}}
+
+{{/fields}}
+|===

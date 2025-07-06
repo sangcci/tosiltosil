@@ -42,3 +42,6 @@ src/main/generated/
 ### application.yml ###
 application-stag.yml
 application-prod.yml
+
+### REST Docs html file ###
+src/main/resources/static/docs/

@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'tosiltosil'
@@ -17,6 +18,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExt
 }
 
 repositories {
@@ -58,20 +60,22 @@ dependencies {
     // log
     implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
+    // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.assertj:assertj-core:3.25.3'
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+    // REST Docs
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
+// QueryDSL Configuration
 def generated = 'src/main/generated'
 
 tasks.withType(JavaCompile).configureEach {
@@ -84,4 +88,39 @@ sourceSets {
 
 clean {
     delete file(generated)
+}
+
+// REST Docs Configuration
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+test {
+    useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+    attributes 'snippets': snippetsDir
+    sources {
+        include("**/index.adoc")
+    }
+    baseDirFollowsSourceFile()
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+    delete('src/main/resources/static/docs')
+    from("${asciidoctor.outputDir}") {
+        include("**/index.html")
+    }
+    into('src/main/resources/static/docs')
+}
+
+bootJar {
+    dependsOn asciidoctor
+    dependsOn copyDocument
 }

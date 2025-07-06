@@ -1,0 +1,70 @@
+== 카테고리 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:snippets: {snippets}
+
+=== 카테고리 생성
+
+==== Request
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_생성하기/http-request.adoc[]
+
+Request Fields
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_생성하기/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_생성하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_생성하기/response-fields.adoc[]
+
+==== 카테고리 생성 제한 초과 (400)
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_생성_시_생성_제한_초과로_검증에_실패/response-body.adoc[]
+
+=== 카테고리 수정
+
+==== Request
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_수정하기/http-request.adoc[]
+
+Path Parameters
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_수정하기/path-parameters.adoc[]
+
+Request Body
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_수정하기/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_수정하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_수정하기/response-fields.adoc[]
+
+=== 카테고리 삭제
+
+==== Request
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_삭제하기/http-request.adoc[]
+
+Path Parameters
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_삭제하기/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_삭제하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_삭제하기/response-fields.adoc[]

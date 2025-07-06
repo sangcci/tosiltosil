@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import tosiltosil.backend.common.auth.annotation.LoginMember;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
@@ -22,25 +23,23 @@ import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
-public class CategoryController implements CategoryApiSpecification {
+public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Response<CategoryResponse> createCategory(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @RequestBody @Valid final CategoryCreateRequest request
     ) {
         CategoryResponse response = categoryService.createCategory(memberId, request);
         return Response.create("카테고리가 정상적으로 생성되었습니다.", response);
     }
 
-    @Override
     @PatchMapping("/{categoryId}")
     public Response<CategoryResponse> updateCategory(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @PathVariable final Long categoryId,
             @RequestBody @Valid final CategoryUpdateRequest request
     ) {
@@ -48,20 +47,18 @@ public class CategoryController implements CategoryApiSpecification {
         return Response.ok("카테고리가 정상적으로 수정되었습니다.", response);
     }
 
-    @Override
     @PatchMapping("/{categoryId}/change-order")
     public void changeCategorySequence(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @PathVariable final Long categoryId,
             @RequestBody @Valid final CategorySequenceChangeRequest request
     ) {
         categoryService.changeSequence(memberId, categoryId, request);
     }
 
-    @Override
     @DeleteMapping("/{categoryId}")
     public Response<CategoryResponse> deleteCategory(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @PathVariable final Long categoryId
     ) {
         CategoryResponse response = categoryService.deleteCategory(memberId, categoryId);

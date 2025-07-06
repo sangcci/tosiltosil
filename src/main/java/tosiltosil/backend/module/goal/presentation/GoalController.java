@@ -12,60 +12,57 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import tosiltosil.backend.common.auth.annotation.LoginMember;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 
 @RestController
 @RequestMapping("/api/v1/goals")
 @RequiredArgsConstructor
-public class GoalController implements GoalApiSpecification {
+public class GoalController {
 
     private final GoalService goalService;
 
-
-    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Response<GoalResponse> createGoal(
-            final UUID memberId,
+    public Response<GoalIdsResponse> createGoal(
+            @LoginMember final UUID memberId,
             @RequestBody @Valid final GoalCreateRequest request
     ) {
-        GoalResponse response = goalService.createGoal(memberId, request);
+        GoalIdsResponse response = goalService.createGoal(memberId, request);
         return Response.create("목표가 정상적으로 생성되었습니다.", response);
     }
 
-    @Override
     @PatchMapping("/{goalId}")
-    public Response<GoalResponse> updateGoal(
-            final UUID memberId,
+    public Response<GoalIdResponse> updateGoal(
+            @LoginMember final UUID memberId,
             @PathVariable final Long goalId,
             @RequestBody @Valid final GoalUpdateRequest request
     ) {
-        GoalResponse response = goalService.updateGoal(memberId, goalId, request);
+        GoalIdResponse response = goalService.updateGoal(memberId, goalId, request);
         return Response.ok("목표가 정상적으로 수정되었습니다.", response);
     }
 
-    @Override
     @PatchMapping("/{goalId}/change-order")
     public void changeGoalSequence(
-            final UUID memberId,
+            @LoginMember final UUID memberId,
             @PathVariable final Long goalId,
             @RequestBody @Valid final GoalSequenceChangeRequest request
     ) {
         goalService.changeSequence(memberId, goalId, request);
     }
 
-    @Override
     @DeleteMapping("/{goalId}")
-    public Response<GoalResponse> deleteGoal(
-            final UUID memberId,
+    public Response<GoalIdResponse> deleteGoal(
+            @LoginMember final UUID memberId,
             @PathVariable final Long goalId
     ) {
-        GoalResponse response = goalService.deleteGoal(memberId, goalId);
+        GoalIdResponse response = goalService.deleteGoal(memberId, goalId);
         return Response.ok("목표가 정상적으로 삭제되었습니다.", response);
     }
 }
