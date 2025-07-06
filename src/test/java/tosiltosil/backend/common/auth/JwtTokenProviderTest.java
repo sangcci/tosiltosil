@@ -1,20 +1,22 @@
 package tosiltosil.backend.common.auth;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import tosiltosil.backend.common.auth.domain.response.TokenPair;
 import tosiltosil.backend.common.auth.util.JwtUtil;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.module.auth.infrastructure.RefreshTokenRedisRepository;
 import tosiltosil.backend.module.auth.infrastructure.TemporaryTokenRedisRepository;
 
-import java.util.UUID;
-
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-
 @SpringBootTest
+@ActiveProfiles("test")
 public class JwtTokenProviderTest {
 
     @Autowired

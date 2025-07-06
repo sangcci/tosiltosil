@@ -19,6 +19,7 @@ import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tosiltosil.backend.module.category.presentation.CategoryController;
 import tosiltosil.backend.module.goal.presentation.GoalController;
@@ -28,6 +29,7 @@ import tosiltosil.backend.support.RestDocsTestSupport.RestDocsTestConfig;
 @WebMvcTest({GoalController.class, CategoryController.class, StopwatchController.class})
 @AutoConfigureRestDocs
 @Import(RestDocsTestConfig.class)
+@ActiveProfiles("test")
 @WithMockCustomUser
 public abstract class RestDocsTestSupport {
 
