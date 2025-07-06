@@ -1,0 +1,52 @@
+== 스톱워치 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:snippets: {snippets}
+
+=== 스톱워치 시작
+
+==== Request
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_시작하기/http-request.adoc[]
+
+Path Parameters
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_시작하기/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_시작하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_시작하기/response-fields.adoc[]
+
+==== 이미 실행 중인 목표 (409)
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_시작_시_이미_실행_중인_목표일_때_검증에_실패/response-body.adoc[]
+
+=== 스톱워치 정지
+
+==== Request
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_정지하기/http-request.adoc[]
+
+Path Parameters
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_정지하기/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_정지하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_정지하기/response-fields.adoc[]
+
+==== 이미 정지된 목표 (409)
+
+include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_정지_시_이미_정지된_목표일_때_검증에_실패/response-body.adoc[]

@@ -15,7 +15,8 @@ import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.GoalResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 
 @Service
@@ -25,7 +26,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
 
     @Transactional
-    public GoalResponse createGoal(
+    public GoalIdsResponse createGoal(
             final UUID memberId,
             final GoalCreateRequest request
     ) {
@@ -35,11 +36,11 @@ public class GoalService {
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
                 .map(Goal::getId)
                 .toList();
-        return GoalResponse.ofList(savedGoalIds);
+        return GoalIdsResponse.of(savedGoalIds);
     }
 
     @Transactional
-    public GoalResponse updateGoal(
+    public GoalIdResponse updateGoal(
             final UUID memberId,
             final Long goalId,
             final GoalUpdateRequest request
@@ -50,7 +51,7 @@ public class GoalService {
         goal.updateBasicInfo(request.title(), request.categoryId(), request.iconId());
         goal.changeDate(LocalDate.parse(request.date()));
 
-        return GoalResponse.ofSingle(goal.getId());
+        return GoalIdResponse.of(goal.getId());
     }
 
     @Transactional
@@ -63,7 +64,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResponse deleteGoal(
+    public GoalIdResponse deleteGoal(
             final UUID memberId,
             final Long goalId
     ) {
@@ -71,7 +72,7 @@ public class GoalService {
         goal.validateIsMine(memberId);
 
         goalRepository.delete(goal);
-        return GoalResponse.ofSingle(goal.getId());
+        return GoalIdResponse.of(goal.getId());
     }
 
     @Transactional
