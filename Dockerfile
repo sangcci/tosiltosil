@@ -3,7 +3,9 @@ FROM gradle:8.13.0-jdk17 AS build
 WORKDIR /app
 COPY . .
 RUN chmod +x ./gradlew
-RUN ./gradlew clean bootJar --no-daemon --stacktrace --info
+ARG SPRING_PROFILES_ACTIVE
+ENV SPRING_PROFILES_ACTIVE $SPRING_PROFILES_ACTIVE
+RUN ./gradlew clean bootJar -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE --no-daemon --stacktrace --info
 
 # image build
 FROM openjdk:17-slim
