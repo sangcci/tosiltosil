@@ -1,11 +1,15 @@
 package tosiltosil.backend.module.email.domain.response;
 
+import java.util.UUID;
+
 public record EmailSendResponse(
-        String email
+        String email,
+        UUID clientId
 ) {
     public static EmailSendResponse of(
-            final String email
+            final String email,
+            final UUID clientId
     ) {
-        return new EmailSendResponse(email);
+        return new EmailSendResponse(email, clientId);
     }
 }
