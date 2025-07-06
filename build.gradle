@@ -105,11 +105,22 @@ asciidoctor {
     configurations 'asciidoctorExt'
     dependsOn test
     attributes 'snippets': snippetsDir
+    sources {
+        include("**/index.adoc")
+    }
+    baseDirFollowsSourceFile()
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+    delete('src/main/resources/static/docs')
+    from("${asciidoctor.outputDir}") {
+        include("**/index.html")
+    }
+    into('src/main/resources/static/docs')
 }
 
 bootJar {
     dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}") {
-        into 'static/docs'
-    }
+    dependsOn copyDocument
 }
