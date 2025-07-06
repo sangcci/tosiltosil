@@ -36,7 +36,7 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          docker build -t pshsh910/tosiltosil:latest --build-arg SPRING_PROFILES_ACTIVE=stag .
+          docker build -t pshsh910/tosiltosil:latest .
           docker push pshsh910/tosiltosil:latest
 
   deploy:
