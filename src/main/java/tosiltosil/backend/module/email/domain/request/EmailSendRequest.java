@@ -10,8 +10,7 @@ public record EmailSendRequest(
         @Email(message = "이메일 형식이 아닙니다.")
         String email,
 
-        @NotBlank(message = "이메일 인증 목적을 입력해주세요.")
         @IsEnum(enumClass = EmailAuthPurpose.class)
-        EmailAuthPurpose purpose
+        String purpose
 ) {
 }

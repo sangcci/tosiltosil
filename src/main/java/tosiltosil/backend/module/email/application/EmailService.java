@@ -12,6 +12,7 @@ import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
 import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
 import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
 import tosiltosil.backend.module.email.domain.response.EmailSendResponse;
+import tosiltosil.backend.module.email.domain.value.EmailAuthPurpose;
 import tosiltosil.backend.module.email.infrastructure.AuthNumberRedisRepository;
 import tosiltosil.backend.module.email.infrastructure.EmailAuthRedisRepository;
 import tosiltosil.backend.module.member.application.MemberService;
@@ -46,8 +47,9 @@ public class EmailService {
                 clientId == null ? generateAndSaveNewClientId() : clientId;
 
         validateSendCount(currentClientId);
+        EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
 
-        if (request.purpose() == SIGN_UP) {
+        if (purpose.equals(SIGN_UP)) {
             validateDuplicatedEmail(request.email());
         }
 
