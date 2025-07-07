@@ -55,6 +55,8 @@ public class AuthService {
 
         termsService.saveTerms(member.getId(), request.terms());
 
+        deleteTemporaryTokenFromRedis(email);
+
         return CreateLocalMemberResponse.of(member.getNickname());
     }
 
@@ -89,5 +91,9 @@ public class AuthService {
     private String getEmailFromRedis(String temporaryToken) {
         TemporaryTokenInfo temporaryTokenInfo = jwtTokenProvider.retrieveTemporaryToken(temporaryToken);
         return temporaryTokenInfo.email();
+    }
+
+    private void deleteTemporaryTokenFromRedis(String email) {
+        jwtTokenProvider.deleteTemporaryTokenFromRedis(email);
     }
 }
