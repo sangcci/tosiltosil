@@ -10,6 +10,8 @@ public interface GoalRepository {
 
     List<Goal> findTodayGoalsByMemberId(UUID memberId);
 
+    List<Goal> findByMemberIdAndCategoryId(UUID memberId, Long categoryId);
+
     Goal save(Goal goal);
 
     List<Goal> saveAll(List<Goal> goals);

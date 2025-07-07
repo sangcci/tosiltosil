@@ -26,6 +26,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
+    public List<Goal> findByMemberIdAndCategoryId(final UUID memberId, final Long categoryId) {
+        return goalJpaRepository.findByMemberIdAndCategoryId(memberId, categoryId);
+    }
+
+    @Override
     public Goal save(final Goal goal) {
         return goalJpaRepository.save(goal);
     }
