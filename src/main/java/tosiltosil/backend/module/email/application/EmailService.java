@@ -6,6 +6,7 @@ import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
@@ -37,7 +38,6 @@ public class EmailService {
     private static final int MAX_SEND_COUNT = 5;
     private static final int MAX_AUTH_COUNT = 5;
     private static final int CODE_LENGTH = 6;
-    private static final boolean IS_UPPER_CASE = true;
 
     public EmailSendResponse sendEmail(
             final UUID clientId,
@@ -90,7 +90,7 @@ public class EmailService {
     }
 
     private String generateAndSaveAuthNumber(String email) {
-        String authNumber = RandomUtils.generateRandomMixString(CODE_LENGTH, IS_UPPER_CASE);
+        String authNumber = RandomUtils.generateRandomNumberString(CODE_LENGTH);
         authNumberRedisRepository.save(email, authNumber, AUTH_NUMBER_TTL_SECONDS);
         return authNumber;
     }
