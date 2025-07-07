@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.email.application;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
@@ -69,6 +70,12 @@ public class EmailService {
         deleteAuthNumber(request.email());
 
         return generateTemporaryToken(request.email());
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?" )
+    public void resetEmailAttemptData() {
+        String pattern = emailAuthRedisRepository.createKeyPattern();
+        emailAuthRedisRepository.delete(pattern);
     }
 
     private UUID generateAndSaveNewClientId() {

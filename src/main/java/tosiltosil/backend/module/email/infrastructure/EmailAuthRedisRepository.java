@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -27,9 +28,10 @@ public class EmailAuthRedisRepository {
         return (EmailAuthMeta) redisTemplate.opsForValue().get(key);
     }
 
-    public void delete(UUID clientId) {
-        String key = createKey(clientId);
-        redisTemplate.delete(key);
+    public void delete(String pattern) {
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (!keys.isEmpty())
+            redisTemplate.delete(keys);
     }
 
     public void increaseSendCount(UUID clientId) {
@@ -44,6 +46,10 @@ public class EmailAuthRedisRepository {
         int failCount = emailAuthMeta.authFailCount();
 
         save(clientId, emailAuthMeta.sendCount(), failCount + 1);
+    }
+
+    public String createKeyPattern() {
+        return String.format(EMAIL_AUTH_CNT_KEY, "*");
     }
 
     private String createKey(UUID clientId) {
