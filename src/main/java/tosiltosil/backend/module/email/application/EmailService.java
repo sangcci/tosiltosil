@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.email.application;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
@@ -32,11 +33,19 @@ public class EmailService {
 
     private static final int INITIAL_SEND_COUNT = 1;
     private static final int INITIAL_FAIL_COUNT = 0;
-    private static final int EMAIL_AUTH_TTL_SECONDS = 86400;
-    private static final long AUTH_NUMBER_TTL_SECONDS = 300L;
-    private static final int MAX_SEND_COUNT = 5;
-    private static final int MAX_AUTH_COUNT = 5;
     private static final int CODE_LENGTH = 6;
+
+    @Value("${email.expiration.auth}")
+    private long emailAuthExpiration;
+
+    @Value("${email.expiration.auth-number}")
+    private long authNumberExpiration;
+
+    @Value("${email.max-count.send}")
+    private int sendMaxCount;
+
+    @Value("${email.max-count.auth-attempt}")
+    private int authAttemptMaxCount;
 
     public EmailSendResponse sendEmail(
             final UUID clientId,
@@ -74,14 +83,14 @@ public class EmailService {
 
     private UUID generateAndSaveNewClientId() {
         UUID newClientId = UUID.randomUUID();
-        emailAuthRedisRepository.save(newClientId, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, EMAIL_AUTH_TTL_SECONDS);
+        emailAuthRedisRepository.save(newClientId, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, emailAuthExpiration);
         return newClientId;
     }
 
     private void validateSendCount(UUID clientId) {
         EmailAuthMeta emailAuthMeta = emailAuthRedisRepository.get(clientId);
 
-        if (emailAuthMeta.sendCount() >= MAX_SEND_COUNT) {
+        if (emailAuthMeta.sendCount() > sendMaxCount) {
             throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
         }
 
@@ -90,7 +99,7 @@ public class EmailService {
 
     private String generateAndSaveAuthNumber(String email) {
         String authNumber = RandomUtils.generateRandomNumberString(CODE_LENGTH);
-        authNumberRedisRepository.save(email, authNumber, AUTH_NUMBER_TTL_SECONDS);
+        authNumberRedisRepository.save(email, authNumber, authNumberExpiration);
         return authNumber;
     }
 
@@ -99,7 +108,7 @@ public class EmailService {
 
         int failCount = emailAuthMeta.authFailCount();
 
-        if (failCount >= MAX_AUTH_COUNT) {
+        if (failCount >= authAttemptMaxCount) {
             throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
         }
         return failCount;

@@ -14,7 +14,6 @@ import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
 import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
 import tosiltosil.backend.module.email.domain.response.EmailSendResponse;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -42,7 +41,7 @@ public class EmailController {
 
     @PostMapping("/verify")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Response<Map<String, Object>>> verifyEmailAuth(
+    public ResponseEntity<Response<?>> verifyEmailAuth(
             @CookieValue(name = "client-id") final UUID clientId,
             @Valid @RequestBody final EmailAuthRequest request
     ) {
