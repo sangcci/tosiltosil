@@ -6,6 +6,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class CookieUtil {
@@ -34,7 +36,6 @@ public class CookieUtil {
     @Value("${jwt.cookie.same-site}")
     private String sameSite;
 
-
     public HttpHeaders generateAccessAndRefreshTokenCookies(String accessToken, String refreshToken) {
         ResponseCookie accessTokenCookie = generateCookie(accessCookieName, accessToken, accessTtl);
         ResponseCookie refreshTokenCookie = generateCookie(refreshCookieName, refreshToken, refreshTtl);
@@ -51,6 +52,14 @@ public class CookieUtil {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, temporaryTokenCookie.toString());
+        return headers;
+    }
+
+    public HttpHeaders generateClientIdCookie(UUID clientId) {
+        ResponseCookie clientIdCookie = generateCookie("client-id", clientId.toString());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, clientIdCookie.toString());
         return headers;
     }
 
@@ -75,6 +84,15 @@ public class CookieUtil {
                         .path("/")
                         .maxAge(maxAge)
                         .build();
+    }
+
+    private ResponseCookie generateCookie(String name, String value) {
+        return ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(secure)
+                .sameSite(sameSite)
+                .path("/")
+                .build();
     }
 
     private void deleteCookie(String name, HttpHeaders headers) {

@@ -27,12 +27,17 @@ public class EmailController {
 
     @PostMapping("/send")
     @ResponseStatus(HttpStatus.OK)
-    public Response<EmailSendResponse> sendEmail(
+    public ResponseEntity<Response<EmailSendResponse>> sendEmail(
             @CookieValue(name = "client-id", required = false) final UUID clientId,
             @Valid @RequestBody final EmailSendRequest request
     ) {
         EmailSendResponse response = emailService.sendEmail(clientId, request);
-        return Response.ok("정상적으로 이메일을 전송했습니다.", response);
+
+        HttpHeaders headers = cookieUtil.generateClientIdCookie(response.clientId());
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(Response.ok("정상적으로 이메일을 전송했습니다.", response));
     }
 
     @PostMapping("/verify")
