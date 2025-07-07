@@ -41,6 +41,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/signup/local").permitAll()
                         .requestMatchers("/api/v1/auth/login/local").permitAll()
                         .requestMatchers("/api/v1/auth/reissue").permitAll()
+                        .requestMatchers("/api/v1/auth/email/send").permitAll()
+                        .requestMatchers("/api/v1/auth/email/verify").permitAll()
+                        .requestMatchers("/api/v1/members/check-email").permitAll()
                         // swagger
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // h2
