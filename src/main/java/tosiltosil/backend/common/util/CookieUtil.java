@@ -21,6 +21,9 @@ public class CookieUtil {
     @Value("${jwt.cookie.name.temporary}")
     private String temporaryCookieName;
 
+    @Value("${email.cookie.name}")
+    private String clientIdCookieName;
+
     @Value("${jwt.expiration.access}")
     private long accessTtl;
 
@@ -29,6 +32,9 @@ public class CookieUtil {
 
     @Value("${jwt.expiration.temporary}")
     private long temporaryTtl;
+
+    @Value("${email.cookie.expiration}")
+    private long clientIdTtl;
 
     @Value("${jwt.cookie.secure}")
     private boolean secure;
@@ -56,7 +62,7 @@ public class CookieUtil {
     }
 
     public HttpHeaders generateClientIdCookie(UUID clientId) {
-        ResponseCookie clientIdCookie = generateCookie("client-id", clientId.toString());
+        ResponseCookie clientIdCookie = generateCookie(clientIdCookieName, clientId.toString(), clientIdTtl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, clientIdCookie.toString());
@@ -84,15 +90,6 @@ public class CookieUtil {
                         .path("/")
                         .maxAge(maxAge)
                         .build();
-    }
-
-    private ResponseCookie generateCookie(String name, String value) {
-        return ResponseCookie.from(name, value)
-                .httpOnly(true)
-                .secure(secure)
-                .sameSite(sameSite)
-                .path("/")
-                .build();
     }
 
     private void deleteCookie(String name, HttpHeaders headers) {

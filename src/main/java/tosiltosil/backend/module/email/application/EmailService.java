@@ -35,17 +35,17 @@ public class EmailService {
     private static final int INITIAL_FAIL_COUNT = 0;
     private static final int CODE_LENGTH = 6;
 
-    @Value("${email.expiration.auth}")
+    @Value("${email.auth.redis-expiration}")
     private long emailAuthExpiration;
 
-    @Value("${email.expiration.auth-number}")
+    @Value("${email.auth-number.redis-expiration}")
     private long authNumberExpiration;
 
-    @Value("${email.max-count.send}")
-    private int sendMaxCount;
+    @Value("${email.auth.max-send-count}")
+    private int maxSendCount;
 
-    @Value("${email.max-count.auth-attempt}")
-    private int authAttemptMaxCount;
+    @Value("${email.auth.max-attempt-count}")
+    private int maxAuthAttemptCount;
 
     public EmailSendResponse sendEmail(
             final UUID clientId,
@@ -72,9 +72,9 @@ public class EmailService {
             final UUID clientId,
             final EmailAuthRequest request
     ) {
-        int failCount = validateAndGetAuthFailCount(clientId);
+        int authFailCount = validateAndGetAuthFailCount(clientId);
 
-        validateAuthNumber(clientId, request.email(), request.authNumber(), failCount);
+        validateAuthNumber(clientId, request.email(), request.authNumber(), authFailCount);
 
         deleteAuthNumber(request.email());
 
@@ -88,9 +88,9 @@ public class EmailService {
     }
 
     private void validateSendCount(UUID clientId) {
-        EmailAuthMeta emailAuthMeta = emailAuthRedisRepository.get(clientId);
+        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(clientId);
 
-        if (emailAuthMeta.sendCount() > sendMaxCount) {
+        if (emailAuthMeta.sendCount() > maxSendCount) {
             throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
         }
 
@@ -104,32 +104,36 @@ public class EmailService {
     }
 
     private int validateAndGetAuthFailCount(UUID clientId) {
-        EmailAuthMeta emailAuthMeta = emailAuthRedisRepository.get(clientId);
+        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(clientId);
 
-        int failCount = emailAuthMeta.authFailCount();
+        int authFailCount = emailAuthMeta.authFailCount();
 
-        if (failCount >= authAttemptMaxCount) {
+        if (authFailCount >= maxAuthAttemptCount) {
             throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
         }
-        return failCount;
+        return authFailCount;
+    }
+
+    private EmailAuthMeta getEmailAuthMeta(UUID clientId) {
+        return emailAuthRedisRepository.get(clientId);
     }
 
     private void validateDuplicatedEmail(String email) {
         memberService.validateEmailNotDuplicated(email, "LOCAL");
     }
 
-    private void validateAuthNumber(UUID clientId, String email, String authNumber, int failCount) {
+    private void validateAuthNumber(UUID clientId, String email, String authNumber, int authFailCount) {
         String savedAuthNumber = authNumberRedisRepository.get(email)
                 .orElseThrow(() -> new NotFoundException("인증번호 데이터를 찾을 수 없습니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
-            increaseFailCount(clientId);
-            throw new InvalidEmailCodeException(++failCount);
+            increaseAuthFailCount(clientId);
+            throw new InvalidEmailCodeException(++authFailCount);
         }
     }
 
-    private void increaseFailCount(UUID clientId) {
-        emailAuthRedisRepository.increaseFailCount(clientId);
+    private void increaseAuthFailCount(UUID clientId) {
+        emailAuthRedisRepository.increaseAuthFailCount(clientId);
     }
 
     private void deleteAuthNumber(String email) {
