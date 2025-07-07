@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.duration.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
@@ -14,7 +15,7 @@ import tosiltosil.backend.module.duration.domain.DurationRepository;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
-class DurationServiceTest {
+class TodayDurationServiceTest {
 
     @Mock
     private DurationRepository durationRepository;
@@ -54,5 +55,41 @@ class DurationServiceTest {
 
         // then
         assertThat(result).isEqualTo(expectedTotalDuration);
+    }
+    
+    @Test
+    void 차감_결과가_음수일때_ZERO로_설정한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Duration currentDuration = Duration.ofMinutes(30);
+        Duration subtractDuration = Duration.ofHours(2);
+        Duration expectedTotalDuration = Duration.ZERO;
+        
+        when(durationRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+
+        // when
+        Duration result = durationService.subtractTodayDuration(memberId, subtractDuration);
+
+        // then
+        assertThat(result).isEqualTo(expectedTotalDuration);
+        verify(durationRepository).saveTodayDuration(memberId, expectedTotalDuration);
+    }
+    
+    @Test
+    void 현재_시간이_ZERO일때_차감해도_ZERO가_유지된다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Duration currentDuration = Duration.ZERO;
+        Duration subtractDuration = Duration.ofMinutes(30);
+        Duration expectedTotalDuration = Duration.ZERO;
+        
+        when(durationRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+
+        // when
+        Duration result = durationService.subtractTodayDuration(memberId, subtractDuration);
+
+        // then
+        assertThat(result).isEqualTo(expectedTotalDuration);
+        verify(durationRepository).saveTodayDuration(memberId, expectedTotalDuration);
     }
 }
