@@ -1,7 +1,6 @@
 package tosiltosil.backend.module.email.application;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
@@ -33,6 +32,7 @@ public class EmailService {
 
     private static final int INITIAL_SEND_COUNT = 1;
     private static final int INITIAL_FAIL_COUNT = 0;
+    private static final int EMAIL_AUTH_TTL_SECONDS = 86400;
     private static final long AUTH_NUMBER_TTL_SECONDS = 300L;
     private static final int MAX_SEND_COUNT = 5;
     private static final int MAX_AUTH_COUNT = 5;
@@ -72,15 +72,9 @@ public class EmailService {
         return generateTemporaryToken(request.email());
     }
 
-    @Scheduled(cron = "0 0 0 * * ?" )
-    public void resetEmailAttemptData() {
-        String pattern = emailAuthRedisRepository.createKeyPattern();
-        emailAuthRedisRepository.delete(pattern);
-    }
-
     private UUID generateAndSaveNewClientId() {
         UUID newClientId = UUID.randomUUID();
-        emailAuthRedisRepository.save(newClientId, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT);
+        emailAuthRedisRepository.save(newClientId, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, EMAIL_AUTH_TTL_SECONDS);
         return newClientId;
     }
 

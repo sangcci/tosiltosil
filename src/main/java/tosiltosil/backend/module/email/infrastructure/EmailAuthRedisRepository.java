@@ -5,8 +5,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,11 +16,11 @@ public class EmailAuthRedisRepository {
 
     private static final String EMAIL_AUTH_CNT_KEY = "email_auth_cnt:%s";
 
-    public void save(UUID clientId, int sendCount, int authCount) {
+    public void save(UUID clientId, int sendCount, int authCount, long expirationTime) {
         String key = createKey(clientId);
         EmailAuthMeta emailAuthMeta = new EmailAuthMeta(sendCount, authCount);
 
-        redisTemplate.opsForValue().set(key, emailAuthMeta);
+        redisTemplate.opsForValue().set(key, emailAuthMeta, expirationTime, TimeUnit.SECONDS);
     }
 
     public EmailAuthMeta get(UUID clientId) {
@@ -28,28 +28,30 @@ public class EmailAuthRedisRepository {
         return (EmailAuthMeta) redisTemplate.opsForValue().get(key);
     }
 
-    public void delete(String pattern) {
-        Set<String> keys = redisTemplate.keys(pattern);
-        if (!keys.isEmpty())
-            redisTemplate.delete(keys);
+    public void delete(UUID clientId) {
+        String key = createKey(clientId);
+        redisTemplate.delete(key);
     }
 
     public void increaseSendCount(UUID clientId) {
         EmailAuthMeta emailAuthMeta = get(clientId);
         int sendCount = emailAuthMeta.sendCount();
 
-        save(clientId, sendCount + 1, emailAuthMeta.authFailCount());
+        updateWithPreservingTtl(clientId, sendCount + 1, emailAuthMeta.authFailCount());
     }
 
     public void increaseFailCount(UUID clientId) {
         EmailAuthMeta emailAuthMeta = get(clientId);
         int failCount = emailAuthMeta.authFailCount();
 
-        save(clientId, emailAuthMeta.sendCount(), failCount + 1);
+        updateWithPreservingTtl(clientId, emailAuthMeta.sendCount(), failCount + 1);
     }
 
-    public String createKeyPattern() {
-        return String.format(EMAIL_AUTH_CNT_KEY, "*");
+    private void updateWithPreservingTtl(UUID clientId, int sendCount, int failCount) {
+        String key = createKey(clientId);
+        Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+
+        save(clientId, sendCount, failCount, ttl);
     }
 
     private String createKey(UUID clientId) {
