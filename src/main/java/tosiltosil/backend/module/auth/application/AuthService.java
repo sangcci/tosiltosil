@@ -16,7 +16,6 @@ import tosiltosil.backend.module.auth.domain.response.LocalLoginResponse;
 import tosiltosil.backend.module.member.application.MemberService;
 import tosiltosil.backend.module.member.domain.LocalAccount;
 import tosiltosil.backend.module.member.domain.Member;
-import tosiltosil.backend.module.member.domain.value.LoginType;
 import tosiltosil.backend.module.terms.application.TermsService;
 
 import java.util.UUID;
@@ -43,7 +42,7 @@ public class AuthService {
         termsService.validateTerms(request.terms());
 
         String email = getEmailFromRedis(temporaryToken);
-        memberService.validateEmail(email, LoginType.LOCAL);
+        memberService.validateEmailNotDuplicated(email, "LOCAL");
 
         String code = memberService.generateRandomCode();
         String profileImgUrl = "https://example.com/profile.png"; // S3 구현 후 수정

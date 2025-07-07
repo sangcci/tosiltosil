@@ -6,7 +6,6 @@ import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
-import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
@@ -21,7 +20,6 @@ import tosiltosil.backend.module.member.application.MemberService;
 import java.util.UUID;
 
 import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.SIGN_UP;
-import static tosiltosil.backend.module.member.domain.value.LoginType.LOCAL;
 
 @Service
 @RequiredArgsConstructor
@@ -107,7 +105,7 @@ public class EmailService {
     }
 
     private void validateDuplicatedEmail(String email) {
-        memberService.validateEmail(email, LOCAL);
+        memberService.validateEmailNotDuplicated(email, "LOCAL");
     }
 
     private void validateAuthNumber(UUID clientId, String email, String authNumber, int failCount) {
