@@ -91,7 +91,6 @@ public class Goal extends BaseEntity {
             final LocalDate date
     ) {
         validateTotalTime(totalTime);
-        validateDate(date);
         return Goal.builder()
                 .memberId(memberId)
                 .categoryId(categoryId)
@@ -116,13 +115,6 @@ public class Goal extends BaseEntity {
         }
     }
 
-    private static void validateDate(final LocalDate date) {
-        LocalDate today = LocalDate.now();
-        if (date.isBefore(today)) {
-            throw new BadRequestException("날짜는 오늘 이후여야 합니다.");
-        }
-    }
-
     public void validateIsMine(final UUID memberId) {
         if (!Objects.equals(this.memberId, memberId)) {
             throw new ForbiddenException("해당 목표에 접근할 권한이 없습니다.");
@@ -140,7 +132,6 @@ public class Goal extends BaseEntity {
     }
 
     public void changeDate(final LocalDate date) {
-        validateDate(date);
         this.date = date;
     }
 

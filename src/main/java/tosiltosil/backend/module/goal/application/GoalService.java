@@ -13,6 +13,7 @@ import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
+import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
@@ -25,6 +26,7 @@ import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 public class GoalService {
 
     private final GoalRepository goalRepository;
+    private final GoalDomainService goalDomainService;
 
     @Transactional(readOnly = true)
     public List<GoalListResponse> getGoalsByMemberId(
@@ -45,6 +47,11 @@ public class GoalService {
     ) {
         // TODO: 순서 구현
 
+        request.dates().forEach(dateString -> {
+            LocalDate date = LocalDate.parse(dateString);
+            goalDomainService.validateGoalDate(date);
+        });
+
         List<Goal> goals = request.toEntities(memberId);
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
                 .map(Goal::getId)
@@ -61,8 +68,11 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
+        LocalDate newDate = LocalDate.parse(request.date());
+        goalDomainService.validateGoalDate(newDate);
+
         goal.updateBasicInfo(request.title(), request.categoryId(), request.iconId());
-        goal.changeDate(LocalDate.parse(request.date()));
+        goal.changeDate(newDate);
 
         return GoalIdResponse.of(goal.getId());
     }
