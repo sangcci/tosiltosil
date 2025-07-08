@@ -39,7 +39,7 @@ public class CategoryController {
     public Response<List<CategoryListResponse>> getGoalsByMemberId(
             @LoginMember final UUID memberOwnerId,
             @PathVariable final UUID memberId,
-            @RequestParam @IsDate(pattern = "yyyy-MM") final LocalDate date
+            @RequestParam @IsDate final LocalDate date
     ) {
         List<CategoryListResponse> responses = categoryService.getCategoriesByMemberId(memberOwnerId, memberId, date);
         return Response.ok("카테고리 리스트 조회 성공", responses);

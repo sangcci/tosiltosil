@@ -9,6 +9,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.goal.application.GoalService;
@@ -132,6 +134,64 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
 
         assertThat(testResult)
                 .apply(documentHandler.document());
+    }
+
+    @Test
+    void 월별_카테고리_색상_조회() {
+        // given
+        YearMonth yearMonth = YearMonth.of(2025, 7);
+
+        List<CategoryColorPerDayResponse> responses = List.of(
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 8), "#FF5733"),
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 15), "#33FF57"),
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 22), "#3357FF")
+        );
+
+        given(categoryService.getCategoryColorPerMonth(any(UUID.class), any(YearMonth.class)))
+                .willReturn(responses);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories/color-per-day?yearMonth={yearMonth}", yearMonth)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "월 별 카테고리 색상 조회 성공",
+                                "data": [
+                                    {
+                                        "date": "2025-07-08",
+                                        "color": "#FF5733"
+                                    },
+                                    {
+                                        "date": "2025-07-15",
+                                        "color": "#33FF57"
+                                    },
+                                    {
+                                        "date": "2025-07-22",
+                                        "color": "#3357FF"
+                                    }
+                                ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        queryParameters(
+                                queryParameter("yearMonth", "조회할 년월 (YYYY-MM 형식)")
+                        ),
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메시지", "월 별 카테고리 색상 조회 성공"),
+                                responseField("data", JsonFieldType.ARRAY, "카테고리 색상 목록", "[]"),
+                                responseField("data[].date", JsonFieldType.STRING, "날짜 (YYYY-MM-DD 형식)", "2025-07-08"),
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상 (HEX 코드)", "#FF5733")
+                        )
+                ));
     }
 
     @Test
@@ -267,6 +327,34 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1")
                         )
                 ));
+    }
+
+    @Test
+    void 월별_카테고리_색상_조회_빈_목록() {
+        // given
+        YearMonth yearMonth = YearMonth.of(2025, 8);
+
+        given(categoryService.getCategoryColorPerMonth(any(UUID.class), any(YearMonth.class)))
+                .willReturn(List.of());
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories/color-per-day?yearMonth={yearMonth}", yearMonth)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "월 별 카테고리 색상 조회 성공",
+                                "data": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
     }
 
     @Test
