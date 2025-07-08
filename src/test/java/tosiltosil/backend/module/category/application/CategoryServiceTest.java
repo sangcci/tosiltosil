@@ -78,13 +78,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
         CategoryResponse category = categoryService.createCategory(memberId, categoryRequest);
         
         // 2. 목표 생성
-        GoalCreateRequest goalRequest = new GoalCreateRequest(
-                "운동하기",
-                1L, 
-                category.categoryId(), 
-                List.of("2025-07-08"),
-                "PT1H"
-        );
+        GoalCreateRequest goalRequest = new GoalCreateRequest("운동하기", 1L, category.categoryId(), List.of("2025-07-08"), "PT1H");
         GoalIdsResponse goalResponse = goalService.createGoal(memberId, goalRequest);
         
         // 3. 목표에 duration 설정 (30분)

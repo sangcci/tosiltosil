@@ -2,6 +2,7 @@ package tosiltosil.backend.module.category.application;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
@@ -38,6 +40,14 @@ public class CategoryService {
 
         List<Category> categories = categoryRepository.findCategoriesByMemberIdAndDate(memberId, date);
         return categories.stream().map(CategoryListResponse::of).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryColorPerDayResponse> getCategoryColorPerMonth(
+            final UUID memberId,
+            final YearMonth yearMonth
+    ) {
+        return categoryRepository.findColorsPerMonth(memberId, yearMonth);
     }
 
     @Transactional
