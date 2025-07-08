@@ -27,7 +27,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
 
     @Transactional(readOnly = true)
-    public List<GoalListResponse> getGoalsByMemberCode(
+    public List<GoalListResponse> getGoalsByMemberId(
             final UUID memberOwnerId,
             final UUID memberId,
             final LocalDate date

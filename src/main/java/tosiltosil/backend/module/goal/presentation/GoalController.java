@@ -39,7 +39,7 @@ public class GoalController {
             @PathVariable final UUID memberId,
             @RequestParam final LocalDate date
     ) {
-        List<GoalListResponse> responses = goalService.getGoalsByMemberCode(memberOwnerId, memberId, date);
+        List<GoalListResponse> responses = goalService.getGoalsByMemberId(memberOwnerId, memberId, date);
         return Response.ok("목표 리스트 조회 성공", responses);
     }
 

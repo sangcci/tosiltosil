@@ -45,7 +45,7 @@ class GoalServiceTest extends IntegrationTestSupport {
         goalService.createGoal(memberId, goalRequest3);
 
         // when
-        List<GoalListResponse> result = goalService.getGoalsByMemberCode(memberOwnerId, memberId, date);
+        List<GoalListResponse> result = goalService.getGoalsByMemberId(memberOwnerId, memberId, date);
 
         // then
         assertThat(result).hasSize(3);
@@ -67,7 +67,7 @@ class GoalServiceTest extends IntegrationTestSupport {
         LocalDate date = LocalDate.of(2025, 7, 8);
 
         // when
-        List<GoalListResponse> result = goalService.getGoalsByMemberCode(memberOwnerId, memberId, date);
+        List<GoalListResponse> result = goalService.getGoalsByMemberId(memberOwnerId, memberId, date);
 
         // then
         assertThat(result).isEmpty();
@@ -89,7 +89,7 @@ class GoalServiceTest extends IntegrationTestSupport {
         goalService.createGoal(memberFriendId, goalRequest);
 
         // when
-        List<GoalListResponse> result = goalService.getGoalsByMemberCode(memberOwnerId, memberFriendId, date);
+        List<GoalListResponse> result = goalService.getGoalsByMemberId(memberOwnerId, memberFriendId, date);
 
         // then
         assertThat(result).hasSize(1);

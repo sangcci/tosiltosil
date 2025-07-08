@@ -52,7 +52,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                 new GoalListResponse(3L, 2L, 3L, "코딩하기", "PAUSED", "PT3H", "PT1H15M")
         );
 
-        given(goalService.getGoalsByMemberCode(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+        given(goalService.getGoalsByMemberId(any(UUID.class), any(UUID.class), any(LocalDate.class)))
                 .willReturn(responses);
 
         // when
@@ -128,7 +128,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
         LocalDate date = LocalDate.of(2025, 7, 8);
 
-        given(goalService.getGoalsByMemberCode(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+        given(goalService.getGoalsByMemberId(any(UUID.class), any(UUID.class), any(LocalDate.class)))
                 .willReturn(List.of());
 
         // when
