@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tosiltosil.backend.common.auth.annotation.LoginMember;
+import tosiltosil.backend.common.domain.validator.IsDate;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
@@ -37,7 +38,7 @@ public class GoalController {
     public Response<List<GoalListResponse>> getGoalsByMemberId(
             @LoginMember final UUID memberOwnerId,
             @PathVariable final UUID memberId,
-            @RequestParam final LocalDate date
+            @RequestParam @IsDate final LocalDate date
     ) {
         List<GoalListResponse> responses = goalService.getGoalsByMemberId(memberOwnerId, memberId, date);
         return Response.ok("목표 리스트 조회 성공", responses);
