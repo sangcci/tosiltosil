@@ -1,5 +1,7 @@
 package tosiltosil.backend.module.category.infrastructure;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +21,8 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public Optional<Category> findByIdAndMemberId(final Long categoryId, final UUID memberId) {
-        return categoryJpaRepository.findByIdAndMemberId(categoryId, memberId);
+    public List<Category> findCategoriesByMemberIdAndDate(final UUID memberId, final LocalDate date) {
+        return categoryJpaRepository.findByMemberIdAndDate(memberId, date);
     }
 
     @Override

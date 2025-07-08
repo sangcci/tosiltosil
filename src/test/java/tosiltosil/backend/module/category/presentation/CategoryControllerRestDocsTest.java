@@ -6,7 +6,10 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,7 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
@@ -34,6 +38,101 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
     private StopwatchService stopwatchService;
+
+    @Test
+    void 회원_카테고리_목록_조회() {
+        // given
+        UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        LocalDate date = LocalDate.of(2025, 7, 8);
+        
+        List<CategoryListResponse> responses = List.of(
+                new CategoryListResponse(1L, "운동", "#FF5733"),
+                new CategoryListResponse(2L, "공부", "#33FF57"),
+                new CategoryListResponse(3L, "업무", "#3357FF")
+        );
+
+        given(categoryService.getCategoriesByMemberId(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+                .willReturn(responses);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories/members/{memberId}?date={date}", memberId, date)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "카테고리 리스트 조회 성공",
+                                "data": [
+                                    {
+                                        "categoryId": 1,
+                                        "title": "운동",
+                                        "color": "#FF5733"
+                                    },
+                                    {
+                                        "categoryId": 2,
+                                        "title": "공부",
+                                        "color": "#33FF57"
+                                    },
+                                    {
+                                        "categoryId": 3,
+                                        "title": "업무",
+                                        "color": "#3357FF"
+                                    }
+                                ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        pathParameters(
+                                pathParameter("memberId", "조회할 회원 ID")
+                        ),
+                        queryParameters(
+                                queryParameter("date", "조회할 날짜 (YYYY-MM-DD 형식)")
+                        ),
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메세지", "카테고리 리스트 조회 성공"),
+                                responseField("data", JsonFieldType.ARRAY, "카테고리 목록", "[]"),
+                                responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
+                                responseField("data[].title", JsonFieldType.STRING, "카테고리 제목", "운동"),
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상 (HEX 코드)", "#FF5733")
+                        )
+                ));
+    }
+
+    @Test
+    void 회원_카테고리_목록_조회_빈_목록() {
+        // given
+        UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        LocalDate date = LocalDate.of(2025, 7, 8);
+
+        given(categoryService.getCategoriesByMemberId(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+                .willReturn(List.of());
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories/members/{memberId}?date={date}", memberId, date)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "카테고리 리스트 조회 성공",
+                                "data": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
 
     @Test
     void 카테고리_생성하기() {

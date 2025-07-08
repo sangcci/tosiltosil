@@ -1,6 +1,8 @@
 package tosiltosil.backend.module.category.application;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
 import tosiltosil.backend.module.goal.application.CategoryGoalService;
@@ -24,6 +27,18 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryDomainService categoryDomainService;
     private final CategoryGoalService categoryGoalService;
+
+    @Transactional(readOnly = true)
+    public List<CategoryListResponse> getCategoriesByMemberId(
+            final UUID memberOwnerId,
+            final UUID memberId,
+            final LocalDate date
+    ) {
+        // TODO: 친구 여부 확인
+
+        List<Category> categories = categoryRepository.findCategoriesByMemberIdAndDate(memberId, date);
+        return categories.stream().map(CategoryListResponse::of).toList();
+    }
 
     @Transactional
     public CategoryResponse createCategory(

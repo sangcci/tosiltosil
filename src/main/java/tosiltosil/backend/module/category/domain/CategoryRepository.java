@@ -1,5 +1,7 @@
 package tosiltosil.backend.module.category.domain;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -7,7 +9,7 @@ public interface CategoryRepository {
 
     Optional<Category> findById(Long categoryId);
 
-    Optional<Category> findByIdAndMemberId(Long categoryId, UUID memberId);
+    List<Category> findCategoriesByMemberIdAndDate(UUID memberId, LocalDate date);
 
     Long countByMemberId(UUID memberId);
 

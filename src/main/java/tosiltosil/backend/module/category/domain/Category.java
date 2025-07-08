@@ -1,13 +1,17 @@
 package tosiltosil.backend.module.category.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
 
@@ -32,17 +36,22 @@ public class Category extends BaseEntity {
     @Column(nullable = false)
     private int sequence;
 
+    @Column(nullable = false)
+    private LocalDate date;
+
     @Builder
     private Category(
             final UUID memberId,
             final String title,
             final String color,
-            final int sequence
+            final int sequence,
+            final LocalDate date
     ) {
         this.memberId = memberId;
         this.title = title;
         this.color = color;
         this.sequence = sequence;
+        this.date = date;
     }
 
     public static Category of(
@@ -56,6 +65,7 @@ public class Category extends BaseEntity {
                 .title(title)
                 .color(color)
                 .sequence(0)
+                .date(LocalDate.now())
                 .build();
     }
 

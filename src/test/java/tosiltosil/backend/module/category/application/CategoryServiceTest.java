@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.duration.application.DurationService;
 import tosiltosil.backend.module.goal.application.GoalService;
@@ -23,7 +25,7 @@ import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.support.IntegrationTestSupport;
 
 @SuppressWarnings("NonAsciiCharacters")
-public class CategoryServiceTest extends IntegrationTestSupport {
+class CategoryServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private CategoryService categoryService;
@@ -109,5 +111,48 @@ public class CategoryServiceTest extends IntegrationTestSupport {
                 softly.assertThat(event.deletedTotalDuration()).isEqualTo(testDuration);
             });
         });
+    }
+
+    @Test
+    void 회원의_특정_날짜_카테고리_목록_조회() {
+        // given
+        UUID memberOwnerId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+        LocalDate date = LocalDate.of(2025, 7, 8);
+
+        // 카테고리 생성
+        CategoryCreateRequest categoryRequest1 = new CategoryCreateRequest("운동", "#FF0000");
+        CategoryCreateRequest categoryRequest2 = new CategoryCreateRequest("공부", "#00FF00");
+        CategoryCreateRequest categoryRequest3 = new CategoryCreateRequest("업무", "#0000FF");
+
+        categoryService.createCategory(memberId, categoryRequest1);
+        categoryService.createCategory(memberId, categoryRequest2);
+        categoryService.createCategory(memberId, categoryRequest3);
+
+        // when
+        List<CategoryListResponse> result = categoryService.getCategoriesByMemberId(memberOwnerId, memberId, date);
+
+        // then
+        assertThat(result).hasSize(3);
+        assertSoftly(softly -> {
+            softly.assertThat(result).extracting(CategoryListResponse::title)
+                    .containsExactlyInAnyOrder("운동", "공부", "업무");
+            softly.assertThat(result).extracting(CategoryListResponse::color)
+                    .containsExactlyInAnyOrder("#FF0000", "#00FF00", "#0000FF");
+        });
+    }
+
+    @Test
+    void 회원의_특정_날짜에_카테고리가_없을_때_빈_목록_반환() {
+        // given
+        UUID memberOwnerId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+        LocalDate date = LocalDate.of(2025, 7, 8);
+
+        // when
+        List<CategoryListResponse> result = categoryService.getCategoriesByMemberId(memberOwnerId, memberId, date);
+
+        // then
+        assertThat(result).isEmpty();
     }
 }
