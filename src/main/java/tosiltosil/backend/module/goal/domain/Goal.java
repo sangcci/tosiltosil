@@ -66,9 +66,9 @@ public class Goal extends BaseEntity {
             final Duration totalTime,
             final GoalStatus status,
             final Duration duration,
-            final LocalDate date,
+            final int sequence,
             final Long iconId,
-            final int sequence
+            final LocalDate date
     ) {
         this.memberId = memberId;
         this.categoryId = categoryId;
@@ -76,9 +76,9 @@ public class Goal extends BaseEntity {
         this.totalTime = totalTime;
         this.status = status;
         this.duration = duration;
-        this.date = date;
-        this.iconId = iconId;
         this.sequence = sequence;
+        this.iconId = iconId;
+        this.date = date;
     }
 
     public static Goal of(
