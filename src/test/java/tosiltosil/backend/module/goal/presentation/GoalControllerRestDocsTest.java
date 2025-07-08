@@ -6,7 +6,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 import tosiltosil.backend.support.RestDocsTestSupport;
 
@@ -36,6 +39,117 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
     private CategoryService categoryService;
+
+    @Test
+    void 회원_목표_목록_조회() {
+        // given
+        UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        LocalDate date = LocalDate.of(2025, 7, 8);
+        
+        List<GoalListResponse> responses = List.of(
+                new GoalListResponse(1L, 1L, 1L, "운동하기", "BEFORE_STARTING", "PT2H", "PT0S"),
+                new GoalListResponse(2L, 1L, 2L, "독서하기", "RUNNING", "PT1H30M", "PT30M"),
+                new GoalListResponse(3L, 2L, 3L, "코딩하기", "PAUSED", "PT3H", "PT1H15M")
+        );
+
+        given(goalService.getGoalsByMemberCode(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+                .willReturn(responses);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/goals/members/{memberId}/goals?date={date}", memberId, date)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "목표 리스트 조회 성공",
+                                "data": [
+                                    {
+                                        "goalId": 1,
+                                        "categoryId": 1,
+                                        "iconId": 1,
+                                        "title": "운동하기",
+                                        "status": "BEFORE_STARTING",
+                                        "totalTime": "PT2H",
+                                        "duration": "PT0S"
+                                    },
+                                    {
+                                        "goalId": 2,
+                                        "categoryId": 1,
+                                        "iconId": 2,
+                                        "title": "독서하기",
+                                        "status": "RUNNING",
+                                        "totalTime": "PT1H30M",
+                                        "duration": "PT30M"
+                                    },
+                                    {
+                                        "goalId": 3,
+                                        "categoryId": 2,
+                                        "iconId": 3,
+                                        "title": "코딩하기",
+                                        "status": "PAUSED",
+                                        "totalTime": "PT3H",
+                                        "duration": "PT1H15M"
+                                    }
+                                ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        pathParameters(
+                                pathParameter("memberId", "조회할 회원 ID")
+                        ),
+                        queryParameters(
+                                queryParameter("date", "조회할 날짜 (YYYY-MM-DD 형식)")
+                        ),
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메세지", "목표 리스트 조회 성공"),
+                                responseField("data", JsonFieldType.ARRAY, "목표 목록", "[]"),
+                                responseField("data[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),
+                                responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
+                                responseField("data[].iconId", JsonFieldType.NUMBER, "아이콘 ID", "1"),
+                                responseField("data[].title", JsonFieldType.STRING, "목표 제목", "운동하기"),
+                                responseField("data[].status", JsonFieldType.STRING, "목표 상태 (BEFORE_STARTING, RUNNING, PAUSED, COMPLETED, FAILED)", "BEFORE_STARTING"),
+                                responseField("data[].totalTime", JsonFieldType.STRING, "목표 총 시간 (ISO-8601 Duration 형식)", "PT2H"),
+                                responseField("data[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S")
+                        )
+                ));
+    }
+
+    @Test
+    void 회원_목표_목록_조회_빈_목록() {
+        // given
+        UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        LocalDate date = LocalDate.of(2025, 7, 8);
+
+        given(goalService.getGoalsByMemberCode(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+                .willReturn(List.of());
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/goals/members/{memberId}/goals?date={date}", memberId, date)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "목표 리스트 조회 성공",
+                                "data": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
 
     @Test
     void 목표_생성하기() {

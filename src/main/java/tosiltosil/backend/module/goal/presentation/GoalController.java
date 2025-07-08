@@ -1,15 +1,19 @@
 package tosiltosil.backend.module.goal.presentation;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tosiltosil.backend.common.auth.annotation.LoginMember;
@@ -20,6 +24,7 @@ import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 
 @RestController
 @RequestMapping("/api/v1/goals")
@@ -27,6 +32,16 @@ import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 public class GoalController {
 
     private final GoalService goalService;
+
+    @GetMapping("/members/{memberId}/goals")
+    public Response<List<GoalListResponse>> getGoalsByMemberId(
+            @LoginMember final UUID memberOwnerId,
+            @PathVariable final UUID memberId,
+            @RequestParam final LocalDate date
+    ) {
+        List<GoalListResponse> responses = goalService.getGoalsByMemberCode(memberOwnerId, memberId, date);
+        return Response.ok("목표 리스트 조회 성공", responses);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

@@ -17,6 +17,7 @@ import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 
 @Service
@@ -24,6 +25,18 @@ import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 public class GoalService {
 
     private final GoalRepository goalRepository;
+
+    @Transactional(readOnly = true)
+    public List<GoalListResponse> getGoalsByMemberCode(
+            final UUID memberOwnerId,
+            final UUID memberId,
+            final LocalDate date
+    ) {
+        // TODO: 친구 여부 확인
+
+        List<Goal> goals = goalRepository.findGoalsByMemberIdAndDate(memberId, date);
+        return goals.stream().map(GoalListResponse::of).toList();
+    }
 
     @Transactional
     public GoalIdsResponse createGoal(
