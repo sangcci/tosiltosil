@@ -57,7 +57,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
 
         // when
         MvcTestResult testResult = mockMvcTester.get()
-                .uri("/api/v1/goals/members/{memberId}/goals?date={date}", memberId, date)
+                .uri("/api/v1/goals/members/{memberId}?date={date}", memberId, date)
                 .exchange();
 
         // then

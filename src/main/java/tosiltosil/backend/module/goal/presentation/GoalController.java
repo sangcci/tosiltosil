@@ -34,7 +34,7 @@ public class GoalController {
 
     private final GoalService goalService;
 
-    @GetMapping("/members/{memberId}/goals")
+    @GetMapping("/members/{memberId}")
     public Response<List<GoalListResponse>> getGoalsByMemberId(
             @LoginMember final UUID memberOwnerId,
             @PathVariable final UUID memberId,
