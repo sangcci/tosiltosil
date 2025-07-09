@@ -17,6 +17,7 @@ import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
+import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
 import tosiltosil.backend.module.goal.application.CategoryGoalService;
@@ -29,17 +30,13 @@ public class CategoryService {
     private final CategoryDomainService categoryDomainService;
     private final CategoryGoalService categoryGoalService;
 
-/*    @Transactional(readOnly = true)
-    public List<CategoryListResponse> getCategoriesByMemberId(
-            final UUID memberOwnerId,
-            final UUID memberId,
-            final LocalDate date
+    @Transactional(readOnly = true)
+    public List<CurrentCategoryListResponse> getCategoriesByMemberId(
+            final UUID memberId
     ) {
-        // TODO: 친구 여부 확인
-
-        List<Category> categories = categoryRepository.findCategoriesByMemberIdAndDate(memberId, date);
-        return categories.stream().map(CategoryListResponse::of).toList();
-    }*/
+        List<Category> categories = categoryRepository.findCurrentCategories(memberId);
+        return categories.stream().map(CurrentCategoryListResponse::of).toList();
+    }
 
     @Transactional(readOnly = true)
     public List<CategoryColorPerDayResponse> getCategoryColorPerMonth(

@@ -10,11 +10,11 @@ public interface CategoryRepository {
 
     Optional<Category> findById(Long categoryId);
 
-    //List<Category> findCategoriesByMemberIdAndDate(UUID memberId, LocalDate date);
+    List<Category> findCurrentCategories(UUID memberId);
 
     List<CategoryColorPerDayResponse> findColorsPerMonth(UUID memberId, YearMonth yearMonth);
 
-    Long countByMemberId(UUID memberId);
+    Long countCurrentCategory(UUID memberId);
 
     Category save(Category category);
 

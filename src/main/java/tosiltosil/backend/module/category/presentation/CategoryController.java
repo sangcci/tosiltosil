@@ -24,6 +24,7 @@ import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeR
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
+import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -32,15 +33,13 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-/*    @GetMapping("/members/{memberId}")
-    public Response<List<CategoryListResponse>> getGoalsByMemberId(
-            @LoginMember final UUID memberOwnerId,
-            @PathVariable final UUID memberId,
-            @RequestParam @IsDate final LocalDate date
+    @GetMapping
+    public Response<List<CurrentCategoryListResponse>> getCurrentCategories(
+            @LoginMember final UUID memberId
     ) {
-        List<CategoryListResponse> responses = categoryService.getCategoriesByMemberId(memberOwnerId, memberId, date);
+        List<CurrentCategoryListResponse> responses = categoryService.getCategoriesByMemberId(memberId);
         return Response.ok("카테고리 리스트 조회 성공", responses);
-    }*/
+    }
 
     @GetMapping("/color-per-day")
     public Response<List<CategoryColorPerDayResponse>> getCategoryColorPerDay(

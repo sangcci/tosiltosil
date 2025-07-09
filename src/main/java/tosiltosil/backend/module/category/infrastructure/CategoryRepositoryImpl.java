@@ -22,10 +22,10 @@ public class CategoryRepositoryImpl implements CategoryRepository {
         return categoryJpaRepository.findById(categoryId);
     }
 
-    /*@Override
-    public List<Category> findCategoriesByMemberIdAndDate(final UUID memberId, final LocalDate date) {
-        return categoryJpaRepository.findByMemberIdAndDate(memberId, date);
-    }*/
+    @Override
+    public List<Category> findCurrentCategories(final UUID memberId) {
+        return categoryJpaRepository.findByMemberIdAndDeletedIsFalse(memberId);
+    }
 
     @Override
     public List<CategoryColorPerDayResponse> findColorsPerMonth(final UUID memberId, final YearMonth yearMonth) {
@@ -33,8 +33,8 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public Long countByMemberId(final UUID memberId) {
-        return categoryJpaRepository.countByMemberId(memberId);
+    public Long countCurrentCategory(final UUID memberId) {
+        return categoryJpaRepository.countByMemberIdAndDeletedIsFalse(memberId);
     }
 
     @Override

@@ -24,6 +24,7 @@ import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
+import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.duration.application.DurationService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.Goal;
@@ -69,6 +70,41 @@ class CategoryServiceTest extends IntegrationTestSupport {
     @BeforeEach
     void setUp() {
         redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+    }
+
+    @Test
+    void 회원_현재_카테고리_목록_조회_시_지난_카테고리_미포함() {
+        // given
+        UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
+        
+        // 현재 카테고리 생성
+        CategoryCreateRequest currentCategoryRequest = new CategoryCreateRequest("현재 카테고리", "#FF0000");
+        CategoryResponse currentCategory = categoryService.createCategory(memberId, currentCategoryRequest);
+        
+        // 삭제될 카테고리 생성
+        CategoryCreateRequest deletedCategoryRequest = new CategoryCreateRequest("삭제될 카테고리", "#00FF00");
+        CategoryResponse deletedCategory = categoryService.createCategory(memberId, deletedCategoryRequest);
+        
+        // 카테고리 삭제 (지난 카테고리로 만들기)
+        categoryService.deleteCategory(memberId, deletedCategory.categoryId());
+        
+        // when
+        List<CurrentCategoryListResponse> currentCategories = categoryService.getCategoriesByMemberId(memberId);
+        
+        // then
+        assertSoftly(softly -> {
+            // 현재 카테고리만 조회되어야 함
+            softly.assertThat(currentCategories).hasSize(1);
+            softly.assertThat(currentCategories.get(0).categoryId()).isEqualTo(currentCategory.categoryId());
+            softly.assertThat(currentCategories.get(0).title()).isEqualTo("현재 카테고리");
+            softly.assertThat(currentCategories.get(0).color()).isEqualTo("#FF0000");
+            
+            // 삭제된 카테고리는 포함되지 않아야 함
+            List<Long> categoryIds = currentCategories.stream()
+                    .map(CurrentCategoryListResponse::categoryId)
+                    .toList();
+            softly.assertThat(categoryIds).doesNotContain(deletedCategory.categoryId());
+        });
     }
 
     @Test
@@ -180,47 +216,4 @@ class CategoryServiceTest extends IntegrationTestSupport {
             });
         });
     }
-
-//    @Test
-//    void 회원의_특정_날짜_카테고리_목록_조회() {
-//        // given
-//        UUID memberOwnerId = UUID.randomUUID();
-//        UUID memberId = UUID.randomUUID();
-//        LocalDate date = LocalDate.of(2025, 7, 8);
-//
-//        // 카테고리 생성
-//        CategoryCreateRequest categoryRequest1 = new CategoryCreateRequest("운동", "#FF0000");
-//        CategoryCreateRequest categoryRequest2 = new CategoryCreateRequest("공부", "#00FF00");
-//        CategoryCreateRequest categoryRequest3 = new CategoryCreateRequest("업무", "#0000FF");
-//
-//        categoryService.createCategory(memberId, categoryRequest1);
-//        categoryService.createCategory(memberId, categoryRequest2);
-//        categoryService.createCategory(memberId, categoryRequest3);
-//
-//        // when
-//        List<CategoryListResponse> result = categoryService.getCategoriesByMemberId(memberOwnerId, memberId, date);
-//
-//        // then
-//        assertThat(result).hasSize(3);
-//        assertSoftly(softly -> {
-//            softly.assertThat(result).extracting(CategoryListResponse::title)
-//                    .containsExactlyInAnyOrder("운동", "공부", "업무");
-//            softly.assertThat(result).extracting(CategoryListResponse::color)
-//                    .containsExactlyInAnyOrder("#FF0000", "#00FF00", "#0000FF");
-//        });
-//    }
-//
-//    @Test
-//    void 회원의_특정_날짜에_카테고리가_없을_때_빈_목록_반환() {
-//        // given
-//        UUID memberOwnerId = UUID.randomUUID();
-//        UUID memberId = UUID.randomUUID();
-//        LocalDate date = LocalDate.of(2025, 7, 8);
-//
-//        // when
-//        List<CategoryListResponse> result = categoryService.getCategoriesByMemberId(memberOwnerId, memberId, date);
-//
-//        // then
-//        assertThat(result).isEmpty();
-//    }
 }
