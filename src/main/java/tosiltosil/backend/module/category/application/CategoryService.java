@@ -1,7 +1,6 @@
 package tosiltosil.backend.module.category.application;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
@@ -13,11 +12,11 @@ import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.category.domain.Category;
 import tosiltosil.backend.module.category.domain.CategoryRepository;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
+import tosiltosil.backend.module.category.domain.event.CategoryUpdatedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
 import tosiltosil.backend.module.goal.application.CategoryGoalService;
@@ -30,7 +29,7 @@ public class CategoryService {
     private final CategoryDomainService categoryDomainService;
     private final CategoryGoalService categoryGoalService;
 
-    @Transactional(readOnly = true)
+/*    @Transactional(readOnly = true)
     public List<CategoryListResponse> getCategoriesByMemberId(
             final UUID memberOwnerId,
             final UUID memberId,
@@ -40,7 +39,7 @@ public class CategoryService {
 
         List<Category> categories = categoryRepository.findCategoriesByMemberIdAndDate(memberId, date);
         return categories.stream().map(CategoryListResponse::of).toList();
-    }
+    }*/
 
     @Transactional(readOnly = true)
     public List<CategoryColorPerDayResponse> getCategoryColorPerMonth(
@@ -74,9 +73,14 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        category.updateBasicInfo(request.title(), request.color());
+        Category newCategory = category.createUpdatedCategory(request.title(), request.color());
+        Category savedNewCategory = categoryRepository.save(newCategory);
 
-        return CategoryResponse.of(category.getId());
+        Events.raise(CategoryUpdatedEvent.of(memberId, categoryId, savedNewCategory.getId()));
+
+        categoryRepository.delete(category);
+
+        return CategoryResponse.of(savedNewCategory.getId());
     }
 
     @Transactional

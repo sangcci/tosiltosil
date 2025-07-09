@@ -11,4 +11,6 @@ public interface GoalJpaRepository extends JpaRepository<Goal, Long> {
     List<Goal> findByMemberIdAndDate(UUID memberId, LocalDate date);
     
     List<Goal> findByMemberIdAndCategoryId(UUID memberId, Long categoryId);
+    
+    List<Goal> findByMemberIdAndCategoryIdAndDateGreaterThanEqual(UUID memberId, Long categoryId, LocalDate fromDate);
 }

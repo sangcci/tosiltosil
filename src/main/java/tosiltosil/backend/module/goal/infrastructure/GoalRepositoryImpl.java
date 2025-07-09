@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 
@@ -14,6 +15,7 @@ import tosiltosil.backend.module.goal.domain.GoalRepository;
 public class GoalRepositoryImpl implements GoalRepository {
 
     private final GoalJpaRepository goalJpaRepository;
+    private final TimeHolder timeHolder;
 
     @Override
     public Optional<Goal> findById(final Long goalId) {
@@ -28,6 +30,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     @Override
     public List<Goal> findByMemberIdAndCategoryId(final UUID memberId, final Long categoryId) {
         return goalJpaRepository.findByMemberIdAndCategoryId(memberId, categoryId);
+    }
+
+    @Override
+    public List<Goal> findByMemberIdAndCategoryIdAndDateFromToday(final UUID memberId, final Long categoryId) {
+        return goalJpaRepository.findByMemberIdAndCategoryIdAndDateGreaterThanEqual(memberId, categoryId, timeHolder.getCurrentDate());
     }
 
     @Override

@@ -5,19 +5,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE category SET deleted = true WHERE id = ?")
+// @SQLRestriction("deleted == false")
 public class Category extends BaseEntity {
 
     @Id
@@ -37,21 +39,19 @@ public class Category extends BaseEntity {
     private int sequence;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private boolean deleted = false;
 
     @Builder
     private Category(
             final UUID memberId,
             final String title,
             final String color,
-            final int sequence,
-            final LocalDate date
+            final int sequence
     ) {
         this.memberId = memberId;
         this.title = title;
         this.color = color;
         this.sequence = sequence;
-        this.date = date;
     }
 
     public static Category of(
@@ -65,7 +65,6 @@ public class Category extends BaseEntity {
                 .title(title)
                 .color(color)
                 .sequence(0)
-                .date(LocalDate.now())
                 .build();
     }
 
@@ -81,5 +80,17 @@ public class Category extends BaseEntity {
     ) {
         this.title = title;
         this.color = color;
+    }
+
+    public Category createUpdatedCategory(
+            final String title,
+            final String color
+    ) {
+        return Category.builder()
+                .memberId(this.memberId)
+                .title(title)
+                .color(color)
+                .sequence(this.sequence)
+                .build();
     }
 }

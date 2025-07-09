@@ -1,7 +1,6 @@
 package tosiltosil.backend.module.category.presentation;
 
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
@@ -18,14 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tosiltosil.backend.common.auth.annotation.LoginMember;
-import tosiltosil.backend.common.domain.validator.IsDate;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 
 @RestController
@@ -35,7 +32,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/members/{memberId}")
+/*    @GetMapping("/members/{memberId}")
     public Response<List<CategoryListResponse>> getGoalsByMemberId(
             @LoginMember final UUID memberOwnerId,
             @PathVariable final UUID memberId,
@@ -43,7 +40,7 @@ public class CategoryController {
     ) {
         List<CategoryListResponse> responses = categoryService.getCategoriesByMemberId(memberOwnerId, memberId, date);
         return Response.ok("카테고리 리스트 조회 성공", responses);
-    }
+    }*/
 
     @GetMapping("/color-per-day")
     public Response<List<CategoryColorPerDayResponse>> getCategoryColorPerDay(

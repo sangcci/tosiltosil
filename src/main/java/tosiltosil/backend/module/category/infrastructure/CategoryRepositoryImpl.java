@@ -1,6 +1,5 @@
 package tosiltosil.backend.module.category.infrastructure;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +22,10 @@ public class CategoryRepositoryImpl implements CategoryRepository {
         return categoryJpaRepository.findById(categoryId);
     }
 
-    @Override
+    /*@Override
     public List<Category> findCategoriesByMemberIdAndDate(final UUID memberId, final LocalDate date) {
         return categoryJpaRepository.findByMemberIdAndDate(memberId, date);
-    }
+    }*/
 
     @Override
     public List<CategoryColorPerDayResponse> findColorsPerMonth(final UUID memberId, final YearMonth yearMonth) {

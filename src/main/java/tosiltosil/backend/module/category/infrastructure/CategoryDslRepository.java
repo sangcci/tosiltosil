@@ -24,7 +24,6 @@ public class CategoryDslRepository {
     ) {
         return queryFactory
                 .select(Projections.constructor(CategoryColorPerDayResponse.class,
-                        category.date,
                         category.color
                 ))
                 .from(category)
@@ -34,7 +33,7 @@ public class CategoryDslRepository {
                         goal.memberId.eq(memberId),
                         goal.date.between(yearMonth.atDay(1), yearMonth.atEndOfMonth())
                 )
-                .orderBy(category.date.asc())
+                //.orderBy(category.date.asc())
                 .fetch();
     }
 }
