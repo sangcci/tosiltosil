@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,14 @@ import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
+import tosiltosil.backend.module.category.infrastructure.CategoryJpaRepository;
 import tosiltosil.backend.module.duration.application.DurationService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.goal.infrastructure.GoalJpaRepository;
 import tosiltosil.backend.support.IntegrationTestSupport;
 
 @Import(TestTimeHolderConfig.class)
@@ -58,6 +61,12 @@ class CategoryServiceTest extends IntegrationTestSupport {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private CategoryJpaRepository categoryJpaRepository;
+    
+    @Autowired
+    private GoalJpaRepository goalJpaRepository;
+
     static class TestTimeHolderConfig {
 
         @Bean
@@ -69,6 +78,13 @@ class CategoryServiceTest extends IntegrationTestSupport {
 
     @BeforeEach
     void setUp() {
+        redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+    }
+    
+    @AfterEach
+    void tearDown() {
+        goalJpaRepository.deleteAllInBatch();
+        categoryJpaRepository.deleteAllInBatch();
         redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
     }
 
