@@ -23,9 +23,9 @@ import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
+import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
-import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 
 @RestController
 @RequestMapping("/api/v1/goals")
@@ -35,12 +35,12 @@ public class GoalController {
     private final GoalService goalService;
 
     @GetMapping("/members/{memberId}")
-    public Response<List<GoalListResponse>> getGoalsByMemberId(
+    public Response<List<DayGoalListResponse>> getGoalsByMemberId(
             @LoginMember final UUID memberOwnerId,
             @PathVariable final UUID memberId,
             @RequestParam @IsDate final LocalDate date
     ) {
-        List<GoalListResponse> responses = goalService.getGoalsByMemberId(memberOwnerId, memberId, date);
+        List<DayGoalListResponse> responses = goalService.getDayGoals(memberOwnerId, memberId, date);
         return Response.ok("목표 리스트 조회 성공", responses);
     }
 

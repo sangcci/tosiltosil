@@ -9,12 +9,14 @@ import org.springframework.stereotype.Repository;
 import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
+import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 
 @Repository
 @RequiredArgsConstructor
 public class GoalRepositoryImpl implements GoalRepository {
 
     private final GoalJpaRepository goalJpaRepository;
+    private final GoalDslRepository goalDslRepository;
     private final TimeHolder timeHolder;
 
     @Override
@@ -23,8 +25,8 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public List<Goal> findGoalsByMemberIdAndDate(final UUID memberId, final LocalDate date) {
-        return goalJpaRepository.findByMemberIdAndDate(memberId, date);
+    public List<DayGoalListResponse> findDayGoals(final UUID memberId, final LocalDate date) {
+        return goalDslRepository.findDayGoals(memberId, date);
     }
 
     @Override

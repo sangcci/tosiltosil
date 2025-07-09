@@ -13,12 +13,12 @@ import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
-import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
+import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
-import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
+import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 
 @Service
@@ -29,15 +29,14 @@ public class GoalService {
     private final GoalDomainService goalDomainService;
 
     @Transactional(readOnly = true)
-    public List<GoalListResponse> getGoalsByMemberId(
+    public List<DayGoalListResponse> getDayGoals(
             final UUID memberOwnerId,
             final UUID memberId,
             final LocalDate date
     ) {
-        // TODO: 친구 여부 확인
+        // TODO: 친구 관계 검증
 
-        List<Goal> goals = goalRepository.findGoalsByMemberIdAndDate(memberId, date);
-        return goals.stream().map(GoalListResponse::of).toList();
+        return goalRepository.findDayGoals(memberId, date);
     }
 
     @Transactional
