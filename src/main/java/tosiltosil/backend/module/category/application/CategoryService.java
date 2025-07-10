@@ -41,8 +41,10 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryColorPerDayResponse> getCategoryColorPerMonth(
             final UUID memberId,
-            final YearMonth yearMonth
+            final int year,
+            final int month
     ) {
+        YearMonth yearMonth = YearMonth.of(year, month);
         return categoryRepository.findColorsPerMonth(memberId, yearMonth);
     }
 

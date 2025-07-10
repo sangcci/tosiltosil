@@ -2,12 +2,12 @@ package tosiltosil.backend.module.category.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 
-import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -161,7 +161,8 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
 //        assertThat(testResult)
 //                .apply(documentHandler.document(
 //                        queryParameters(
-//                                queryParameter("yearMonth", "조회할 년월 (YYYY-MM 형식)")
+//                                queryParameter("year", "조회할 년도"),
+//                                queryParameter("month", "조회할 월")
 //                        ),
 //                        responseFields(
 //                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
@@ -176,14 +177,15 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
     @Test
     void 월별_카테고리_색상_조회_빈_목록() {
         // given
-        YearMonth yearMonth = YearMonth.of(2025, 8);
+        int year = 2025;
+        int month = 8;
 
-        given(categoryService.getCategoryColorPerMonth(any(UUID.class), any(YearMonth.class)))
+        given(categoryService.getCategoryColorPerMonth(any(UUID.class), eq(year), eq(month)))
                 .willReturn(List.of());
 
         // when
         MvcTestResult testResult = mockMvcTester.get()
-                .uri("/api/v1/categories/color-per-day?yearMonth={yearMonth}", yearMonth)
+                .uri("/api/v1/categories/color-per-day?year={year}&month={month}", year, month)
                 .exchange();
 
         // then

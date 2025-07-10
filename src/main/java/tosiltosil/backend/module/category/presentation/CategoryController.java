@@ -44,9 +44,10 @@ public class CategoryController {
     @GetMapping("/color-per-day")
     public Response<List<CategoryColorPerDayResponse>> getCategoryColorPerDay(
             @LoginMember final UUID memberId,
-            @RequestParam final YearMonth yearMonth
+            @RequestParam final int year,
+            @RequestParam final int month
     ) {
-        List<CategoryColorPerDayResponse> responses = categoryService.getCategoryColorPerMonth(memberId, yearMonth);
+        List<CategoryColorPerDayResponse> responses = categoryService.getCategoryColorPerMonth(memberId, year, month);
         return Response.ok("월 별 카테고리 색상 조회 성공", responses);
     }
 
