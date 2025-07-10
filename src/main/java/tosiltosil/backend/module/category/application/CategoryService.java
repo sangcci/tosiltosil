@@ -17,10 +17,10 @@ import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
+import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
-import tosiltosil.backend.module.goal.application.CategoryGoalService;
+import tosiltosil.backend.module.goal.application.GoalService;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryDomainService categoryDomainService;
-    private final CategoryGoalService categoryGoalService;
+    private final GoalService goalService;
 
     @Transactional(readOnly = true)
     public List<CurrentCategoryListResponse> getCategoriesByMemberId(
@@ -99,7 +99,7 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        Duration deletedTotalDuration = categoryGoalService.deleteGoalsAndCalculateTotalDuration(memberId, categoryId);
+        Duration deletedTotalDuration = goalService.deleteGoalsAndCalculateTotalDuration(memberId, categoryId);
 
         categoryRepository.delete(category);
 

@@ -8,7 +8,7 @@ import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 
 @Component
 @RequiredArgsConstructor
-public class CategoryDeletedEventHandler {
+public class DurationEventHandler {
 
     private final DurationService durationService;
 

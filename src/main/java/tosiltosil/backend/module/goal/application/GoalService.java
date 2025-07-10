@@ -7,8 +7,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
@@ -19,7 +17,6 @@ import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
-import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -98,6 +95,19 @@ public class GoalService {
     }
 
     @Transactional
+    public Duration deleteGoalsAndCalculateTotalDuration(final UUID memberId, final Long categoryId) {
+        List<Goal> goalsToDelete = goalRepository.findGoal(memberId, categoryId);
+
+        Duration totalDuration = goalsToDelete.stream()
+                .map(Goal::getDuration)
+                .reduce(Duration.ZERO, Duration::plus);
+
+        goalsToDelete.forEach(goalRepository::delete);
+
+        return totalDuration;
+    }
+
+    @Transactional
     public void changeStatusToStarted(
             final UUID memberId,
             final Long goalId
@@ -117,14 +127,5 @@ public class GoalService {
         goal.validateIsMine(memberId);
 
         goal.changeStatusToPaused();
-    }
-
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void addDuration(final StopwatchPausedEvent event) {
-        Goal goal = goalRepository.findById(event.goalId())
-                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
-
-        Duration addedDuration = Duration.between(event.startTime(), event.endTime());
-        goal.addDuration(addedDuration);
     }
 }
