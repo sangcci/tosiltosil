@@ -30,12 +30,12 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public List<Goal> findByMemberIdAndCategoryId(final UUID memberId, final Long categoryId) {
+    public List<Goal> findGoal(final UUID memberId, final Long categoryId) {
         return goalJpaRepository.findByMemberIdAndCategoryId(memberId, categoryId);
     }
 
     @Override
-    public List<Goal> findByMemberIdAndCategoryIdAndDateFromToday(final UUID memberId, final Long categoryId) {
+    public List<Goal> findGoalsAfterToday(final UUID memberId, final Long categoryId) {
         return goalJpaRepository.findByMemberIdAndCategoryIdAndDateGreaterThanEqual(memberId, categoryId, timeHolder.getCurrentDate());
     }
 

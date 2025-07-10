@@ -12,9 +12,9 @@ public interface GoalRepository {
 
     List<DayGoalListResponse> findDayGoals(UUID memberId, LocalDate date);
 
-    List<Goal> findByMemberIdAndCategoryId(UUID memberId, Long categoryId);
+    List<Goal> findGoal(UUID memberId, Long categoryId);
 
-    List<Goal> findByMemberIdAndCategoryIdAndDateFromToday(UUID memberId, Long categoryId);
+    List<Goal> findGoalsAfterToday(UUID memberId, Long categoryId);
 
     Goal save(Goal goal);
 
