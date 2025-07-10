@@ -1,8 +1,10 @@
 package tosiltosil.backend.module.category.infrastructure;
 
+import static com.querydsl.core.types.Projections.list;
 import static tosiltosil.backend.module.category.domain.QCategory.category;
 import static tosiltosil.backend.module.goal.domain.QGoal.goal;
 
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.YearMonth;
@@ -23,17 +25,19 @@ public class CategoryDslRepository {
             final YearMonth yearMonth
     ) {
         return queryFactory
-                .select(Projections.constructor(CategoryColorPerDayResponse.class,
-                        category.color
-                ))
-                .from(category)
-                .join(goal)
-                .on(category.id.eq(goal.categoryId))
+                .from(goal)
+                .join(category)
+                .on(goal.categoryId.eq(category.id))
                 .where(
                         goal.memberId.eq(memberId),
                         goal.date.between(yearMonth.atDay(1), yearMonth.atEndOfMonth())
                 )
-                //.orderBy(category.date.asc())
-                .fetch();
+                .orderBy(goal.date.asc(), category.color.asc()) // 순서
+                .transform(GroupBy.groupBy(goal.date).list(
+                        Projections.constructor(CategoryColorPerDayResponse.class,
+                                goal.date,
+                                list(category.color)
+                        )
+                ));
     }
 }

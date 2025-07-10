@@ -1,13 +1,11 @@
 package tosiltosil.backend.module.category.domain.response;
 
-import tosiltosil.backend.module.category.domain.Category;
+import java.time.LocalDate;
+import java.util.List;
 
 public record CategoryColorPerDayResponse(
-        //LocalDate date,
-        String color
+        LocalDate date,
+        List<String> color
 ) {
 
-    public static CategoryColorPerDayResponse of(final Category category) {
-        return new CategoryColorPerDayResponse(category.getColor());
-    }
 }
