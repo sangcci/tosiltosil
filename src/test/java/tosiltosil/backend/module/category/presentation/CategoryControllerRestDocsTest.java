@@ -166,8 +166,8 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         assertThat(testResult)
                 .apply(documentHandler.document(
                         queryParameters(
-                                parameterWithName("year").description("조회할 년도"),
-                                parameterWithName("month").description("조회할 월")
+                                parameterWithName("year").description("조회할 년도 (1900-2100)"),
+                                parameterWithName("month").description("조회할 월 (1-12)")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),

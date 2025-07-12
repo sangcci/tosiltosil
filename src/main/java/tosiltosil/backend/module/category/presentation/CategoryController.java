@@ -1,7 +1,8 @@
 package tosiltosil.backend.module.category.presentation;
 
 import jakarta.validation.Valid;
-import java.time.YearMonth;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +45,8 @@ public class CategoryController {
     @GetMapping("/color-per-day")
     public Response<List<CategoryColorPerDayResponse>> getCategoryColorPerDay(
             @LoginMember final UUID memberId,
-            @RequestParam final int year,
-            @RequestParam final int month
+            @RequestParam final @Min(1900) @Max(2100) int year,
+            @RequestParam final @Min(1) @Max(12) int month
     ) {
         List<CategoryColorPerDayResponse> responses = categoryService.getCategoryColorPerMonth(memberId, year, month);
         return Response.ok("월 별 카테고리 색상 조회 성공", responses);
