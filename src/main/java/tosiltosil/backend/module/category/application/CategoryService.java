@@ -72,7 +72,7 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        Category newCategory = category.createUpdatedCategory(request.title(), request.color());
+        Category newCategory = Category.of(memberId, request.title(), request.color());
         Category savedNewCategory = categoryRepository.save(newCategory);
 
         Events.raise(CategoryUpdatedEvent.of(memberId, categoryId, savedNewCategory.getId()));

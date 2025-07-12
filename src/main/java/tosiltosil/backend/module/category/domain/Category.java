@@ -73,24 +73,4 @@ public class Category extends BaseEntity {
             throw new ForbiddenException("해당 카테고리에 접근할 권한이 없습니다.");
         }
     }
-
-    public void updateBasicInfo(
-            final String title,
-            final String color
-    ) {
-        this.title = title;
-        this.color = color;
-    }
-
-    public Category createUpdatedCategory(
-            final String title,
-            final String color
-    ) {
-        return Category.builder()
-                .memberId(this.memberId)
-                .title(title)
-                .color(color)
-                .sequence(this.sequence)
-                .build();
-    }
 }
