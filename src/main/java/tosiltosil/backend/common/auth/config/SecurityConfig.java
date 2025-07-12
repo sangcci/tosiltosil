@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/reissue").permitAll()
                         // swagger
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // restdocs
+                        .requestMatchers("/docs/**").permitAll()
                         // h2
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
