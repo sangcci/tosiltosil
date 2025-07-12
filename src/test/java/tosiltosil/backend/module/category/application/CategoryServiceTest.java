@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -190,8 +191,12 @@ class CategoryServiceTest extends IntegrationTestSupport {
     }
 
     @Test
+    @Disabled
     void 카테고리_삭제_시_카테고리에_속한_목표_전체_삭제() {
-
+        // given
+        // when
+        // then
+        // TODO: 테스트 구현 예정
     }
 
     @Test
