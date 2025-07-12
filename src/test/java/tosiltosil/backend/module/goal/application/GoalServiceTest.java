@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.goal.application;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -9,7 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class GoalServiceTest {
 
     @Test
+    @Disabled
     void 친구의_특정_날짜_목표_목록_조회() {
-
+        // given
+        // when
+        // then
+        // TODO: 테스트 구현 예정
     }
 }
