@@ -121,6 +121,5 @@ tasks.register('copyDocument', Copy) {
 }
 
 bootJar {
-    dependsOn asciidoctor
     dependsOn copyDocument
 }
