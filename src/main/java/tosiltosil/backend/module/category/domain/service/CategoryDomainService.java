@@ -15,7 +15,7 @@ public class CategoryDomainService {
     private final CategoryRepository categoryRepository;
 
     public void validateCategoryCreation(final UUID memberId) {
-        Long count = categoryRepository.countByMemberId(memberId);
+        Long count = categoryRepository.countCurrentCategory(memberId);
         if (count >= MAX_CATEGORIES_PER_MEMBER) {
             throw new BadRequestException("생성 제한을 넘어 카테고리를 생성할 수 없습니다.");
         }

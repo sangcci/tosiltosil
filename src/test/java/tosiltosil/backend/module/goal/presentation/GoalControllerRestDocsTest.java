@@ -6,7 +6,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
+import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
@@ -36,6 +39,139 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
     private CategoryService categoryService;
+
+    @Test
+    void 회원_목표_목록_조회() {
+        // given
+        UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        LocalDate date = LocalDate.of(2025, 7, 8);
+        
+        List<DayGoalListResponse> responses = List.of(
+                new DayGoalListResponse(1L, "운동", "#FF5733", List.of(
+                        new DayGoalListResponse.GoalListResponse(1L, 1L, 1L, "운동하기", "BEFORE_STARTING", "PT2H", "PT0S"),
+                        new DayGoalListResponse.GoalListResponse(2L, 1L, 2L, "독서하기", "RUNNING", "PT1H30M", "PT30M")
+                )),
+                new DayGoalListResponse(2L, "공부", "#33C3F0", List.of(
+                        new DayGoalListResponse.GoalListResponse(3L, 2L, 3L, "코딩하기", "PAUSED", "PT3H", "PT1H15M")
+                ))
+        );
+
+        given(goalService.getDayGoals(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+                .willReturn(responses);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/goals/members/{memberId}?date={date}", memberId, date)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "목표 리스트 조회 성공",
+                                "data": [
+                                    {
+                                        "categoryId": 1,
+                                        "categoryTitle": "운동",
+                                        "categoryColor": "#FF5733",
+                                        "goals": [
+                                            {
+                                                "goalId": 1,
+                                                "categoryId": 1,
+                                                "iconId": 1,
+                                                "title": "운동하기",
+                                                "status": "BEFORE_STARTING",
+                                                "totalTime": "PT2H",
+                                                "duration": "PT0S"
+                                            },
+                                            {
+                                                "goalId": 2,
+                                                "categoryId": 1,
+                                                "iconId": 2,
+                                                "title": "독서하기",
+                                                "status": "RUNNING",
+                                                "totalTime": "PT1H30M",
+                                                "duration": "PT30M"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "categoryId": 2,
+                                        "categoryTitle": "공부",
+                                        "categoryColor": "#33C3F0",
+                                        "goals": [
+                                            {
+                                                "goalId": 3,
+                                                "categoryId": 2,
+                                                "iconId": 3,
+                                                "title": "코딩하기",
+                                                "status": "PAUSED",
+                                                "totalTime": "PT3H",
+                                                "duration": "PT1H15M"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        pathParameters(
+                                pathParameter("memberId", "조회할 회원 ID")
+                        ),
+                        queryParameters(
+                                queryParameter("date", "조회할 날짜 (YYYY-MM-DD 형식)")
+                        ),
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메세지", "목표 리스트 조회 성공"),
+                                responseField("data", JsonFieldType.ARRAY, "카테고리별 목표 목록", "[]"),
+                                responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
+                                responseField("data[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),
+                                responseField("data[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "#FF5733"),
+                                responseField("data[].goals", JsonFieldType.ARRAY, "카테고리에 속한 목표 목록", "[]"),
+                                responseField("data[].goals[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),
+                                responseField("data[].goals[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
+                                responseField("data[].goals[].iconId", JsonFieldType.NUMBER, "아이콘 ID", "1"),
+                                responseField("data[].goals[].title", JsonFieldType.STRING, "목표 제목", "운동하기"),
+                                responseField("data[].goals[].status", JsonFieldType.STRING, "목표 상태 (BEFORE_STARTING, RUNNING, PAUSED, COMPLETED, FAILED)", "BEFORE_STARTING"),
+                                responseField("data[].goals[].totalTime", JsonFieldType.STRING, "목표 총 시간 (ISO-8601 Duration 형식)", "PT2H"),
+                                responseField("data[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S")
+                        )
+                ));
+    }
+
+    @Test
+    void 회원_목표_목록_조회_빈_목록() {
+        // given
+        UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        LocalDate date = LocalDate.of(2025, 7, 8);
+
+        given(goalService.getDayGoals(any(UUID.class), any(UUID.class), any(LocalDate.class)))
+                .willReturn(List.of());
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/goals/members/{memberId}?date={date}", memberId, date)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "목표 리스트 조회 성공",
+                                "data": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
 
     @Test
     void 목표_생성하기() {

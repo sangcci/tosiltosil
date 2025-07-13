@@ -1,15 +1,20 @@
 package tosiltosil.backend.module.category.presentation;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tosiltosil.backend.common.auth.annotation.LoginMember;
@@ -18,7 +23,9 @@ import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
+import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -26,6 +33,24 @@ import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+    @GetMapping
+    public Response<List<CurrentCategoryListResponse>> getCurrentCategories(
+            @LoginMember final UUID memberId
+    ) {
+        List<CurrentCategoryListResponse> responses = categoryService.getCategoriesByMemberId(memberId);
+        return Response.ok("카테고리 리스트 조회 성공", responses);
+    }
+
+    @GetMapping("/color-per-day")
+    public Response<List<CategoryColorPerDayResponse>> getCategoryColorPerDay(
+            @LoginMember final UUID memberId,
+            @RequestParam final @Min(1900) @Max(2100) int year,
+            @RequestParam final @Min(1) @Max(12) int month
+    ) {
+        List<CategoryColorPerDayResponse> responses = categoryService.getCategoryColorPerMonth(memberId, year, month);
+        return Response.ok("월 별 카테고리 색상 조회 성공", responses);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

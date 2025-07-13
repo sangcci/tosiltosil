@@ -6,14 +6,18 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
+import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 
 @Repository
 @RequiredArgsConstructor
 public class GoalRepositoryImpl implements GoalRepository {
 
     private final GoalJpaRepository goalJpaRepository;
+    private final GoalDslRepository goalDslRepository;
+    private final TimeHolder timeHolder;
 
     @Override
     public Optional<Goal> findById(final Long goalId) {
@@ -21,8 +25,18 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public List<Goal> findTodayGoalsByMemberId(final UUID memberId) {
-        return goalJpaRepository.findByMemberIdAndDate(memberId, LocalDate.now());
+    public List<DayGoalListResponse> findDayGoals(final UUID memberId, final LocalDate date) {
+        return goalDslRepository.findDayGoals(memberId, date);
+    }
+
+    @Override
+    public List<Goal> findGoal(final UUID memberId, final Long categoryId) {
+        return goalJpaRepository.findByMemberIdAndCategoryId(memberId, categoryId);
+    }
+
+    @Override
+    public List<Goal> findGoalsAfterToday(final UUID memberId, final Long categoryId) {
+        return goalJpaRepository.findByMemberIdAndCategoryIdAndDateGreaterThanEqual(memberId, categoryId, timeHolder.getCurrentDate());
     }
 
     @Override

@@ -25,10 +25,10 @@ public class DurationRedisRepository {
 
     public Duration findTodayDuration(final UUID memberId) {
         String key = createKey(memberId);
-        Long duration = (Long) redisTemplate.opsForValue().get(key);
+        Object duration = redisTemplate.opsForValue().get(key);
         if (duration == null) {
             return Duration.ZERO;
         }
-        return Duration.ofSeconds(duration);
+        return Duration.ofSeconds(((Number) duration).longValue());
     }
 }

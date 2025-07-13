@@ -2,11 +2,16 @@ package tosiltosil.backend.module.category.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,7 +23,9 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
+import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 import tosiltosil.backend.support.RestDocsTestSupport;
@@ -34,6 +41,172 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
     private StopwatchService stopwatchService;
+
+    @Test
+    void 회원_카테고리_목록_조회() {
+        // given
+        List<CurrentCategoryListResponse> responses = List.of(
+                new CurrentCategoryListResponse(1L, "운동", "#FF5733"),
+                new CurrentCategoryListResponse(2L, "공부", "#33FF57")
+        );
+
+        given(categoryService.getCategoriesByMemberId(any(UUID.class)))
+                .willReturn(responses);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories")
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "카테고리 리스트 조회 성공",
+                                "data": [
+                                    {
+                                        "categoryId": 1,
+                                        "title": "운동",
+                                        "color": "#FF5733"
+                                    },
+                                    {
+                                        "categoryId": 2,
+                                        "title": "공부",
+                                        "color": "#33FF57"
+                                    }
+                                ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메시지", "카테고리 리스트 조회 성공"),
+                                responseField("data", JsonFieldType.ARRAY, "카테고리 목록", "[]"),
+                                responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
+                                responseField("data[].title", JsonFieldType.STRING, "카테고리 제목", "운동"),
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상 (HEX 코드)", "#FF5733")
+                        )
+                ));
+    }
+
+    @Test
+    void 회원_카테고리_목록_조회_빈_목록() {
+        // given
+        given(categoryService.getCategoriesByMemberId(any(UUID.class)))
+                .willReturn(List.of());
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories")
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "카테고리 리스트 조회 성공",
+                                "data": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
+
+    @Test
+    void 월별_카테고리_색상_조회() {
+        // given
+        int year = 2025;
+        int month = 7;
+
+        List<CategoryColorPerDayResponse> responses = List.of(
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 8), List.of("#FF5733", "#33FF57")),
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 15), List.of("#3357FF")),
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 22), List.of("#FF33F5", "#FFAA33"))
+        );
+
+        given(categoryService.getCategoryColorPerMonth(any(UUID.class), eq(year), eq(month)))
+                .willReturn(responses);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories/color-per-day?year={year}&month={month}", year, month)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "월 별 카테고리 색상 조회 성공",
+                                "data": [
+                                    {
+                                        "date": "2025-07-08",
+                                        "color": ["#FF5733", "#33FF57"]
+                                    },
+                                    {
+                                        "date": "2025-07-15",
+                                        "color": ["#3357FF"]
+                                    },
+                                    {
+                                        "date": "2025-07-22",
+                                        "color": ["#FF33F5", "#FFAA33"]
+                                    }
+                                ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        queryParameters(
+                                parameterWithName("year").description("조회할 년도 (1900-2100)"),
+                                parameterWithName("month").description("조회할 월 (1-12)")
+                        ),
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메시지", "월 별 카테고리 색상 조회 성공"),
+                                responseField("data", JsonFieldType.ARRAY, "카테고리 색상 목록", "[]"),
+                                responseField("data[].date", JsonFieldType.STRING, "날짜 (YYYY-MM-DD 형식)", "2025-07-08"),
+                                responseField("data[].color", JsonFieldType.ARRAY, "해당 날짜의 카테고리 색상 리스트", "[\"#FF5733\", \"#33FF57\"]")
+                        )
+                ));
+    }
+
+    @Test
+    void 월별_카테고리_색상_조회_빈_목록() {
+        // given
+        int year = 2025;
+        int month = 8;
+
+        given(categoryService.getCategoryColorPerMonth(any(UUID.class), eq(year), eq(month)))
+                .willReturn(List.of());
+
+        // when
+        MvcTestResult testResult = mockMvcTester.get()
+                .uri("/api/v1/categories/color-per-day?year={year}&month={month}", year, month)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "월 별 카테고리 색상 조회 성공",
+                                "data": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
 
     @Test
     void 카테고리_생성하기() {
@@ -120,21 +293,22 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
     @Test
     void 카테고리_수정하기() {
         // given
-        Long categoryId = 1L;
+        Long lastCategoryId = 1L;
+        Long newCategoryId = 2L;
         String request = """
                     {
                         "title": "공부",
                         "color": "#33FF57"
                     }
                 """;
-        CategoryResponse response = CategoryResponse.of(categoryId);
+        CategoryResponse response = CategoryResponse.of(newCategoryId);
 
         given(categoryService.updateCategory(any(UUID.class), any(Long.class), any(CategoryUpdateRequest.class)))
                 .willReturn(response);
 
         // when
         MvcTestResult testResult = mockMvcTester.patch()
-                .uri("/api/v1/categories/{categoryId}", categoryId)
+                .uri("/api/v1/categories/{categoryId}", lastCategoryId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
                 .exchange();
@@ -147,7 +321,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 "status": 200,
                                 "message": "카테고리가 정상적으로 수정되었습니다.",
                                 "data": {
-                                    "categoryId": 1
+                                    "categoryId": 2
                                 }
                             }
                         """);
@@ -165,7 +339,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "카테고리가 정상적으로 수정되었습니다."),
                                 responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
-                                responseField("data.categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1")
+                                responseField("data.categoryId", JsonFieldType.NUMBER, "수정된 새 카테고리 ID", "2")
                         )
                 ));
     }

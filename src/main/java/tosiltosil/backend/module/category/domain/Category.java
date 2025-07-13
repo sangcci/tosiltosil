@@ -1,19 +1,25 @@
 package tosiltosil.backend.module.category.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.hibernate.annotations.SQLDelete;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE category SET deleted = true WHERE id = ?")
+// @SQLRestriction("deleted == false")
 public class Category extends BaseEntity {
 
     @Id
@@ -31,6 +37,9 @@ public class Category extends BaseEntity {
 
     @Column(nullable = false)
     private int sequence;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     @Builder
     private Category(
@@ -63,13 +72,5 @@ public class Category extends BaseEntity {
         if (!Objects.equals(this.memberId, memberId)) {
             throw new ForbiddenException("해당 카테고리에 접근할 권한이 없습니다.");
         }
-    }
-
-    public void updateBasicInfo(
-            final String title,
-            final String color
-    ) {
-        this.title = title;
-        this.color = color;
     }
 }

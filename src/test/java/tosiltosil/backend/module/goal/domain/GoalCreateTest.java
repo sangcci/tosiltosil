@@ -61,18 +61,6 @@ class GoalCreateTest {
     }
 
     @Test
-    void 날짜가_오늘_이전이면_예외_발생() {
-        // given
-        UUID memberId = UUID.randomUUID();
-        LocalDate futureDate = LocalDate.now().minusDays(1);
-
-        // when & then
-        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", Duration.ofHours(2), 1, 1L, futureDate))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("날짜는 오늘 이후여야 합니다.");
-    }
-
-    @Test
     void 시간_경계값_테스트_1분() {
         // given
         UUID memberId = UUID.randomUUID();

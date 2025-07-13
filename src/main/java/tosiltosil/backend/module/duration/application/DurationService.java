@@ -22,4 +22,14 @@ public class DurationService {
         durationRepository.saveTodayDuration(memberId, todayTotalTime);
         return todayTotalTime;
     }
+    
+    public Duration subtractTodayDuration(final UUID memberId, final Duration duration) {
+        Duration todayTotalTime = durationRepository.findTodayDuration(memberId);
+        todayTotalTime = todayTotalTime.minus(duration);
+        if (todayTotalTime.isNegative()) {
+            todayTotalTime = Duration.ZERO;
+        }
+        durationRepository.saveTodayDuration(memberId, todayTotalTime);
+        return todayTotalTime;
+    }
 }

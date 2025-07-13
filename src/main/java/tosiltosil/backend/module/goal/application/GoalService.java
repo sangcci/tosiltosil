@@ -7,23 +7,34 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
+import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
-import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
+import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 
 @Service
 @RequiredArgsConstructor
 public class GoalService {
 
     private final GoalRepository goalRepository;
+    private final GoalDomainService goalDomainService;
+
+    @Transactional(readOnly = true)
+    public List<DayGoalListResponse> getDayGoals(
+            final UUID memberOwnerId,
+            final UUID memberId,
+            final LocalDate date
+    ) {
+        // TODO: 친구 관계 검증
+
+        return goalRepository.findDayGoals(memberId, date);
+    }
 
     @Transactional
     public GoalIdsResponse createGoal(
@@ -31,6 +42,11 @@ public class GoalService {
             final GoalCreateRequest request
     ) {
         // TODO: 순서 구현
+
+        request.dates().forEach(dateString -> {
+            LocalDate date = LocalDate.parse(dateString);
+            goalDomainService.validateGoalDate(date);
+        });
 
         List<Goal> goals = request.toEntities(memberId);
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
@@ -48,8 +64,11 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
+        LocalDate newDate = LocalDate.parse(request.date());
+        goalDomainService.validateGoalDate(newDate);
+
         goal.updateBasicInfo(request.title(), request.categoryId(), request.iconId());
-        goal.changeDate(LocalDate.parse(request.date()));
+        goal.changeDate(newDate);
 
         return GoalIdResponse.of(goal.getId());
     }
@@ -76,6 +95,19 @@ public class GoalService {
     }
 
     @Transactional
+    public Duration deleteGoalsAndCalculateTotalDuration(final UUID memberId, final Long categoryId) {
+        List<Goal> goalsToDelete = goalRepository.findGoal(memberId, categoryId);
+
+        Duration totalDuration = goalsToDelete.stream()
+                .map(Goal::getDuration)
+                .reduce(Duration.ZERO, Duration::plus);
+
+        goalsToDelete.forEach(goalRepository::delete);
+
+        return totalDuration;
+    }
+
+    @Transactional
     public void changeStatusToStarted(
             final UUID memberId,
             final Long goalId
@@ -95,14 +127,5 @@ public class GoalService {
         goal.validateIsMine(memberId);
 
         goal.changeStatusToPaused();
-    }
-
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void addDuration(final StopwatchPausedEvent event) {
-        Goal goal = goalRepository.findById(event.goalId())
-                .orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
-
-        Duration addedDuration = Duration.between(event.startTime(), event.endTime());
-        goal.addDuration(addedDuration);
     }
 }

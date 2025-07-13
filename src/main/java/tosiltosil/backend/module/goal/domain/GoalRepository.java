@@ -1,14 +1,20 @@
 package tosiltosil.backend.module.goal.domain;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 
 public interface GoalRepository {
 
     Optional<Goal> findById(Long goalId);
 
-    List<Goal> findTodayGoalsByMemberId(UUID memberId);
+    List<DayGoalListResponse> findDayGoals(UUID memberId, LocalDate date);
+
+    List<Goal> findGoal(UUID memberId, Long categoryId);
+
+    List<Goal> findGoalsAfterToday(UUID memberId, Long categoryId);
 
     Goal save(Goal goal);
 

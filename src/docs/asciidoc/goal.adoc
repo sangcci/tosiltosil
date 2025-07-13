@@ -7,6 +7,34 @@
 :sectlinks:
 :snippets: {snippets}
 
+=== 회원 목표 목록 조회
+
+==== Request
+
+include::{snippets}/goal-controller-rest-docs-test/회원_목표_목록_조회/http-request.adoc[]
+
+Path Parameters
+
+include::{snippets}/goal-controller-rest-docs-test/회원_목표_목록_조회/path-parameters.adoc[]
+
+Query Parameters
+
+include::{snippets}/goal-controller-rest-docs-test/회원_목표_목록_조회/query-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/goal-controller-rest-docs-test/회원_목표_목록_조회/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/goal-controller-rest-docs-test/회원_목표_목록_조회/response-fields.adoc[]
+
+==== 빈 목록 응답
+
+특정 날짜에 목표가 없는 경우의 응답입니다.
+
+include::{snippets}/goal-controller-rest-docs-test/회원_목표_목록_조회_빈_목록/response-body.adoc[]
+
 === 목표 생성
 
 ==== Request
