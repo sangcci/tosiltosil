@@ -14,8 +14,6 @@ public interface GoalRepository {
 
     List<Goal> findGoal(UUID memberId, Long categoryId);
 
-    List<Goal> findGoalsAfterToday(UUID memberId, Long categoryId);
-
     Goal save(Goal goal);
 
     List<Goal> saveAll(List<Goal> goals);

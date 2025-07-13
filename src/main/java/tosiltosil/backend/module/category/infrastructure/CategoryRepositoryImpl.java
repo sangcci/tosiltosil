@@ -24,7 +24,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
     public List<Category> findCurrentCategories(final UUID memberId) {
-        return categoryJpaRepository.findByMemberIdAndDeletedIsFalse(memberId);
+        return categoryJpaRepository.findByMemberId(memberId);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
     public Long countCurrentCategory(final UUID memberId) {
-        return categoryJpaRepository.countByMemberIdAndDeletedIsFalse(memberId);
+        return categoryJpaRepository.countByMemberId(memberId);
     }
 
     @Override
