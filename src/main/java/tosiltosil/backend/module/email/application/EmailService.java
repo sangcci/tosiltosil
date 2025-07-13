@@ -2,6 +2,11 @@ package tosiltosil.backend.module.email.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
@@ -18,6 +23,8 @@ import tosiltosil.backend.module.email.infrastructure.AuthNumberRedisRepository;
 import tosiltosil.backend.module.email.infrastructure.EmailAuthRedisRepository;
 import tosiltosil.backend.module.member.application.MemberService;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.UUID;
 
 import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.SIGN_UP;
@@ -30,10 +37,12 @@ public class EmailService {
     private final EmailAuthRedisRepository emailAuthRedisRepository;
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JavaMailSender mailSender;
 
     private static final int INITIAL_SEND_COUNT = 1;
     private static final int INITIAL_FAIL_COUNT = 0;
     private static final int CODE_LENGTH = 6;
+    private static final String EMAIL_TITLE = "토실토실 인증번호";
 
     @Value("${email.auth.redis-expiration}")
     private long emailAuthExpiration;
@@ -47,7 +56,28 @@ public class EmailService {
     @Value("${email.auth.max-attempt-count}")
     private int maxAuthAttemptCount;
 
-    public EmailSendResponse sendEmail(
+    @Value("${spring.mail.username}")
+    private String id;
+
+    @Async("emailAsyncExecutor")
+    public void sendEmail(String email, String subject, String content) {
+        MimeMessagePreparator messagePreparator =
+                mimeMessage -> {
+                    final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
+
+                    messageHelper.setFrom(id);
+                    messageHelper.setTo(email);
+                    messageHelper.setSubject(subject);
+                    messageHelper.setText(content, true);
+                };
+        try {
+            mailSender.send(messagePreparator);
+        } catch(Exception e) {
+            throw new RuntimeException("이메일 전송에 실패하였습니다.", e);
+        }
+    }
+
+    public EmailSendResponse sendAuthEmail(
             final UUID clientId,
             final EmailSendRequest request
     ) {
@@ -63,12 +93,23 @@ public class EmailService {
 
         String authNumber = generateAndSaveAuthNumber(request.email());
 
-        // TODO : 이메일 전송
+        String content = loadAuthTemplate(authNumber);
+        sendEmail(request.email(), EMAIL_TITLE, content);
 
         return EmailSendResponse.of(request.email(), currentClientId);
     }
 
-    public EmailAuthResponse verifyEmailAuth(
+    private String loadAuthTemplate(String authNumber) {
+        try {
+            ClassPathResource resource = new ClassPathResource("templates/email-auth-template.html");
+            String template = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
+            return template.replace("{{authNumber}}", authNumber);
+        } catch (Exception e) {
+            throw new RuntimeException("템플릿을 가져올 수 없습니다.", e);
+        }
+    }
+
+    public EmailAuthResponse verifyAuthEmail(
             final UUID clientId,
             final EmailAuthRequest request
     ) {

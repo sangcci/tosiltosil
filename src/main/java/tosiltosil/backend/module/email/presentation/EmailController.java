@@ -30,7 +30,7 @@ public class EmailController {
             @CookieValue(name = "client-id", required = false) final UUID clientId,
             @Valid @RequestBody final EmailSendRequest request
     ) {
-        EmailSendResponse response = emailService.sendEmail(clientId, request);
+        EmailSendResponse response = emailService.sendAuthEmail(clientId, request);
 
         HttpHeaders headers = cookieUtil.generateClientIdCookie(response.clientId());
         return ResponseEntity
@@ -45,7 +45,7 @@ public class EmailController {
             @CookieValue(name = "client-id") final UUID clientId,
             @Valid @RequestBody final EmailAuthRequest request
     ) {
-        EmailAuthResponse response = emailService.verifyEmailAuth(clientId, request);
+        EmailAuthResponse response = emailService.verifyAuthEmail(clientId, request);
         String temporaryToken = response.temporaryToken();
 
         HttpHeaders headers = cookieUtil.generateTemporaryTokenCookies(temporaryToken);
