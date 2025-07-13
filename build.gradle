@@ -111,15 +111,9 @@ asciidoctor {
     baseDirFollowsSourceFile()
 }
 
-tasks.register('copyDocument', Copy) {
+bootJar {
     dependsOn asciidoctor
     from("${asciidoctor.outputDir}") {
-        include("**/index.html")
+        into 'static/docs'
     }
-    into('src/main/resources/static/docs')
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
-bootJar {
-    dependsOn copyDocument
 }

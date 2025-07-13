@@ -2,7 +2,7 @@ name: backend-cd
 
 on:
   push:
-    branches: [ "develop", "hotfix" ]
+    branches: [ "develop", "hotfix/#40-docs" ]
 
 jobs:
   build:
