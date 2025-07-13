@@ -2,7 +2,7 @@ name: backend-cd
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop", "hotfix" ]
 
 jobs:
   build:
