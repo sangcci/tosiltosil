@@ -10,6 +10,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,6 +48,7 @@ public class CategoryDslRepository {
                 .stream()
                 .collect(groupingBy(
                         tuple -> Objects.requireNonNull(tuple.get(goal.date)),
+                        LinkedHashMap::new,
                         mapping(
                                 tuple -> Objects.requireNonNull(tuple.get(category.color)),
                                 toList()
