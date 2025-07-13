@@ -293,22 +293,21 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
     @Test
     void 카테고리_수정하기() {
         // given
-        Long lastCategoryId = 1L;
-        Long newCategoryId = 2L;
+        Long categoryId = 1L;
         String request = """
                     {
                         "title": "공부",
                         "color": "#33FF57"
                     }
                 """;
-        CategoryResponse response = CategoryResponse.of(newCategoryId);
+        CategoryResponse response = CategoryResponse.of(categoryId);
 
         given(categoryService.updateCategory(any(UUID.class), any(Long.class), any(CategoryUpdateRequest.class)))
                 .willReturn(response);
 
         // when
         MvcTestResult testResult = mockMvcTester.patch()
-                .uri("/api/v1/categories/{categoryId}", lastCategoryId)
+                .uri("/api/v1/categories/{categoryId}", categoryId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
                 .exchange();
@@ -321,7 +320,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 "status": 200,
                                 "message": "카테고리가 정상적으로 수정되었습니다.",
                                 "data": {
-                                    "categoryId": 2
+                                    "categoryId": 1
                                 }
                             }
                         """);
@@ -339,7 +338,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "카테고리가 정상적으로 수정되었습니다."),
                                 responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
-                                responseField("data.categoryId", JsonFieldType.NUMBER, "수정된 새 카테고리 ID", "2")
+                                responseField("data.categoryId", JsonFieldType.NUMBER, "수정된 카테고리 ID", "1")
                         )
                 ));
     }

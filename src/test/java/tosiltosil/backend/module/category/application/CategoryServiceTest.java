@@ -18,13 +18,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import tosiltosil.backend.common.domain.holder.TestTimeHolder;
-import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.category.application.CategoryServiceTest.TestTimeHolderConfig;
-import tosiltosil.backend.module.category.domain.Category;
-import tosiltosil.backend.module.category.domain.CategoryRepository;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
-import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.infrastructure.CategoryJpaRepository;
@@ -51,13 +47,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
     private GoalRepository goalRepository;
     
     @Autowired
-    private CategoryRepository categoryRepository;
-    
-    @Autowired
     private DurationService durationService;
-
-    @Autowired
-    private TimeHolder timeHolder;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -138,56 +128,6 @@ class CategoryServiceTest extends IntegrationTestSupport {
         
         // then
         assertThat(response.categoryId()).isNotEqualTo(responseHasSameTitle.categoryId());
-    }
-
-    @Test
-    void 카테고리_수정_시_목표에_카테고리_업데이트_반영() {
-        // given
-        UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
-        LocalDate currentDate = timeHolder.getCurrentDate();
-
-        // 1. 카테고리 직접 DB 삽입
-        Category originalCategory = Category.of(memberId, "자기개발", "#FF0000");
-        Category savedOriginalCategory = categoryRepository.save(originalCategory);
-        
-        // 2. 어제, 오늘, 내일 목표 직접 DB 삽입
-        LocalDate yesterday = currentDate.minusDays(1);
-        LocalDate today = currentDate;
-        LocalDate tomorrow = currentDate.plusDays(1);
-        
-        Goal yesterdayGoal = Goal.of(memberId, savedOriginalCategory.getId(), "어제 목표", Duration.ofHours(1), 0, 1L, yesterday);
-        Goal todayGoal = Goal.of(memberId, savedOriginalCategory.getId(), "오늘 목표", Duration.ofHours(1), 0, 1L, today);
-        Goal tomorrowGoal = Goal.of(memberId, savedOriginalCategory.getId(), "내일 목표", Duration.ofHours(1), 0, 1L, tomorrow);
-        
-        Goal savedYesterdayGoal = goalRepository.save(yesterdayGoal);
-        Goal savedTodayGoal = goalRepository.save(todayGoal);
-        Goal savedTomorrowGoal = goalRepository.save(tomorrowGoal);
-        
-        Long yesterdayGoalId = savedYesterdayGoal.getId();
-        Long todayGoalId = savedTodayGoal.getId();
-        Long tomorrowGoalId = savedTomorrowGoal.getId();
-        
-        // when
-        CategoryUpdateRequest updateRequest = new CategoryUpdateRequest("수정된 카테고리", "#00FF00");
-        CategoryResponse updatedCategory = categoryService.updateCategory(memberId, savedOriginalCategory.getId(), updateRequest);
-        
-        // then
-        // 1. 새로운 카테고리가 생성되어야 함
-        assertThat(updatedCategory.categoryId()).isNotEqualTo(savedOriginalCategory.getId());
-        
-        // 2. 목표들의 카테고리 ID 검증
-        Goal updatedYesterdayGoal = goalRepository.findById(yesterdayGoalId).get();
-        Goal updatedTodayGoal = goalRepository.findById(todayGoalId).get();
-        Goal updatedTomorrowGoal = goalRepository.findById(tomorrowGoalId).get();
-        
-        assertSoftly(softly -> {
-            // 어제 목표는 원래 카테고리 ID 유지 (과거 데이터 보존)
-            softly.assertThat(updatedYesterdayGoal.getCategoryId()).isEqualTo(savedOriginalCategory.getId());
-            // 오늘 목표는 새로운 카테고리 ID로 업데이트
-            softly.assertThat(updatedTodayGoal.getCategoryId()).isEqualTo(updatedCategory.categoryId());
-            // 내일 목표는 새로운 카테고리 ID로 업데이트
-            softly.assertThat(updatedTomorrowGoal.getCategoryId()).isEqualTo(updatedCategory.categoryId());
-        });
     }
 
     @Test
