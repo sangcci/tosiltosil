@@ -113,11 +113,11 @@ asciidoctor {
 
 tasks.register('copyDocument', Copy) {
     dependsOn asciidoctor
-    delete('src/main/resources/static/docs')
     from("${asciidoctor.outputDir}") {
         include("**/index.html")
     }
     into('src/main/resources/static/docs')
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 bootJar {
