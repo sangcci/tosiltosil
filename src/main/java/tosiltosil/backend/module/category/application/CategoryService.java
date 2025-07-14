@@ -12,7 +12,6 @@ import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.category.domain.Category;
 import tosiltosil.backend.module.category.domain.CategoryRepository;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
-import tosiltosil.backend.module.category.domain.event.CategoryUpdatedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
@@ -72,14 +71,9 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        Category newCategory = Category.of(memberId, request.title(), request.color());
-        Category savedNewCategory = categoryRepository.save(newCategory);
+        category.updateBasicInfo(request.title(), request.color());
 
-        Events.raise(CategoryUpdatedEvent.of(memberId, categoryId, savedNewCategory.getId()));
-
-        categoryRepository.delete(category);
-
-        return CategoryResponse.of(savedNewCategory.getId());
+        return CategoryResponse.of(category.getId());
     }
 
     @Transactional

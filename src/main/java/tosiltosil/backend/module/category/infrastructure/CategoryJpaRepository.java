@@ -7,7 +7,7 @@ import tosiltosil.backend.module.category.domain.Category;
 
 public interface CategoryJpaRepository extends JpaRepository<Category, Long> {
 
-    List<Category> findByMemberIdAndDeletedIsFalse(UUID memberId);
+    List<Category> findByMemberId(UUID memberId);
 
-    Long countByMemberIdAndDeletedIsFalse(UUID memberId);
+    Long countByMemberId(UUID memberId);
 }

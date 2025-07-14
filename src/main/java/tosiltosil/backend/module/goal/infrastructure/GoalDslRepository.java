@@ -30,8 +30,7 @@ public class GoalDslRepository {
                 .on(goal.categoryId.eq(category.id))
                 .where(
                         goal.memberId.eq(memberId),
-                        goal.date.eq(date),
-                        category.deleted.eq(false)
+                        goal.date.eq(date)
                 )
                 .orderBy(category.sequence.asc(), goal.sequence.asc())
                 .transform(GroupBy.groupBy(category.id).list(
