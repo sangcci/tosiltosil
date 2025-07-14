@@ -11,14 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tosiltosil.backend.module.duration.domain.DurationRepository;
+import tosiltosil.backend.module.duration.infrastructure.DurationRedisRepository;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
 class TodayDurationServiceTest {
 
     @Mock
-    private DurationRepository durationRepository;
+    private DurationRedisRepository durationRedisRepository;
 
     @InjectMocks
     private DurationService durationService;
@@ -31,7 +31,7 @@ class TodayDurationServiceTest {
         Duration additionalDuration = Duration.ofHours(2);
         Duration expectedTotalDuration = Duration.ofHours(5);
         
-        when(durationRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+        when(durationRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
 
         // when
         Duration result = durationService.updateTodayDuration(memberId, additionalDuration);
@@ -48,7 +48,7 @@ class TodayDurationServiceTest {
         Duration additionalDuration = Duration.ofMinutes(30);
         Duration expectedTotalDuration = Duration.ofMinutes(30);
         
-        when(durationRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+        when(durationRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
 
         // when
         Duration result = durationService.updateTodayDuration(memberId, additionalDuration);
@@ -65,14 +65,14 @@ class TodayDurationServiceTest {
         Duration subtractDuration = Duration.ofHours(2);
         Duration expectedTotalDuration = Duration.ZERO;
         
-        when(durationRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+        when(durationRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
 
         // when
         Duration result = durationService.subtractTodayDuration(memberId, subtractDuration);
 
         // then
         assertThat(result).isEqualTo(expectedTotalDuration);
-        verify(durationRepository).saveTodayDuration(memberId, expectedTotalDuration);
+        verify(durationRedisRepository).cacheTodayDuration(memberId, expectedTotalDuration);
     }
     
     @Test
@@ -83,13 +83,13 @@ class TodayDurationServiceTest {
         Duration subtractDuration = Duration.ofMinutes(30);
         Duration expectedTotalDuration = Duration.ZERO;
         
-        when(durationRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+        when(durationRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
 
         // when
         Duration result = durationService.subtractTodayDuration(memberId, subtractDuration);
 
         // then
         assertThat(result).isEqualTo(expectedTotalDuration);
-        verify(durationRepository).saveTodayDuration(memberId, expectedTotalDuration);
+        verify(durationRedisRepository).cacheTodayDuration(memberId, expectedTotalDuration);
     }
 }
