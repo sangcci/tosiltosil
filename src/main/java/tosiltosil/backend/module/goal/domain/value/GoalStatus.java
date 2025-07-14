@@ -1,9 +1,22 @@
 package tosiltosil.backend.module.goal.domain.value;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum GoalStatus {
-    BEFORE_STARTING,
-    RUNNING,
-    PAUSED,
-    COMPLETED,
-    FAILED
+    BEFORE_STARTING("시작 전"),
+    RUNNING("진행 중"),
+    PAUSED("진행 중"),
+    COMPLETED("완료"),
+    FAILED("실패");
+
+    private final String koreanName;
+
+    GoalStatus(final String koreanName) {
+        this.koreanName = koreanName;
+    }
+
+    @JsonValue
+    public String getKoreanName() {
+        return koreanName;
+    }
 }

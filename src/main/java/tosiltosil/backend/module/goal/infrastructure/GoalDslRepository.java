@@ -44,7 +44,7 @@ public class GoalDslRepository {
                                                 category.id,
                                                 goal.iconId,
                                                 goal.title,
-                                                goal.status.stringValue(),
+                                                goal.status,
                                                 // ISO-8601 Duration 문자열(예: "PT2H")로 응답하기 위해 SQL에서 VARCHAR로 캐스팅
                                                 Expressions.stringTemplate("CAST({0} AS VARCHAR)", goal.totalTime),
                                                 Expressions.stringTemplate("CAST({0} AS VARCHAR)", goal.duration)

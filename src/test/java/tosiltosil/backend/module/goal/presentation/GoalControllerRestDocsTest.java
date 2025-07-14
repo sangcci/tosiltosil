@@ -25,6 +25,7 @@ import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 import tosiltosil.backend.support.RestDocsTestSupport;
 
@@ -48,11 +49,11 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         
         List<DayGoalListResponse> responses = List.of(
                 new DayGoalListResponse(1L, "운동", "#FF5733", List.of(
-                        new DayGoalListResponse.GoalListResponse(1L, 1L, 1L, "운동하기", "BEFORE_STARTING", "PT2H", "PT0S"),
-                        new DayGoalListResponse.GoalListResponse(2L, 1L, 2L, "독서하기", "RUNNING", "PT1H30M", "PT30M")
+                        new DayGoalListResponse.GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S"),
+                        new DayGoalListResponse.GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M")
                 )),
                 new DayGoalListResponse(2L, "공부", "#33C3F0", List.of(
-                        new DayGoalListResponse.GoalListResponse(3L, 2L, 3L, "코딩하기", "PAUSED", "PT3H", "PT1H15M")
+                        new DayGoalListResponse.GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M")
                 ))
         );
 
@@ -82,7 +83,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                 "categoryId": 1,
                                                 "iconId": 1,
                                                 "title": "운동하기",
-                                                "status": "BEFORE_STARTING",
+                                                "status": "시작 전",
                                                 "totalTime": "PT2H",
                                                 "duration": "PT0S"
                                             },
@@ -91,7 +92,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                 "categoryId": 1,
                                                 "iconId": 2,
                                                 "title": "독서하기",
-                                                "status": "RUNNING",
+                                                "status": "진행 중",
                                                 "totalTime": "PT1H30M",
                                                 "duration": "PT30M"
                                             }
@@ -107,7 +108,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                 "categoryId": 2,
                                                 "iconId": 3,
                                                 "title": "코딩하기",
-                                                "status": "PAUSED",
+                                                "status": "진행 중",
                                                 "totalTime": "PT3H",
                                                 "duration": "PT1H15M"
                                             }
@@ -137,7 +138,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data[].goals[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data[].goals[].iconId", JsonFieldType.NUMBER, "아이콘 ID", "1"),
                                 responseField("data[].goals[].title", JsonFieldType.STRING, "목표 제목", "운동하기"),
-                                responseField("data[].goals[].status", JsonFieldType.STRING, "목표 상태 (BEFORE_STARTING, RUNNING, PAUSED, COMPLETED, FAILED)", "BEFORE_STARTING"),
+                                responseField("data[].goals[].status", JsonFieldType.STRING, "목표 상태 (시작 전, 진행 중, 완료, 실패)", "시작 전"),
                                 responseField("data[].goals[].totalTime", JsonFieldType.STRING, "목표 총 시간 (ISO-8601 Duration 형식)", "PT2H"),
                                 responseField("data[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S")
                         )
