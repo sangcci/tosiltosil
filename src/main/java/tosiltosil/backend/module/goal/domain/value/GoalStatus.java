@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum GoalStatus {
     BEFORE_STARTING("시작 전"),
     RUNNING("진행 중"),
-    PAUSED("일시 정지"),
+    PAUSED("진행 중"),
     COMPLETED("완료"),
     FAILED("실패");
 
