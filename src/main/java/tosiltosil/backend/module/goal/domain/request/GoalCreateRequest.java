@@ -6,13 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import tosiltosil.backend.common.domain.validator.IsDate;
 import tosiltosil.backend.common.domain.validator.IsDuration;
-import tosiltosil.backend.module.goal.domain.Goal;
 
 public record GoalCreateRequest(
         @NotBlank(message = "제목은 1글자 이상 20글자 이하여야 합니다.")
@@ -34,12 +30,4 @@ public record GoalCreateRequest(
         String time
 ) {
 
-    public List<Goal> toEntities(
-            final UUID memberId
-            //final int sequence
-    ) {
-        return dates.stream()
-                .map(date -> Goal.of(memberId, categoryId, title, Duration.parse(time), 1, iconId, LocalDate.parse(date)))
-                .toList();
-    }
 }

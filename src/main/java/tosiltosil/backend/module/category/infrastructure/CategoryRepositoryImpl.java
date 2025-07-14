@@ -46,4 +46,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     public void delete(final Category category) {
         categoryJpaRepository.delete(category);
     }
+
+    @Override
+    public List<Category> findByMemberIdOrderByOrderKey(final UUID memberId) {
+        return categoryJpaRepository.findByMemberIdAndDeletedIsFalseOrderByOrderKey(memberId);
+    }
 }

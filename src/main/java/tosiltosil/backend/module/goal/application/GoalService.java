@@ -8,14 +8,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.domain.order.OrderManager;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
-import tosiltosil.backend.module.goal.domain.request.GoalSequenceChangeRequest;
+import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
 import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 
 @Service
@@ -24,6 +26,7 @@ public class GoalService {
 
     private final GoalRepository goalRepository;
     private final GoalDomainService goalDomainService;
+    private final OrderManager orderManager;
 
     @Transactional(readOnly = true)
     public List<DayGoalListResponse> getDayGoals(
@@ -41,14 +44,23 @@ public class GoalService {
             final UUID memberId,
             final GoalCreateRequest request
     ) {
-        // TODO: 순서 구현
-
         request.dates().forEach(dateString -> {
             LocalDate date = LocalDate.parse(dateString);
             goalDomainService.validateGoalDate(date);
         });
 
-        List<Goal> goals = request.toEntities(memberId);
+        List<Goal> goals = request.dates().stream()
+                .map(dateString -> Goal.of(
+                        memberId, 
+                        request.categoryId(), 
+                        request.title(), 
+                        Duration.parse(request.time()),
+                        orderManager.generateInitialOrderKey(),
+                        request.iconId(), 
+                        LocalDate.parse(dateString)
+                ))
+                .toList();
+
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
                 .map(Goal::getId)
                 .toList();
@@ -74,12 +86,20 @@ public class GoalService {
     }
 
     @Transactional
-    public void changeSequence(
+    public GoalOrderChangeResponse changeOrder(
             final UUID memberId,
             final Long goalId,
-            final GoalSequenceChangeRequest request
+            final GoalOrderChangeRequest request
     ) {
-        // TODO: 순서 구현
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
+        goal.validateIsMine(memberId);
+
+        String newOrderKey = orderManager.generateOrderKeyBetween(request.prevOrderKey(), request.nextOrderKey());
+        goal.updateOrderKey(newOrderKey);
+        
+        goalRepository.save(goal);
+
+        return GoalOrderChangeResponse.of(newOrderKey);
     }
 
     @Transactional

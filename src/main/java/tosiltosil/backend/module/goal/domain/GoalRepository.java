@@ -19,4 +19,8 @@ public interface GoalRepository {
     List<Goal> saveAll(List<Goal> goals);
 
     void delete(Goal goal);
+
+    List<Goal> findByCategoryIdAndDateOrderByOrderKey(Long categoryId, LocalDate date);
+
+    List<Goal> findByMemberIdAndDateOrderByOrderKey(UUID memberId, LocalDate date);
 }

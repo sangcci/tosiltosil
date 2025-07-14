@@ -45,7 +45,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
     
     @Autowired
     private GoalRepository goalRepository;
-    
+
     @Autowired
     private DurationService durationService;
 

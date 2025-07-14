@@ -13,11 +13,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
+import tosiltosil.backend.common.domain.order.Orderable;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category extends BaseEntity {
+public class Category extends BaseEntity implements Orderable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,32 +34,32 @@ public class Category extends BaseEntity {
     private String color;
 
     @Column(nullable = false)
-    private int sequence;
+    private String orderKey;
 
     @Builder
     private Category(
             final UUID memberId,
             final String title,
             final String color,
-            final int sequence
+            final String orderKey
     ) {
         this.memberId = memberId;
         this.title = title;
         this.color = color;
-        this.sequence = sequence;
+        this.orderKey = orderKey;
     }
 
     public static Category of(
             final UUID memberId,
             final String title,
-            final String color
-            //final int sequence
+            final String color,
+            final String orderKey
     ) {
         return Category.builder()
                 .memberId(memberId)
                 .title(title)
                 .color(color)
-                .sequence(0)
+                .orderKey(orderKey)
                 .build();
     }
 
@@ -71,5 +72,15 @@ public class Category extends BaseEntity {
     public void updateBasicInfo(final String title, final String color) {
         this.title = title;
         this.color = color;
+    }
+
+    @Override
+    public String getOrderKey() {
+        return this.orderKey;
+    }
+
+    @Override
+    public void updateOrderKey(final String orderKey) {
+        this.orderKey = orderKey;
     }
 }

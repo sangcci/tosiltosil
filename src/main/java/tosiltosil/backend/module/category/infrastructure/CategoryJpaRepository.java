@@ -10,4 +10,6 @@ public interface CategoryJpaRepository extends JpaRepository<Category, Long> {
     List<Category> findByMemberId(UUID memberId);
 
     Long countByMemberId(UUID memberId);
+
+    List<Category> findByMemberIdOrderByOrderKey(UUID memberId);
 }

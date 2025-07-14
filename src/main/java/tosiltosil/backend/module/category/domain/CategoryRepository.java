@@ -19,4 +19,6 @@ public interface CategoryRepository {
     Category save(Category category);
 
     void delete(Category category);
+
+    List<Category> findByMemberIdOrderByOrderKey(UUID memberId);
 }

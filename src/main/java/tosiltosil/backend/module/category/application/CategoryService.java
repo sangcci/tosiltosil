@@ -8,14 +8,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.domain.order.OrderManager;
 import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.category.domain.Category;
 import tosiltosil.backend.module.category.domain.CategoryRepository;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
-import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
+import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
+import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
@@ -28,6 +30,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryDomainService categoryDomainService;
     private final GoalService goalService;
+    private final OrderManager orderManager;
 
     @Transactional(readOnly = true)
     public List<CurrentCategoryListResponse> getCategoriesByMemberId(
@@ -54,9 +57,9 @@ public class CategoryService {
     ) {
         categoryDomainService.validateCategoryCreation(memberId);
 
-        // TODO: 순서 구현
+        String orderKey = orderManager.generateInitialOrderKey();
 
-        Category category = request.toEntity(memberId);
+        Category category = request.toEntity(memberId, orderKey);
         Category savedCategory = categoryRepository.save(category);
 
         return CategoryResponse.of(savedCategory.getId());
@@ -77,12 +80,20 @@ public class CategoryService {
     }
 
     @Transactional
-    public void changeSequence(
+    public CategoryOrderChangeResponse changeOrder(
             final UUID memberId,
             final Long categoryId,
-            final CategorySequenceChangeRequest request
+            final CategoryOrderChangeRequest request
     ) {
-        // TODO: 순서 구현
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
+        category.validateIsMine(memberId);
+
+        String newOrderKey = orderManager.generateOrderKeyBetween(request.prevOrderKey(), request.nextOrderKey());
+        category.updateOrderKey(newOrderKey);
+
+        categoryRepository.save(category);
+
+        return CategoryOrderChangeResponse.of(newOrderKey);
     }
 
     @Transactional
