@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.goal.domain.response;
 
 import java.util.List;
+import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 public record DayGoalListResponse(
         Long categoryId,
@@ -15,7 +16,7 @@ public record DayGoalListResponse(
             //Long order,
             Long iconId,
             String title,
-            String status,
+            GoalStatus status,
             String totalTime,
             String duration
     ) {
