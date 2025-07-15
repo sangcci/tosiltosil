@@ -16,8 +16,8 @@ public record CategoryCreateRequest(
     
     public Category toEntity(
             final UUID memberId,
-            final String orderKey
+            final Double orderIndex
     ) {
-        return Category.of(memberId, title, color, orderKey);
+        return Category.of(memberId, title, color, orderIndex);
     }
 }

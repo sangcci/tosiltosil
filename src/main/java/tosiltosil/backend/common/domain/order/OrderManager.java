@@ -1,15 +1,8 @@
 package tosiltosil.backend.common.domain.order;
 
-import org.springframework.stereotype.Component;
+public interface OrderManager {
 
-@Component
-public class OrderManager {
+    Double generateInitialOrderIndex();
 
-    public String generateInitialOrderKey() {
-        return LexoRank.getInitialRank();
-    }
-
-    public String generateOrderKeyBetween(final String prevOrderKey, final String nextOrderKey) {
-        return LexoRank.getRankBetween(prevOrderKey, nextOrderKey);
-    }
+    Double generateOrderIndexBetween(Double prevOrderIndex, Double nextOrderIndex);
 }

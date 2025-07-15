@@ -1,10 +1,10 @@
 package tosiltosil.backend.module.category.domain.response;
 
 public record CategoryOrderChangeResponse(
-        String orderKey
+        Double orderIndex
 ) {
 
-    public static CategoryOrderChangeResponse of(final String orderKey) {
-        return new CategoryOrderChangeResponse(orderKey);
+    public static CategoryOrderChangeResponse of(final Double orderIndex) {
+        return new CategoryOrderChangeResponse(orderIndex);
     }
 }

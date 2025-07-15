@@ -57,9 +57,9 @@ public class CategoryService {
     ) {
         categoryDomainService.validateCategoryCreation(memberId);
 
-        String orderKey = orderManager.generateInitialOrderKey();
+        Double orderIndex = orderManager.generateInitialOrderIndex();
 
-        Category category = request.toEntity(memberId, orderKey);
+        Category category = request.toEntity(memberId, orderIndex);
         Category savedCategory = categoryRepository.save(category);
 
         return CategoryResponse.of(savedCategory.getId());
@@ -88,12 +88,12 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        String newOrderKey = orderManager.generateOrderKeyBetween(request.prevOrderKey(), request.nextOrderKey());
-        category.updateOrderKey(newOrderKey);
+        Double newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
+        category.updateOrderIndex(newOrderIndex);
 
         categoryRepository.save(category);
 
-        return CategoryOrderChangeResponse.of(newOrderKey);
+        return CategoryOrderChangeResponse.of(newOrderIndex);
     }
 
     @Transactional

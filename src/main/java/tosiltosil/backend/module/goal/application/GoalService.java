@@ -55,7 +55,7 @@ public class GoalService {
                         request.categoryId(), 
                         request.title(), 
                         Duration.parse(request.time()),
-                        orderManager.generateInitialOrderKey(),
+                        orderManager.generateInitialOrderIndex(),
                         request.iconId(), 
                         LocalDate.parse(dateString)
                 ))
@@ -94,12 +94,12 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
-        String newOrderKey = orderManager.generateOrderKeyBetween(request.prevOrderKey(), request.nextOrderKey());
-        goal.updateOrderKey(newOrderKey);
+        Double newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
+        goal.updateOrderIndex(newOrderIndex);
         
         goalRepository.save(goal);
 
-        return GoalOrderChangeResponse.of(newOrderKey);
+        return GoalOrderChangeResponse.of(newOrderIndex);
     }
 
     @Transactional

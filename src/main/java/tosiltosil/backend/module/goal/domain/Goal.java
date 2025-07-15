@@ -19,13 +19,12 @@ import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
-import tosiltosil.backend.common.domain.order.Orderable;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Goal extends BaseEntity implements Orderable {
+public class Goal extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,8 +49,8 @@ public class Goal extends BaseEntity implements Orderable {
     @Column(nullable = false)
     private Duration duration;
 
-    @Column(nullable = false)
-    private String orderKey;
+    @Column(nullable = false, precision = 15, scale = 6)
+    private Double orderIndex;
 
     @Column(nullable = false)
     private Long iconId;
@@ -67,7 +66,7 @@ public class Goal extends BaseEntity implements Orderable {
             final Duration totalTime,
             final GoalStatus status,
             final Duration duration,
-            final String orderKey,
+            final Double orderIndex,
             final Long iconId,
             final LocalDate date
     ) {
@@ -77,7 +76,7 @@ public class Goal extends BaseEntity implements Orderable {
         this.totalTime = totalTime;
         this.status = status;
         this.duration = duration;
-        this.orderKey = orderKey;
+        this.orderIndex = orderIndex;
         this.iconId = iconId;
         this.date = date;
     }
@@ -87,7 +86,7 @@ public class Goal extends BaseEntity implements Orderable {
             final Long categoryId,
             final String title,
             final Duration totalTime,
-            final String orderKey,
+            final Double orderIndex,
             final Long iconId,
             final LocalDate date
     ) {
@@ -99,7 +98,7 @@ public class Goal extends BaseEntity implements Orderable {
                 .totalTime(totalTime)
                 .status(GoalStatus.BEFORE_STARTING)
                 .duration(Duration.ZERO)
-                .orderKey(orderKey)
+                .orderIndex(orderIndex)
                 .iconId(iconId)
                 .date(date)
                 .build();
@@ -156,7 +155,7 @@ public class Goal extends BaseEntity implements Orderable {
         this.duration = this.duration.plus(addedDuration);
     }
 
-    public void updateOrderKey(final String newOrderKey) {
-        this.orderKey = newOrderKey;
+    public void updateOrderIndex(final Double orderIndex) {
+        this.orderIndex = orderIndex;
     }
 }

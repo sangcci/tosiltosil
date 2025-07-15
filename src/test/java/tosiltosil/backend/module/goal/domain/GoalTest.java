@@ -122,7 +122,7 @@ class GoalTest {
                 .totalTime(Duration.ofHours(2))
                 .status(status)
                 .duration(Duration.ZERO)
-                .orderKey("n")
+                .orderIndex(1.0)
                 .iconId(1L)
                 .date(LocalDate.now())
                 .build();

@@ -1,10 +1,10 @@
 package tosiltosil.backend.module.goal.domain.response;
 
 public record GoalOrderChangeResponse(
-        String orderKey
+        Double orderIndex
 ) {
 
-    public static GoalOrderChangeResponse of(final String orderKey) {
-        return new GoalOrderChangeResponse(orderKey);
+    public static GoalOrderChangeResponse of(final Double orderIndex) {
+        return new GoalOrderChangeResponse(orderIndex);
     }
 }
