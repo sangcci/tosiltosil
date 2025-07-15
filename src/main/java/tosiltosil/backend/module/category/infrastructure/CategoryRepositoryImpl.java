@@ -24,7 +24,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
     public List<Category> findCurrentCategories(final UUID memberId) {
-        return categoryJpaRepository.findByMemberId(memberId);
+        return categoryJpaRepository.findByMemberIdOrderByOrderKey(memberId);
     }
 
     @Override
@@ -45,10 +45,5 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public void delete(final Category category) {
         categoryJpaRepository.delete(category);
-    }
-
-    @Override
-    public List<Category> findByMemberIdOrderByOrderKey(final UUID memberId) {
-        return categoryJpaRepository.findByMemberIdAndDeletedIsFalseOrderByOrderKey(memberId);
     }
 }
