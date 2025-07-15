@@ -13,11 +13,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
+import tosiltosil.backend.common.domain.order.Orderable;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category extends BaseEntity {
+public class Category extends BaseEntity implements Orderable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

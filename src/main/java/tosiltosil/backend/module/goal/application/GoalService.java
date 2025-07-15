@@ -14,6 +14,7 @@ import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
+import tosiltosil.backend.module.goal.domain.request.GoalRenewOrderRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
@@ -112,6 +113,18 @@ public class GoalService {
         goalRepository.save(goal);
 
         return GoalOrderChangeResponse.of(newOrderIndex);
+    }
+
+    @Transactional
+    public void renewOrderIndexes(
+            final UUID memberId,
+            final GoalRenewOrderRequest request
+    ) {
+        List<Goal> goals = goalRepository.findGoal(memberId, request.categoryId());
+
+        List<Goal> renewedGoals = orderManager.renewOrderIndexes(goals);
+
+        goalRepository.saveAll(renewedGoals);
     }
 
     @Transactional

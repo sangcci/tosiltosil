@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -81,6 +82,15 @@ public class CategoryController {
     ) {
         CategoryOrderChangeResponse response = categoryService.changeOrder(memberId, categoryId, request);
         return Response.ok("카테고리 순서가 정상적으로 변경되었습니다.", response);
+    }
+
+    @PostMapping("/renew-order")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Response<Map<String, Object>> renewOrderIndexes(
+            @LoginMember final UUID memberId
+    ) {
+        categoryService.renewOrderIndexes(memberId);
+        return Response.ok("카테고리 순서가 정상적으로 갱신되었습니다.");
     }
 
     @DeleteMapping("/{categoryId}")

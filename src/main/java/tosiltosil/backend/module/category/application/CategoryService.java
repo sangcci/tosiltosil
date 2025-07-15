@@ -99,6 +99,15 @@ public class CategoryService {
     }
 
     @Transactional
+    public void renewOrderIndexes(final UUID memberId) {
+        List<Category> categories = categoryRepository.findCurrentCategories(memberId);
+
+        List<Category> renewedCategories = orderManager.renewOrderIndexes(categories);
+
+        categoryRepository.saveAll(renewedCategories);
+    }
+
+    @Transactional
     public CategoryResponse deleteCategory(
             final UUID memberId,
             final Long categoryId

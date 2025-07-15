@@ -2,6 +2,7 @@ package tosiltosil.backend.common.domain.order;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,7 +18,10 @@ public class FractionalOrderManager implements OrderManager {
     }
 
     @Override
-    public Double generateOrderIndexBetween(Double prevOrderIndex, Double nextOrderIndex) {
+    public Double generateOrderIndexBetween(
+            final Double prevOrderIndex,
+            final Double nextOrderIndex
+    ) {
         if (prevOrderIndex == null && nextOrderIndex == null) {
             return INITIAL_INDEX;
         }
@@ -33,7 +37,8 @@ public class FractionalOrderManager implements OrderManager {
         return getIndexBetweenValues(prevOrderIndex, nextOrderIndex);
     }
 
-    public Double getIndexBefore(final Double index) {
+
+    private Double getIndexBefore(final Double index) {
         if (index == null) {
             return INITIAL_INDEX;
         }
@@ -48,7 +53,7 @@ public class FractionalOrderManager implements OrderManager {
         return beforeIndex.doubleValue();
     }
 
-    public Double getIndexAfter(final Double index) {
+    private Double getIndexAfter(final Double index) {
         if (index == null) {
             return INITIAL_INDEX;
         }
@@ -75,5 +80,17 @@ public class FractionalOrderManager implements OrderManager {
         BigDecimal midpoint = prev.add(difference.divide(BigDecimal.valueOf(2), SCALE, RoundingMode.HALF_UP));
 
         return midpoint.doubleValue();
+    }
+
+    public <T extends Orderable> List<T> renewOrderIndexes(final List<T> entities) {
+        double startIndex = INITIAL_INDEX;
+        double increment = INITIAL_INDEX;
+
+        for (int i = 0; i < entities.size(); i++) {
+            double newOrderIndex = startIndex + (i * increment);
+            entities.get(i).updateOrderIndex(newOrderIndex);
+        }
+
+        return entities;
     }
 }

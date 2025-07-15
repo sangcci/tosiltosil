@@ -48,6 +48,12 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
+    public List<Category> saveAll(final List<Category> categories) {
+        // TODO: bulk insert 구현
+        return categoryJpaRepository.saveAll(categories);
+    }
+
+    @Override
     public void delete(final Category category) {
         categoryJpaRepository.delete(category);
     }

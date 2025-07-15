@@ -19,12 +19,13 @@ import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
+import tosiltosil.backend.common.domain.order.Orderable;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Goal extends BaseEntity {
+public class Goal extends BaseEntity implements Orderable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
