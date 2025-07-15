@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.category.infrastructure;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public Optional<Double> findLastOrderIndex(final UUID memberId) {
+    public Optional<BigDecimal> findLastOrderIndex(final UUID memberId) {
         return categoryJpaRepository.findMaxOrderIndexByMemberId(memberId);
     }
 

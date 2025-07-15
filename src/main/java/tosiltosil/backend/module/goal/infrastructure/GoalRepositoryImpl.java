@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.goal.infrastructure;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public Optional<Double> findLastOrderIndex(final UUID memberId) {
+    public Optional<BigDecimal> findLastOrderIndex(final UUID memberId) {
         return goalJpaRepository.findMaxOrderIndexByMemberId(memberId);
     }
 

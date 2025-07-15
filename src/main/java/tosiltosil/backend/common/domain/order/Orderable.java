@@ -1,7 +1,9 @@
 package tosiltosil.backend.common.domain.order;
 
+import java.math.BigDecimal;
+
 public interface Orderable {
 
-    Double getOrderIndex();
-    void updateOrderIndex(Double orderIndex);
+    BigDecimal getOrderIndex();
+    void updateOrderIndex(BigDecimal orderIndex);
 }

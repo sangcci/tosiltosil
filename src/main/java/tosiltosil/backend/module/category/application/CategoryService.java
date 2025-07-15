@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.category.application;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.YearMonth;
 import java.util.List;
@@ -57,7 +58,7 @@ public class CategoryService {
     ) {
         categoryDomainService.validateCategoryCreation(memberId);
 
-        Double orderIndex = categoryRepository.findLastOrderIndex(memberId)
+        BigDecimal orderIndex = categoryRepository.findLastOrderIndex(memberId)
                 .map(lastIndex -> orderManager.generateOrderIndexBetween(lastIndex, null))
                 .orElse(orderManager.generateInitialOrderIndex());
 
@@ -90,7 +91,7 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        Double newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
+        BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
         category.updateOrderIndex(newOrderIndex);
 
         categoryRepository.save(category);

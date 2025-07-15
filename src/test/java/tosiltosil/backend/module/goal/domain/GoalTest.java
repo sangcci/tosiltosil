@@ -3,6 +3,7 @@ package tosiltosil.backend.module.goal.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -122,7 +123,7 @@ class GoalTest {
                 .totalTime(Duration.ofHours(2))
                 .status(status)
                 .duration(Duration.ZERO)
-                .orderIndex(1.0)
+                .orderIndex(BigDecimal.valueOf(100000.0))
                 .iconId(1L)
                 .date(LocalDate.now())
                 .build();

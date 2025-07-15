@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.category.infrastructure;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,5 +16,5 @@ public interface CategoryJpaRepository extends JpaRepository<Category, Long> {
     Long countByMemberId(UUID memberId);
 
     @Query("SELECT MAX(c.orderIndex) FROM Category c WHERE c.memberId = :memberId")
-    Optional<Double> findMaxOrderIndexByMemberId(@Param("memberId") UUID memberId);
+    Optional<BigDecimal> findMaxOrderIndexByMemberId(@Param("memberId") UUID memberId);
 }

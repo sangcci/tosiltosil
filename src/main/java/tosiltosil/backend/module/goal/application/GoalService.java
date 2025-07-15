@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.goal.application;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,13 +53,13 @@ public class GoalService {
         });
 
         // 마지막 저장된 Goal 순서 가져오기
-        Double lastOrderIndex = goalRepository.findLastOrderIndex(memberId)
+        BigDecimal lastOrderIndex = goalRepository.findLastOrderIndex(memberId)
                 .orElse(orderManager.generateInitialOrderIndex());
 
         List<Goal> goals = new ArrayList<>();
         for (String date : request.dates()) {
             // 마지막 순서 불러오기
-            Double newOrderIndex = orderManager.generateOrderIndexBetween(lastOrderIndex, null);
+            BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(lastOrderIndex, null);
             Goal goal = Goal.of(
                     memberId,
                     request.categoryId(),
@@ -107,7 +108,7 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
-        Double newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
+        BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
         goal.updateOrderIndex(newOrderIndex);
         
         goalRepository.save(goal);

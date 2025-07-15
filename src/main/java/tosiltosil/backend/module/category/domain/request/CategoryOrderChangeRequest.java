@@ -1,10 +1,12 @@
 package tosiltosil.backend.module.category.domain.request;
 
+import java.math.BigDecimal;
+
 public record CategoryOrderChangeRequest(
         Long categoryId,
         Integer targetIndex,
-        Double prevOrderIndex,
-        Double nextOrderIndex
+        BigDecimal prevOrderIndex,
+        BigDecimal nextOrderIndex
 ) {
 
 }

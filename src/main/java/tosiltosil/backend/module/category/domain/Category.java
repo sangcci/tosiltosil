@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -33,15 +34,15 @@ public class Category extends BaseEntity implements Orderable {
     @Column(nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private Double orderIndex;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal orderIndex;
 
     @Builder
     private Category(
             final UUID memberId,
             final String title,
             final String color,
-            final Double orderIndex
+            final BigDecimal orderIndex
     ) {
         this.memberId = memberId;
         this.title = title;
@@ -53,7 +54,7 @@ public class Category extends BaseEntity implements Orderable {
             final UUID memberId,
             final String title,
             final String color,
-            final Double orderIndex
+            final BigDecimal orderIndex
     ) {
         return Category.builder()
                 .memberId(memberId)
@@ -74,7 +75,7 @@ public class Category extends BaseEntity implements Orderable {
         this.color = color;
     }
 
-    public void updateOrderIndex(final Double orderIndex) {
+    public void updateOrderIndex(final BigDecimal orderIndex) {
         this.orderIndex = orderIndex;
     }
 }

@@ -1,10 +1,12 @@
 package tosiltosil.backend.module.goal.domain.response;
 
+import java.math.BigDecimal;
+
 public record GoalOrderChangeResponse(
-        Double orderIndex
+        BigDecimal orderIndex
 ) {
 
-    public static GoalOrderChangeResponse of(final Double orderIndex) {
+    public static GoalOrderChangeResponse of(final BigDecimal orderIndex) {
         return new GoalOrderChangeResponse(orderIndex);
     }
 }

@@ -4,23 +4,24 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 
 @Component
 public class FractionalOrderManager implements OrderManager {
 
-    private static final Double INITIAL_INDEX = 1000000.0;
-    private static final Double MIN_INCREMENT = 0.000001;
-    private static final int SCALE = 6;
+    private static final BigDecimal INITIAL_INDEX = BigDecimal.valueOf(1024);
+    private static final BigDecimal MIN_INCREMENT = BigDecimal.valueOf(0.001);
+    private static final int SCALE = 3;
 
     @Override
-    public Double generateInitialOrderIndex() {
+    public BigDecimal generateInitialOrderIndex() {
         return INITIAL_INDEX;
     }
 
     @Override
-    public Double generateOrderIndexBetween(
-            final Double prevOrderIndex,
-            final Double nextOrderIndex
+    public BigDecimal generateOrderIndexBetween(
+            final BigDecimal prevOrderIndex,
+            final BigDecimal nextOrderIndex
     ) {
         if (prevOrderIndex == null && nextOrderIndex == null) {
             return INITIAL_INDEX;
@@ -37,60 +38,54 @@ public class FractionalOrderManager implements OrderManager {
         return getIndexBetweenValues(prevOrderIndex, nextOrderIndex);
     }
 
-
-    private Double getIndexBefore(final Double index) {
-        if (index == null) {
-            return INITIAL_INDEX;
-        }
-
-        BigDecimal currentIndex = BigDecimal.valueOf(index);
-        BigDecimal beforeIndex = currentIndex.subtract(BigDecimal.valueOf(INITIAL_INDEX));
-
-        if (beforeIndex.compareTo(BigDecimal.valueOf(MIN_INCREMENT)) < 0) {
-            beforeIndex = currentIndex.divide(BigDecimal.valueOf(2), SCALE, RoundingMode.HALF_UP);
-        }
-
-        return beforeIndex.doubleValue();
-    }
-
-    private Double getIndexAfter(final Double index) {
-        if (index == null) {
-            return INITIAL_INDEX;
-        }
-
-        BigDecimal currentIndex = BigDecimal.valueOf(index);
-        BigDecimal afterIndex = currentIndex.add(BigDecimal.valueOf(INITIAL_INDEX));
-
-        return afterIndex.doubleValue();
-    }
-
-    private Double getIndexBetweenValues(final Double prevIndex, final Double nextIndex) {
-        BigDecimal prev = BigDecimal.valueOf(prevIndex);
-        BigDecimal next = BigDecimal.valueOf(nextIndex);
-
-        if (prev.compareTo(next) >= 0) {
-            throw new IllegalArgumentException("Previous index must be less than next index");
-        }
-
-        BigDecimal difference = next.subtract(prev);
-        if (difference.compareTo(BigDecimal.valueOf(MIN_INCREMENT)) <= 0) {
-            throw new IllegalArgumentException("Indexes are too close to insert between");
-        }
-
-        BigDecimal midpoint = prev.add(difference.divide(BigDecimal.valueOf(2), SCALE, RoundingMode.HALF_UP));
-
-        return midpoint.doubleValue();
-    }
-
+    @Override
     public <T extends Orderable> List<T> renewOrderIndexes(final List<T> entities) {
-        double startIndex = INITIAL_INDEX;
-        double increment = INITIAL_INDEX;
+        BigDecimal startIndex = INITIAL_INDEX;
+        BigDecimal increment = INITIAL_INDEX;
 
         for (int i = 0; i < entities.size(); i++) {
-            double newOrderIndex = startIndex + (i * increment);
+            BigDecimal newOrderIndex = startIndex.add(BigDecimal.valueOf(i).multiply(increment));
             entities.get(i).updateOrderIndex(newOrderIndex);
         }
 
         return entities;
+    }
+
+    private BigDecimal getIndexBefore(final BigDecimal index) {
+        if (index == null) {
+            return INITIAL_INDEX;
+        }
+
+        BigDecimal currentIndex = index;
+        BigDecimal beforeIndex = currentIndex.subtract(INITIAL_INDEX);
+
+        // If subtraction results in negative or too small value, try division by 2
+        if (beforeIndex.compareTo(BigDecimal.ZERO) < 0 || beforeIndex.compareTo(MIN_INCREMENT) < 0) {
+            beforeIndex = currentIndex.divide(BigDecimal.valueOf(2), SCALE, RoundingMode.HALF_UP);
+        }
+
+        // Check if the result is still too small (precision limit reached)
+        if (beforeIndex.compareTo(MIN_INCREMENT) < 0) {
+            throw new BadRequestException("인덱스 변경 한계에 도달하였습니다.");
+        }
+
+        return beforeIndex;
+    }
+
+    private BigDecimal getIndexAfter(final BigDecimal index) {
+        if (index == null) {
+            return INITIAL_INDEX;
+        }
+
+        return index.add(INITIAL_INDEX);
+    }
+
+    private BigDecimal getIndexBetweenValues(final BigDecimal prevIndex, final BigDecimal nextIndex) {
+        BigDecimal difference = nextIndex.subtract(prevIndex);
+        if (difference.compareTo(MIN_INCREMENT) <= 0) {
+            throw new BadRequestException("인덱스 변경 한계에 도달하였습니다.");
+        }
+
+        return prevIndex.add(difference.divide(BigDecimal.valueOf(2), SCALE, RoundingMode.HALF_UP));
     }
 }

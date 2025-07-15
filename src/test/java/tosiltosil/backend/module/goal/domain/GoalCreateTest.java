@@ -3,6 +3,7 @@ package tosiltosil.backend.module.goal.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -19,7 +20,7 @@ class GoalCreateTest {
         Duration invalidTime = Duration.ofSeconds(30);
 
         // when & then
-        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, 1.0, 1L, LocalDate.now()))
+        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, BigDecimal.valueOf(100000.0), 1L, LocalDate.now()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다");
     }
@@ -31,7 +32,7 @@ class GoalCreateTest {
         Duration invalidTime = Duration.ofHours(24);
 
         // when & then
-        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, 1.0, 1L, LocalDate.now()))
+        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, BigDecimal.valueOf(100000.0), 1L, LocalDate.now()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다");
     }
@@ -43,7 +44,7 @@ class GoalCreateTest {
         Duration invalidTime = Duration.ZERO;
 
         // when & then
-        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, 1.0, 1L, LocalDate.now()))
+        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, BigDecimal.valueOf(100000.0), 1L, LocalDate.now()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다");
     }
@@ -55,7 +56,7 @@ class GoalCreateTest {
         Duration invalidTime = Duration.ofMinutes(-1);
 
         // when & then
-        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, 1.0, 1L, LocalDate.now()))
+        assertThatThrownBy(() -> Goal.of(memberId, 1L, "테스트", invalidTime, BigDecimal.valueOf(100000.0), 1L, LocalDate.now()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("시간은 0시 1분 이상 23시 59분 이하가 되어야 합니다");
     }
@@ -67,7 +68,7 @@ class GoalCreateTest {
         Duration oneMinute = Duration.ofMinutes(1);
 
         // when
-        Goal goal = Goal.of(memberId, 1L, "테스트", oneMinute, 1.0, 1L, LocalDate.now());
+        Goal goal = Goal.of(memberId, 1L, "테스트", oneMinute, BigDecimal.valueOf(100000.0), 1L, LocalDate.now());
 
         // then
         assertThat(goal.getTotalTime()).isEqualTo(oneMinute);
@@ -80,7 +81,7 @@ class GoalCreateTest {
         Duration maxTime = Duration.ofHours(23).plusMinutes(59);
 
         // when
-        Goal goal = Goal.of(memberId, 1L, "테스트", maxTime, 1.0, 1L, LocalDate.now());
+        Goal goal = Goal.of(memberId, 1L, "테스트", maxTime, BigDecimal.valueOf(100000.0), 1L, LocalDate.now());
 
         // then
         assertThat(goal.getTotalTime()).isEqualTo(maxTime);

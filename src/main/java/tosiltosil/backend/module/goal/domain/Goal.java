@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -50,8 +51,8 @@ public class Goal extends BaseEntity implements Orderable {
     @Column(nullable = false)
     private Duration duration;
 
-    @Column(nullable = false)
-    private Double orderIndex;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal orderIndex;
 
     @Column(nullable = false)
     private Long iconId;
@@ -67,7 +68,7 @@ public class Goal extends BaseEntity implements Orderable {
             final Duration totalTime,
             final GoalStatus status,
             final Duration duration,
-            final Double orderIndex,
+            final BigDecimal orderIndex,
             final Long iconId,
             final LocalDate date
     ) {
@@ -87,7 +88,7 @@ public class Goal extends BaseEntity implements Orderable {
             final Long categoryId,
             final String title,
             final Duration totalTime,
-            final Double orderIndex,
+            final BigDecimal orderIndex,
             final Long iconId,
             final LocalDate date
     ) {
@@ -156,7 +157,7 @@ public class Goal extends BaseEntity implements Orderable {
         this.duration = this.duration.plus(addedDuration);
     }
 
-    public void updateOrderIndex(final Double orderIndex) {
+    public void updateOrderIndex(final BigDecimal orderIndex) {
         this.orderIndex = orderIndex;
     }
 }

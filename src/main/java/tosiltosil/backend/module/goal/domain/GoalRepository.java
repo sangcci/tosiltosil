@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.goal.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public interface GoalRepository {
 
     List<Goal> findGoal(UUID memberId, Long categoryId);
 
-    Optional<Double> findLastOrderIndex(UUID memberId);
+    Optional<BigDecimal> findLastOrderIndex(UUID memberId);
 
     Goal save(Goal goal);
 
