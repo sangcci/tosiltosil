@@ -32,7 +32,7 @@ public class GoalDslRepository {
                         goal.memberId.eq(memberId),
                         goal.date.eq(date)
                 )
-                .orderBy(category.orderKey.asc(), goal.orderKey.asc())
+                .orderBy(category.orderIndex.asc(), goal.orderIndex.asc())
                 .transform(GroupBy.groupBy(category.id).list(
                         Projections.constructor(DayGoalListResponse.class,
                                 category.id,

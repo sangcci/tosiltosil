@@ -49,7 +49,7 @@ public class Goal extends BaseEntity {
     @Column(nullable = false)
     private Duration duration;
 
-    @Column(nullable = false, precision = 15, scale = 6)
+    @Column(nullable = false)
     private Double orderIndex;
 
     @Column(nullable = false)

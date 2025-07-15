@@ -8,7 +8,7 @@ import tosiltosil.backend.module.goal.domain.Goal;
 
 public interface GoalJpaRepository extends JpaRepository<Goal, Long> {
     
-    List<Goal> findByMemberIdAndCategoryId(UUID memberId, Long categoryId);
+    List<Goal> findByMemberIdAndCategoryIdOrderByOrderIndexAsc(UUID memberId, Long categoryId);
 
     List<Goal> findByCategoryIdAndDateOrderByOrderKey(Long categoryId, LocalDate date);
 

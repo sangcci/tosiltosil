@@ -39,7 +39,7 @@ public class CategoryDslRepository {
                         goal.memberId.eq(memberId),
                         goal.date.between(yearMonth.atDay(1), yearMonth.atEndOfMonth())
                 )
-                .orderBy(goal.date.asc(), category.orderKey.asc(), category.createdAt.asc())
+                .orderBy(goal.date.asc(), category.orderIndex.asc(), category.createdAt.asc())
                 .fetch();
 
         // 2. 날짜 별 색깔 grouping

@@ -29,7 +29,7 @@ public class GoalRepositoryImpl implements GoalRepository {
 
     @Override
     public List<Goal> findGoal(final UUID memberId, final Long categoryId) {
-        return goalJpaRepository.findByMemberIdAndCategoryId(memberId, categoryId);
+        return goalJpaRepository.findByMemberIdAndCategoryIdOrderByOrderIndexAsc(memberId, categoryId);
     }
 
     @Override
@@ -46,15 +46,5 @@ public class GoalRepositoryImpl implements GoalRepository {
     @Override
     public void delete(final Goal goal) {
         goalJpaRepository.delete(goal);
-    }
-
-    @Override
-    public List<Goal> findByCategoryIdAndDateOrderByOrderKey(final Long categoryId, final LocalDate date) {
-        return goalJpaRepository.findByCategoryIdAndDateOrderByOrderKey(categoryId, date);
-    }
-
-    @Override
-    public List<Goal> findByMemberIdAndDateOrderByOrderKey(final UUID memberId, final LocalDate date) {
-        return goalJpaRepository.findByMemberIdAndDateOrderByOrderKey(memberId, date);
     }
 }

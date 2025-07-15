@@ -7,7 +7,7 @@ import tosiltosil.backend.module.category.domain.Category;
 
 public interface CategoryJpaRepository extends JpaRepository<Category, Long> {
 
-    List<Category> findByMemberIdOrderByOrderKey(UUID memberId);
+    List<Category> findByMemberIdOrderByOrderIndex(UUID memberId);
 
     Long countByMemberId(UUID memberId);
 }

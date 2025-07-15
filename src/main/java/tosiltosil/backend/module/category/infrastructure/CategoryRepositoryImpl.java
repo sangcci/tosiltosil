@@ -24,7 +24,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
     public List<Category> findCurrentCategories(final UUID memberId) {
-        return categoryJpaRepository.findByMemberIdOrderByOrderKey(memberId);
+        return categoryJpaRepository.findByMemberIdOrderByOrderIndex(memberId);
     }
 
     @Override
