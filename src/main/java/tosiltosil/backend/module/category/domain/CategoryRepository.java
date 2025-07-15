@@ -16,6 +16,8 @@ public interface CategoryRepository {
 
     Long countCurrentCategory(UUID memberId);
 
+    Optional<Double> findLastOrderIndex(UUID memberId);
+
     Category save(Category category);
 
     void delete(Category category);

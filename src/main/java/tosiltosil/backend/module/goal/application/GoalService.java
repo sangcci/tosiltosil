@@ -2,6 +2,7 @@ package tosiltosil.backend.module.goal.application;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -49,17 +50,28 @@ public class GoalService {
             goalDomainService.validateGoalDate(date);
         });
 
-        List<Goal> goals = request.dates().stream()
-                .map(dateString -> Goal.of(
-                        memberId, 
-                        request.categoryId(), 
-                        request.title(), 
-                        Duration.parse(request.time()),
-                        orderManager.generateInitialOrderIndex(),
-                        request.iconId(), 
-                        LocalDate.parse(dateString)
-                ))
-                .toList();
+        // 마지막 저장된 Goal 순서 가져오기
+        Double lastOrderIndex = goalRepository.findLastOrderIndex(memberId)
+                .orElse(orderManager.generateInitialOrderIndex());
+
+        List<Goal> goals = new ArrayList<>();
+        for (String date : request.dates()) {
+            // 마지막 순서 불러오기
+            Double newOrderIndex = orderManager.generateOrderIndexBetween(lastOrderIndex, null);
+            Goal goal = Goal.of(
+                    memberId,
+                    request.categoryId(),
+                    request.title(),
+                    Duration.parse(request.time()),
+                    // 마지막 순서 다음으로 저장
+                    newOrderIndex,
+                    request.iconId(),
+                    LocalDate.parse(date)
+            );
+            goals.add(goal);
+            // lastOrderIndex 업데이트
+            lastOrderIndex = newOrderIndex;
+        }
 
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
                 .map(Goal::getId)

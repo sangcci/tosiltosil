@@ -38,6 +38,11 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
+    public Optional<Double> findLastOrderIndex(final UUID memberId) {
+        return categoryJpaRepository.findMaxOrderIndexByMemberId(memberId);
+    }
+
+    @Override
     public Category save(final Category category) {
         return categoryJpaRepository.save(category);
     }

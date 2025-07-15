@@ -57,7 +57,9 @@ public class CategoryService {
     ) {
         categoryDomainService.validateCategoryCreation(memberId);
 
-        Double orderIndex = orderManager.generateInitialOrderIndex();
+        Double orderIndex = categoryRepository.findLastOrderIndex(memberId)
+                .map(lastIndex -> orderManager.generateOrderIndexBetween(lastIndex, null))
+                .orElse(orderManager.generateInitialOrderIndex());
 
         Category category = request.toEntity(memberId, orderIndex);
         Category savedCategory = categoryRepository.save(category);

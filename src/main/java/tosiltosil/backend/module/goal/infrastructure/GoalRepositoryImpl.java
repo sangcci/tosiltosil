@@ -33,6 +33,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
+    public Optional<Double> findLastOrderIndex(final UUID memberId) {
+        return goalJpaRepository.findMaxOrderIndexByMemberId(memberId);
+    }
+
+    @Override
     public Goal save(final Goal goal) {
         return goalJpaRepository.save(goal);
     }

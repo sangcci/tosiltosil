@@ -14,6 +14,8 @@ public interface GoalRepository {
 
     List<Goal> findGoal(UUID memberId, Long categoryId);
 
+    Optional<Double> findLastOrderIndex(UUID memberId);
+
     Goal save(Goal goal);
 
     List<Goal> saveAll(List<Goal> goals);
