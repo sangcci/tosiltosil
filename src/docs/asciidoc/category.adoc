@@ -89,6 +89,42 @@ Response Fields
 
 include::{snippets}/category-controller-rest-docs-test/카테고리_수정하기/response-fields.adoc[]
 
+=== 카테고리 순서 변경
+
+특정 카테고리의 순서를 변경합니다.
+
+==== Request
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_순서_변경하기/http-request.adoc[]
+
+Path Parameters
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_순서_변경하기/path-parameters.adoc[]
+
+Request Fields
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_순서_변경하기/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_순서_변경하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_순서_변경하기/response-fields.adoc[]
+
+=== 카테고리 순서 갱신
+
+모든 카테고리의 순서 인덱스를 재정렬합니다.
+
+==== Request
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_순서_갱신하기/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/category-controller-rest-docs-test/카테고리_순서_갱신하기/http-response.adoc[]
+
 === 카테고리 삭제
 
 ==== Request

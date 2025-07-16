@@ -85,7 +85,6 @@ public class CategoryController {
     }
 
     @PostMapping("/renew-order")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Response<Map<String, Object>> renewOrderIndexes(
             @LoginMember final UUID memberId
     ) {

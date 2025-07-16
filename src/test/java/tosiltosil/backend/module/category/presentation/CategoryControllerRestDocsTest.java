@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -22,8 +24,10 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
+import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
+import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.goal.application.GoalService;
@@ -46,8 +50,8 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
     void 회원_카테고리_목록_조회() {
         // given
         List<CurrentCategoryListResponse> responses = List.of(
-                new CurrentCategoryListResponse(1L, "운동", "#FF5733"),
-                new CurrentCategoryListResponse(2L, "공부", "#33FF57")
+                new CurrentCategoryListResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024)),
+                new CurrentCategoryListResponse(2L, "공부", "#33FF57", BigDecimal.valueOf(2048))
         );
 
         given(categoryService.getCategoriesByMemberId(any(UUID.class)))
@@ -69,12 +73,14 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                     {
                                         "categoryId": 1,
                                         "title": "운동",
-                                        "color": "#FF5733"
+                                        "color": "#FF5733",
+                                        "orderIndex": 1024
                                     },
                                     {
                                         "categoryId": 2,
                                         "title": "공부",
-                                        "color": "#33FF57"
+                                        "color": "#33FF57",
+                                        "orderIndex": 2048
                                     }
                                 ]
                             }
@@ -88,7 +94,8 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data", JsonFieldType.ARRAY, "카테고리 목록", "[]"),
                                 responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data[].title", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상 (HEX 코드)", "#FF5733")
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상 (HEX 코드)", "#FF5733"),
+                                responseField("data[].orderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024")
                         )
                 ));
     }
@@ -341,6 +348,86 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.categoryId", JsonFieldType.NUMBER, "수정된 카테고리 ID", "1")
                         )
                 ));
+    }
+
+    @Test
+    void 카테고리_순서_변경하기() {
+        // given
+        Long categoryId = 1L;
+        String request = """
+                    {
+                        "categoryId": 1,
+                        "prevOrderIndex": 1024,
+                        "nextOrderIndex": 2048
+                    }
+                """;
+        CategoryOrderChangeResponse response = CategoryOrderChangeResponse.of(BigDecimal.valueOf(1536));
+
+        given(categoryService.changeOrder(any(UUID.class), eq(categoryId), any(CategoryOrderChangeRequest.class)))
+                .willReturn(response);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.patch()
+                .uri("/api/v1/categories/{categoryId}/change-order", categoryId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "카테고리 순서가 정상적으로 변경되었습니다.",
+                                "data": {
+                                    "orderIndex": 1536
+                                }
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        pathParameters(
+                                pathParameter("categoryId", "순서를 변경할 카테고리 ID")
+                        ),
+                        requestFields(
+                                requestField("categoryId", JsonFieldType.NUMBER, "카테고리 ID", false, "", "1"),
+                                requestField("prevOrderIndex", JsonFieldType.NUMBER, "이전 순서 인덱스 (null일 경우 맨 처음)", true, "", "1024"),
+                                requestField("nextOrderIndex", JsonFieldType.NUMBER, "다음 순서 인덱스 (null일 경우 맨 마지막)", true, "", "2048")
+                        ),
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메시지", "카테고리 순서가 정상적으로 변경되었습니다."),
+                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
+                                responseField("data.orderIndex", JsonFieldType.NUMBER, "변경된 순서 인덱스", "1536")
+                        )
+                ));
+    }
+
+    @Test
+    void 카테고리_순서_갱신하기() {
+        // given
+        doNothing().when(categoryService).renewOrderIndexes(any(UUID.class));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/categories/renew-order")
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "카테고리 순서가 정상적으로 갱신되었습니다.",
+                                "data": {}
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
     }
 
     @Test
