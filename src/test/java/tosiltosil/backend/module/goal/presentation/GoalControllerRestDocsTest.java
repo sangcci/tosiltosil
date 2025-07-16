@@ -2,12 +2,15 @@ package tosiltosil.backend.module.goal.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -21,10 +24,13 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
+import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
+import tosiltosil.backend.module.goal.domain.request.GoalRenewOrderRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 import tosiltosil.backend.support.RestDocsTestSupport;
@@ -48,12 +54,12 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         LocalDate date = LocalDate.of(2025, 7, 8);
         
         List<DayGoalListResponse> responses = List.of(
-                new DayGoalListResponse(1L, "운동", "#FF5733", List.of(
-                        new DayGoalListResponse.GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S"),
-                        new DayGoalListResponse.GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M")
+                new DayGoalListResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024), List.of(
+                        new DayGoalListResponse.GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
+                        new DayGoalListResponse.GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M", BigDecimal.valueOf(2048))
                 )),
-                new DayGoalListResponse(2L, "공부", "#33C3F0", List.of(
-                        new DayGoalListResponse.GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M")
+                new DayGoalListResponse(2L, "공부", "#33C3F0", BigDecimal.valueOf(2048), List.of(
+                        new DayGoalListResponse.GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M", BigDecimal.valueOf(3072))
                 ))
         );
 
@@ -77,6 +83,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                         "categoryId": 1,
                                         "categoryTitle": "운동",
                                         "categoryColor": "#FF5733",
+                                        "categoryOrderIndex": 1024,
                                         "goals": [
                                             {
                                                 "goalId": 1,
@@ -85,7 +92,8 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                 "title": "운동하기",
                                                 "status": "시작 전",
                                                 "totalTime": "PT2H",
-                                                "duration": "PT0S"
+                                                "duration": "PT0S",
+                                                "orderIndex": 1024
                                             },
                                             {
                                                 "goalId": 2,
@@ -94,7 +102,8 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                 "title": "독서하기",
                                                 "status": "진행 중",
                                                 "totalTime": "PT1H30M",
-                                                "duration": "PT30M"
+                                                "duration": "PT30M",
+                                                "orderIndex": 2048
                                             }
                                         ]
                                     },
@@ -102,6 +111,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                         "categoryId": 2,
                                         "categoryTitle": "공부",
                                         "categoryColor": "#33C3F0",
+                                        "categoryOrderIndex": 2048,
                                         "goals": [
                                             {
                                                 "goalId": 3,
@@ -110,7 +120,8 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                 "title": "코딩하기",
                                                 "status": "진행 중",
                                                 "totalTime": "PT3H",
-                                                "duration": "PT1H15M"
+                                                "duration": "PT1H15M",
+                                                "orderIndex": 3072
                                             }
                                         ]
                                     }
@@ -133,6 +144,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),
                                 responseField("data[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "#FF5733"),
+                                responseField("data[].categoryOrderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024"),
                                 responseField("data[].goals", JsonFieldType.ARRAY, "카테고리에 속한 목표 목록", "[]"),
                                 responseField("data[].goals[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),
                                 responseField("data[].goals[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
@@ -140,7 +152,8 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data[].goals[].title", JsonFieldType.STRING, "목표 제목", "운동하기"),
                                 responseField("data[].goals[].status", JsonFieldType.STRING, "목표 상태 (시작 전, 진행 중, 완료, 실패)", "시작 전"),
                                 responseField("data[].goals[].totalTime", JsonFieldType.STRING, "목표 총 시간 (ISO-8601 Duration 형식)", "PT2H"),
-                                responseField("data[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S")
+                                responseField("data[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S"),
+                                responseField("data[].goals[].orderIndex", JsonFieldType.NUMBER, "목표 순서 인덱스", "1024")
                         )
                 ));
     }
@@ -437,6 +450,98 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
 
         assertThat(testResult)
                 .apply(documentHandler.document());
+    }
+
+    @Test
+    void 목표_순서_변경하기() {
+        // given
+        Long goalId = 1L;
+        String request = """
+                    {
+                        "goalId": 1,
+                        "prevOrderIndex": 1024,
+                        "nextOrderIndex": 2048
+                    }
+                """;
+        GoalOrderChangeResponse response = GoalOrderChangeResponse.of(BigDecimal.valueOf(1536));
+
+        given(goalService.changeOrder(any(UUID.class), eq(goalId), any(GoalOrderChangeRequest.class)))
+                .willReturn(response);
+
+        // when
+        MvcTestResult testResult = mockMvcTester.patch()
+                .uri("/api/v1/goals/{goalId}/change-order", goalId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "목표 순서가 정상적으로 변경되었습니다.",
+                                "data": {
+                                    "orderIndex": 1536
+                                }
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        pathParameters(
+                                pathParameter("goalId", "순서를 변경할 목표 ID")
+                        ),
+                        requestFields(
+                                requestField("goalId", JsonFieldType.NUMBER, "목표 ID", false, "", "1"),
+                                requestField("prevOrderIndex", JsonFieldType.NUMBER, "이전 순서 인덱스 (null일 경우 맨 처음)", true, "", "1024"),
+                                requestField("nextOrderIndex", JsonFieldType.NUMBER, "다음 순서 인덱스 (null일 경우 맨 마지막)", true, "", "2048")
+                        ),
+                        responseFields(
+                                responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
+                                responseField("message", JsonFieldType.STRING, "응답 메시지", "목표 순서가 정상적으로 변경되었습니다."),
+                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
+                                responseField("data.orderIndex", JsonFieldType.NUMBER, "변경된 순서 인덱스", "1536")
+                        )
+                ));
+    }
+
+    @Test
+    void 목표_순서_갱신하기() {
+        // given
+        String request = """
+                    {
+                        "categoryId": 1
+                    }
+                """;
+
+        doNothing().when(goalService).renewOrderIndexes(any(UUID.class), any(GoalRenewOrderRequest.class));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/goals/renew-order")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .hasStatus(HttpStatus.OK)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 200,
+                                "message": "목표 순서가 정상적으로 갱신되었습니다.",
+                                "data": {}
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document(
+                        requestFields(
+                                requestField("categoryId", JsonFieldType.NUMBER, "순서를 갱신할 카테고리 ID", true, "", "1")
+                        )
+                ));
     }
 
     @Test

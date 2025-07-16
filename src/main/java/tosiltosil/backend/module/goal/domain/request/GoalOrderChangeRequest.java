@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 public record GoalOrderChangeRequest(
         Long goalId,
-        Integer targetIndex,
         BigDecimal prevOrderIndex,
         BigDecimal nextOrderIndex
 ) {

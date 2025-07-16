@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.goal.domain.response;
 
+import java.math.BigDecimal;
 import java.util.List;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
@@ -7,6 +8,7 @@ public record DayGoalListResponse(
         Long categoryId,
         String categoryTitle,
         String categoryColor,
+        BigDecimal categoryOrderIndex,
         List<GoalListResponse> goals
 ) {
 
@@ -18,7 +20,8 @@ public record DayGoalListResponse(
             String title,
             GoalStatus status,
             String totalTime,
-            String duration
+            String duration,
+            BigDecimal orderIndex
     ) {
 
     }

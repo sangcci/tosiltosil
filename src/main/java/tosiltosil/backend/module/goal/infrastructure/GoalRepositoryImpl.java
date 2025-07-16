@@ -29,7 +29,7 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public List<Goal> findGoal(final UUID memberId, final Long categoryId) {
+    public List<Goal> findGoalsInCategory(final UUID memberId, final Long categoryId) {
         return goalJpaRepository.findByMemberIdAndCategoryIdOrderByOrderIndexAsc(memberId, categoryId);
     }
 

@@ -121,7 +121,7 @@ public class GoalService {
             final UUID memberId,
             final GoalRenewOrderRequest request
     ) {
-        List<Goal> goals = goalRepository.findGoal(memberId, request.categoryId());
+        List<Goal> goals = goalRepository.findGoalsInCategory(memberId, request.categoryId());
 
         List<Goal> renewedGoals = orderManager.renewOrderIndexes(goals);
 
@@ -142,7 +142,7 @@ public class GoalService {
 
     @Transactional
     public Duration deleteGoalsAndCalculateTotalDuration(final UUID memberId, final Long categoryId) {
-        List<Goal> goalsToDelete = goalRepository.findGoal(memberId, categoryId);
+        List<Goal> goalsToDelete = goalRepository.findGoalsInCategory(memberId, categoryId);
 
         Duration totalDuration = goalsToDelete.stream()
                 .map(Goal::getDuration)

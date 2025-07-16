@@ -13,7 +13,7 @@ public interface GoalRepository {
 
     List<DayGoalListResponse> findDayGoals(UUID memberId, LocalDate date);
 
-    List<Goal> findGoal(UUID memberId, Long categoryId);
+    List<Goal> findGoalsInCategory(UUID memberId, Long categoryId);
 
     Optional<BigDecimal> findLastOrderIndex(UUID memberId);
 
