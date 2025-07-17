@@ -108,7 +108,7 @@ public class GoalService {
         goal.validateIsMine(memberId);
 
         if (orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
-            renewOrderIndexes(memberId, request.categoryId());
+            renewOrderIndexes(memberId, goal.getCategoryId());
         }
 
         BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());

@@ -355,7 +355,6 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         Long categoryId = 1L;
         String request = """
                     {
-                        "categoryId": 1,
                         "prevOrderIndex": 1024,
                         "nextOrderIndex": 2048
                     }
@@ -391,7 +390,6 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 pathParameter("categoryId", "순서를 변경할 카테고리 ID")
                         ),
                         requestFields(
-                                requestField("categoryId", JsonFieldType.NUMBER, "카테고리 ID", false, "", "1"),
                                 requestField("prevOrderIndex", JsonFieldType.NUMBER, "이전 순서 인덱스 (null일 경우 맨 처음)", true, "", "1024"),
                                 requestField("nextOrderIndex", JsonFieldType.NUMBER, "다음 순서 인덱스 (null일 경우 맨 마지막)", true, "", "2048")
                         ),
