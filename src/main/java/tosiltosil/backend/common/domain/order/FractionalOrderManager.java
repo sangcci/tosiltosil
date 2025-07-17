@@ -52,10 +52,6 @@ public class FractionalOrderManager implements OrderManager {
     }
 
     private BigDecimal getIndexBefore(final BigDecimal index) {
-        if (index == null) {
-            return INITIAL_INDEX;
-        }
-
         BigDecimal currentIndex = index;
         BigDecimal beforeIndex = currentIndex.subtract(INITIAL_INDEX);
 
@@ -73,10 +69,6 @@ public class FractionalOrderManager implements OrderManager {
     }
 
     private BigDecimal getIndexAfter(final BigDecimal index) {
-        if (index == null) {
-            return INITIAL_INDEX;
-        }
-
         return index.add(INITIAL_INDEX);
     }
 
