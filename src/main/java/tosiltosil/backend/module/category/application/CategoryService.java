@@ -91,6 +91,10 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
+        if (orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
+            renewOrderIndexes(memberId);
+        }
+
         BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
         category.updateOrderIndex(newOrderIndex);
 
@@ -99,8 +103,7 @@ public class CategoryService {
         return CategoryOrderChangeResponse.of(newOrderIndex);
     }
 
-    @Transactional
-    public void renewOrderIndexes(final UUID memberId) {
+    private void renewOrderIndexes(final UUID memberId) {
         List<Category> categories = categoryRepository.findCurrentCategories(memberId);
 
         List<Category> renewedCategories = orderManager.renewOrderIndexes(categories);

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -403,31 +402,6 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.orderIndex", JsonFieldType.NUMBER, "변경된 순서 인덱스", "1536")
                         )
                 ));
-    }
-
-    @Test
-    void 카테고리_순서_갱신하기() {
-        // given
-        doNothing().when(categoryService).renewOrderIndexes(any(UUID.class));
-
-        // when
-        MvcTestResult testResult = mockMvcTester.post()
-                .uri("/api/v1/categories/renew-order")
-                .exchange();
-
-        // then
-        assertThat(testResult)
-                .hasStatus(HttpStatus.OK)
-                .bodyJson().isEqualTo("""
-                            {
-                                "status": 200,
-                                "message": "카테고리 순서가 정상적으로 갱신되었습니다.",
-                                "data": {}
-                            }
-                        """);
-
-        assertThat(testResult)
-                .apply(documentHandler.document());
     }
 
     @Test

@@ -15,7 +15,6 @@ import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
-import tosiltosil.backend.module.goal.domain.request.GoalRenewOrderRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
@@ -108,6 +107,10 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
+        if (orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
+            renewOrderIndexes(memberId, request.categoryId());
+        }
+
         BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
         goal.updateOrderIndex(newOrderIndex);
         
@@ -116,12 +119,8 @@ public class GoalService {
         return GoalOrderChangeResponse.of(newOrderIndex);
     }
 
-    @Transactional
-    public void renewOrderIndexes(
-            final UUID memberId,
-            final GoalRenewOrderRequest request
-    ) {
-        List<Goal> goals = goalRepository.findTodayGoalsInCategory(memberId, request.categoryId());
+    private void renewOrderIndexes(final UUID memberId, final Long categoryId) {
+        List<Goal> goals = goalRepository.findTodayGoalsInCategory(memberId, categoryId);
 
         List<Goal> renewedGoals = orderManager.renewOrderIndexes(goals);
 

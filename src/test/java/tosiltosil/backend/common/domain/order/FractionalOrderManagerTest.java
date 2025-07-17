@@ -1,15 +1,11 @@
 package tosiltosil.backend.common.domain.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import tosiltosil.backend.common.domain.exception.BadRequestException;
 
 @SuppressWarnings("NonAsciiCharacters")
 public class FractionalOrderManagerTest {
@@ -39,101 +35,117 @@ public class FractionalOrderManagerTest {
     }
 
     @Test
-    void 이전_인덱스가_null인_경우_다음_인덱스_앞에_위치하는_인덱스_생성() {
+    void 이전_인덱스가_null인_경우_다음_인덱스에서_INCREMENT_빼기() {
         // given
         BigDecimal nextIndex = BigDecimal.valueOf(2048);
-        BigDecimal expectedIndex = nextIndex.divide(BigDecimal.valueOf(2));
 
         // when
         BigDecimal index = fractionalOrderManager.generateOrderIndexBetween(null, nextIndex);
 
         // then
-        assertThat(index).isLessThan(nextIndex);
-        assertThat(index).isEqualTo(expectedIndex);
+        assertThat(index).isEqualTo(BigDecimal.valueOf(1024)); // 2048 - 1024 = 1024
     }
 
     @Test
-    void 다음_인덱스가_null인_경우_이전_인덱스_뒤에_위치하는_인덱스_생성() {
+    void 다음_인덱스가_null인_경우_이전_인덱스에_INCREMENT_더하기() {
         // given
         BigDecimal prevIndex = BigDecimal.valueOf(1024);
-        BigDecimal expectedIndex = prevIndex.add(BigDecimal.valueOf(1024));
 
         // when
         BigDecimal index = fractionalOrderManager.generateOrderIndexBetween(prevIndex, null);
 
         // then
-        assertThat(index).isGreaterThan(prevIndex);
-        assertThat(index).isEqualTo(expectedIndex);
+        assertThat(index).isEqualTo(BigDecimal.valueOf(2048)); // 1024 + 1024 = 2048
     }
 
     @Test
-    void 두_인덱스_사이에_위치하는_인덱스_생성() {
+    void 두_인덱스_사이의_중간값_계산() {
         // given
         BigDecimal prevIndex = BigDecimal.valueOf(1024);
-        BigDecimal nextIndex = BigDecimal.valueOf(2048);
-        BigDecimal expectedIndex = prevIndex.add(nextIndex).divide(BigDecimal.valueOf(2), 3, RoundingMode.HALF_UP);
+        BigDecimal nextIndex = BigDecimal.valueOf(3072);
 
         // when
         BigDecimal index = fractionalOrderManager.generateOrderIndexBetween(prevIndex, nextIndex);
 
         // then
+        assertThat(index).isEqualTo(BigDecimal.valueOf(2048)); // (1024 + 3072) / 2 = 2048
         assertThat(index).isGreaterThan(prevIndex);
         assertThat(index).isLessThan(nextIndex);
-        assertThat(index).isEqualTo(expectedIndex);
     }
 
     @Test
-    void 두_인덱스_차이가_너무_작은_경우_예외_발생() {
+    void 두_인덱스_사이의_중간값_계산_소수점_포함() {
         // given
         BigDecimal prevIndex = BigDecimal.valueOf(1024);
-        BigDecimal nextIndex = BigDecimal.valueOf(1024.001); // MIN_INCREMENT와 같은 차이
-
-        // when & then
-        assertThatThrownBy(() -> fractionalOrderManager.generateOrderIndexBetween(prevIndex, nextIndex))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("인덱스 변경 한계에 도달하였습니다.");
-    }
-
-    @Test
-    void 연속적인_인덱스_생성_테스트() {
-        // given
-        BigDecimal first = fractionalOrderManager.generateInitialOrderIndex();
-        BigDecimal second = fractionalOrderManager.generateOrderIndexBetween(first, null);
-        BigDecimal third = fractionalOrderManager.generateOrderIndexBetween(second, null);
+        BigDecimal nextIndex = BigDecimal.valueOf(2048);
 
         // when
-        BigDecimal between1and2 = fractionalOrderManager.generateOrderIndexBetween(first, second);
-        BigDecimal between2and3 = fractionalOrderManager.generateOrderIndexBetween(second, third);
+        BigDecimal index = fractionalOrderManager.generateOrderIndexBetween(prevIndex, nextIndex);
 
         // then
-        assertThat(first).isLessThan(between1and2);
-        assertThat(between1and2).isLessThan(second);
-        assertThat(second).isLessThan(between2and3);
-        assertThat(between2and3).isLessThan(third);
+        assertThat(index).isEqualTo(BigDecimal.valueOf(1536)); // (1024 + 2048) / 2 = 1536
+        assertThat(index).isGreaterThan(prevIndex);
+        assertThat(index).isLessThan(nextIndex);
     }
 
     @Test
-    void 소수점_정밀도_테스트() {
+    void 이전_인덱스가_MIN_INDEX_이하인_경우_false() {
         // given
-        BigDecimal prev = BigDecimal.valueOf(1024);
-        BigDecimal next = BigDecimal.valueOf(1024.002); // MIN_INCREMENT * 2
-        BigDecimal expectedIndex = prev.add(next).divide(BigDecimal.valueOf(2), 3, RoundingMode.HALF_UP); // 1024.001
+        BigDecimal prevIndex = BigDecimal.valueOf(0.001);
+        BigDecimal nextIndex = BigDecimal.valueOf(2048);
 
         // when
-        BigDecimal index = fractionalOrderManager.generateOrderIndexBetween(prev, next);
+        boolean result = fractionalOrderManager.validateIndexBounds(prevIndex, nextIndex);
 
         // then
-        assertThat(index).isGreaterThan(prev);
-        assertThat(index).isLessThan(next);
-        assertThat(index).isEqualTo(expectedIndex);
+        assertThat(result).isFalse();
     }
 
     @Test
-    void 여러_엔티티_올바른_순서로_갱신() {
+    void 다음_인덱스_더하기_INCREMENT가_MAX_INDEX_초과인_경우_false() {
+        // given
+        BigDecimal prevIndex = BigDecimal.valueOf(1024);
+        BigDecimal nextIndex = BigDecimal.valueOf(999000); // 999000 + 1024 = 1000024 > 1000000
+
+        // when
+        boolean result = fractionalOrderManager.validateIndexBounds(prevIndex, nextIndex);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void 다음_인덱스_빼기_INCREMENT가_0_이하인_경우_false() {
+        // given
+        BigDecimal prevIndex = BigDecimal.valueOf(1024);
+        BigDecimal nextIndex = BigDecimal.valueOf(1024); // 1024 - 1024 = 0
+
+        // when
+        boolean result = fractionalOrderManager.validateIndexBounds(prevIndex, nextIndex);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void 다음_인덱스_빼기_INCREMENT가_음수인_경우_false() {
+        // given
+        BigDecimal prevIndex = BigDecimal.valueOf(1024);
+        BigDecimal nextIndex = BigDecimal.valueOf(500); // 500 - 1024 = -524
+
+        // when
+        boolean result = fractionalOrderManager.validateIndexBounds(prevIndex, nextIndex);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void 엔티티들의_순서_인덱스_갱신() {
         // given
         TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1536));
-        TestOrderableEntity entity2 = new TestOrderableEntity(BigDecimal.valueOf(1024.001));
-        TestOrderableEntity entity3 = new TestOrderableEntity(BigDecimal.valueOf(1024.002));
+        TestOrderableEntity entity2 = new TestOrderableEntity(BigDecimal.valueOf(3000));
+        TestOrderableEntity entity3 = new TestOrderableEntity(BigDecimal.valueOf(500));
         List<TestOrderableEntity> entities = List.of(entity1, entity2, entity3);
 
         // when
@@ -141,51 +153,21 @@ public class FractionalOrderManagerTest {
 
         // then
         assertThat(result).hasSize(3);
-        assertThat(result.get(0).getOrderIndex()).isEqualTo(BigDecimal.valueOf(1024));  // 1024 + (0 * 1024)
-        assertThat(result.get(1).getOrderIndex()).isEqualTo(BigDecimal.valueOf(2048));  // 1024 + (1 * 1024)
-        assertThat(result.get(2).getOrderIndex()).isEqualTo(BigDecimal.valueOf(3072));  // 1024 + (2 * 1024)
+        assertThat(result.get(0).getOrderIndex()).isEqualTo(BigDecimal.valueOf(1024)); // 1024 + (0 * 1024)
+        assertThat(result.get(1).getOrderIndex()).isEqualTo(BigDecimal.valueOf(2048)); // 1024 + (1 * 1024)
+        assertThat(result.get(2).getOrderIndex()).isEqualTo(BigDecimal.valueOf(3072)); // 1024 + (2 * 1024)
     }
 
     @Test
-    void renewOrderIndexes_원본_리스트_수정되지_않음() {
+    void 빈_리스트인_경우() {
         // given
-        TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1536));
-        TestOrderableEntity entity2 = new TestOrderableEntity(BigDecimal.valueOf(1024.001));
-        List<TestOrderableEntity> originalEntities = new ArrayList<>();
-        originalEntities.add(entity1);
-        originalEntities.add(entity2);
-        
-        BigDecimal originalIndex1 = entity1.getOrderIndex();
-        BigDecimal originalIndex2 = entity2.getOrderIndex();
+        List<TestOrderableEntity> entities = new ArrayList<>();
 
         // when
-        List<TestOrderableEntity> result = fractionalOrderManager.renewOrderIndexes(originalEntities);
+        List<TestOrderableEntity> result = fractionalOrderManager.renewOrderIndexes(entities);
 
         // then
-        assertThat(result).isSameAs(originalEntities); // 같은 리스트 객체 반환
-        assertThat(entity1.getOrderIndex()).isNotEqualTo(originalIndex1); // 인덱스는 변경됨
-        assertThat(entity2.getOrderIndex()).isNotEqualTo(originalIndex2);
-    }
-
-    @Test
-    @Disabled
-    void getIndexAfter_매우_큰_값에서_오버플로우_예외_발생() {
-        // given
-
-        // when & then
-
-    }
-
-    @Test
-    void getIndexBetweenValues_연속된_MIN_INCREMENT_값들_사이에서_예외_발생() {
-        // given
-        BigDecimal prev = BigDecimal.valueOf(1024.001);
-        BigDecimal next = BigDecimal.valueOf(1024.002); // 차이가 정확히 MIN_INCREMENT = 0.001
-
-        // when & then
-        assertThatThrownBy(() -> fractionalOrderManager.generateOrderIndexBetween(prev, next))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("인덱스 변경 한계에 도달하였습니다.");
+        assertThat(result).isEmpty();
     }
 
     private static class TestOrderableEntity implements Orderable {

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -25,7 +24,6 @@ import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
-import tosiltosil.backend.module.goal.domain.request.GoalRenewOrderRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
@@ -503,43 +501,6 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "목표 순서가 정상적으로 변경되었습니다."),
                                 responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
                                 responseField("data.orderIndex", JsonFieldType.NUMBER, "변경된 순서 인덱스", "1536")
-                        )
-                ));
-    }
-
-    @Test
-    void 목표_순서_갱신하기() {
-        // given
-        String request = """
-                    {
-                        "categoryId": 1
-                    }
-                """;
-
-        doNothing().when(goalService).renewOrderIndexes(any(UUID.class), any(GoalRenewOrderRequest.class));
-
-        // when
-        MvcTestResult testResult = mockMvcTester.post()
-                .uri("/api/v1/goals/renew-order")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(request)
-                .exchange();
-
-        // then
-        assertThat(testResult)
-                .hasStatus(HttpStatus.OK)
-                .bodyJson().isEqualTo("""
-                            {
-                                "status": 200,
-                                "message": "목표 순서가 정상적으로 갱신되었습니다.",
-                                "data": {}
-                            }
-                        """);
-
-        assertThat(testResult)
-                .apply(documentHandler.document(
-                        requestFields(
-                                requestField("categoryId", JsonFieldType.NUMBER, "순서를 갱신할 카테고리 ID", true, "", "1")
                         )
                 ));
     }

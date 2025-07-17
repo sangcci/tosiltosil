@@ -3,7 +3,6 @@ package tosiltosil.backend.module.goal.presentation;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
-import tosiltosil.backend.module.goal.domain.request.GoalRenewOrderRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
@@ -75,15 +73,6 @@ public class GoalController {
     ) {
         GoalOrderChangeResponse response = goalService.changeOrder(memberId, goalId, request);
         return Response.ok("목표 순서가 정상적으로 변경되었습니다.", response);
-    }
-
-    @PostMapping("/renew-order")
-    public Response<Map<String, Object>> renewOrderIndexes(
-            @LoginMember final UUID memberId,
-            @RequestBody final GoalRenewOrderRequest request
-    ) {
-        goalService.renewOrderIndexes(memberId, request);
-        return Response.ok("목표 순서가 정상적으로 갱신되었습니다.");
     }
 
     @DeleteMapping("/{goalId}")

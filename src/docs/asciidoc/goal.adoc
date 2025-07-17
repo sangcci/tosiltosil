@@ -115,22 +115,6 @@ Response Fields
 
 include::{snippets}/goal-controller-rest-docs-test/목표_순서_변경하기/response-fields.adoc[]
 
-=== 목표 순서 갱신
-
-특정 카테고리 내의 모든 목표 순서 인덱스를 재정렬합니다.
-
-==== Request
-
-include::{snippets}/goal-controller-rest-docs-test/목표_순서_갱신하기/http-request.adoc[]
-
-Request Fields
-
-include::{snippets}/goal-controller-rest-docs-test/목표_순서_갱신하기/request-fields.adoc[]
-
-==== Response
-
-include::{snippets}/goal-controller-rest-docs-test/목표_순서_갱신하기/http-response.adoc[]
-
 === 목표 삭제
 
 ==== Request
