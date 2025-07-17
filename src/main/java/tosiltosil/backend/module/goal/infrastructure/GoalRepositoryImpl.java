@@ -42,7 +42,7 @@ public class GoalRepositoryImpl implements GoalRepository {
 
     @Override
     public Optional<BigDecimal> findLastOrderIndex(final UUID memberId) {
-        return goalJpaRepository.findMaxOrderIndexByMemberId(memberId);
+        return goalJpaRepository.findMaxOrderIndexByMemberIdAndDate(memberId, timeHolder.getCurrentDate());
     }
 
     @Override
