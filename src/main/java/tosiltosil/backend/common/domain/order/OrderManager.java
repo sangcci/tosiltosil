@@ -36,6 +36,7 @@ public interface OrderManager {
     /**
      * 순서를 재정렬 합니다.
      * - service 코드 내에서 사용할 때 먼저 validation을 거쳐야 합니다.
+     * - 수정할 엔티티 수에 따라 쿼리 최적화를 진행하는 것이 좋습니다
      *
      * @param <T>       목록 내 엔티티의 타입으로, {@link Orderable} 인터페이스를 구현해야 합니다.
      * @param entities  순서 인덱스를 업데이트할 엔티티 목록입니다.
