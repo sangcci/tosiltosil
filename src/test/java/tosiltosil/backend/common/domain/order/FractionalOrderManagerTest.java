@@ -115,26 +115,12 @@ public class FractionalOrderManagerTest {
     }
 
     @Test
-    void 다음_인덱스_빼기_INCREMENT가_0_이하인_경우_false() {
+    void 다음_인덱스가_MIN_INDEX_이하인_경우_false() {
         // given
-        BigDecimal prevIndex = BigDecimal.valueOf(1024);
-        BigDecimal nextIndex = BigDecimal.valueOf(1024); // 1024 - 1024 = 0
+        BigDecimal nextIndex = BigDecimal.valueOf(0.001); // MIN_INDEX
 
         // when
-        boolean result = fractionalOrderManager.validateIndexBounds(prevIndex, nextIndex);
-
-        // then
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void 다음_인덱스_빼기_INCREMENT가_음수인_경우_false() {
-        // given
-        BigDecimal prevIndex = BigDecimal.valueOf(1024);
-        BigDecimal nextIndex = BigDecimal.valueOf(500); // 500 - 1024 = -524
-
-        // when
-        boolean result = fractionalOrderManager.validateIndexBounds(prevIndex, nextIndex);
+        boolean result = fractionalOrderManager.validateIndexBounds(null, nextIndex);
 
         // then
         assertThat(result).isFalse();

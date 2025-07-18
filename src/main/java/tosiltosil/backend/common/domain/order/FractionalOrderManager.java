@@ -45,7 +45,7 @@ public class FractionalOrderManager implements OrderManager {
         if (nextIndex != null && nextIndex.add(INCREMENT).compareTo(MAX_INDEX) > 0) {
             return false;
         }
-        if (nextIndex != null && nextIndex.subtract(INCREMENT).compareTo(BigDecimal.ZERO) <= 0) {
+        if (nextIndex != null && nextIndex.compareTo(MIN_INDEX) <= 0) {
             return false;
         }
         return true;
