@@ -46,6 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/members/check-email").permitAll()
                         // swagger
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // restdocs
+                        .requestMatchers("/docs/**").permitAll()
                         // h2
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())

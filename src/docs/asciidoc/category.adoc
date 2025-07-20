@@ -7,6 +7,44 @@
 :sectlinks:
 :snippets: {snippets}
 
+=== 회원 카테고리 목록 조회
+
+==== Request
+
+include::{snippets}/category-controller-rest-docs-test/회원_카테고리_목록_조회/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/category-controller-rest-docs-test/회원_카테고리_목록_조회/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/category-controller-rest-docs-test/회원_카테고리_목록_조회/response-fields.adoc[]
+
+==== 빈 목록 응답
+
+특정 날짜에 카테고리가 없는 경우의 응답입니다.
+
+include::{snippets}/category-controller-rest-docs-test/회원_카테고리_목록_조회_빈_목록/response-body.adoc[]
+
+=== 월별 카테고리 색상 조회
+
+특정 월에 해당하는 날짜별 카테고리 색상 정보를 조회합니다.
+
+==== Request
+
+include::{snippets}/category-controller-rest-docs-test/월별_카테고리_색상_조회_빈_목록/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/category-controller-rest-docs-test/월별_카테고리_색상_조회_빈_목록/http-response.adoc[]
+
+==== 빈 목록 응답
+
+특정 월에 카테고리 색상 정보가 없는 경우의 응답입니다.
+
+include::{snippets}/category-controller-rest-docs-test/월별_카테고리_색상_조회_빈_목록/response-body.adoc[]
+
 === 카테고리 생성
 
 ==== Request

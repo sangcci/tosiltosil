@@ -27,7 +27,7 @@ class CategoryDomainServiceTest {
     void 카테고리_생성_시_10개_미만이면_성공한다() {
         // given
         UUID memberId = UUID.randomUUID();
-        when(categoryRepository.countByMemberId(memberId)).thenReturn(9L);
+        when(categoryRepository.countCurrentCategory(memberId)).thenReturn(9L);
 
         // when & then
         assertThatCode(() -> categoryDomainService.validateCategoryCreation(memberId))
@@ -38,7 +38,7 @@ class CategoryDomainServiceTest {
     void 카테고리_생성_시_10개_이상이면_실패한다() {
         // given
         UUID memberId = UUID.randomUUID();
-        when(categoryRepository.countByMemberId(memberId)).thenReturn(10L);
+        when(categoryRepository.countCurrentCategory(memberId)).thenReturn(10L);
 
         // when & then
         assertThatThrownBy(() -> categoryDomainService.validateCategoryCreation(memberId))

@@ -1,13 +1,16 @@
 package tosiltosil.backend.module.category.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
 
@@ -65,10 +68,7 @@ public class Category extends BaseEntity {
         }
     }
 
-    public void updateBasicInfo(
-            final String title,
-            final String color
-    ) {
+    public void updateBasicInfo(final String title, final String color) {
         this.title = title;
         this.color = color;
     }

@@ -1,17 +1,25 @@
 package tosiltosil.backend.module.category.application;
 
+import java.time.Duration;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.category.domain.Category;
 import tosiltosil.backend.module.category.domain.CategoryRepository;
+import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
+import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
+import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
+import tosiltosil.backend.module.goal.application.GoalService;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +27,25 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryDomainService categoryDomainService;
+    private final GoalService goalService;
+
+    @Transactional(readOnly = true)
+    public List<CurrentCategoryListResponse> getCategoriesByMemberId(
+            final UUID memberId
+    ) {
+        List<Category> categories = categoryRepository.findCurrentCategories(memberId);
+        return categories.stream().map(CurrentCategoryListResponse::of).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryColorPerDayResponse> getCategoryColorPerMonth(
+            final UUID memberId,
+            final int year,
+            final int month
+    ) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        return categoryRepository.findColorsPerMonth(memberId, yearMonth);
+    }
 
     @Transactional
     public CategoryResponse createCategory(
@@ -66,7 +93,14 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
+        Duration deletedTotalDuration = goalService.deleteGoalsAndCalculateTotalDuration(memberId, categoryId);
+
         categoryRepository.delete(category);
+
+        if (deletedTotalDuration.compareTo(Duration.ZERO) > 0) {
+            Events.raise(CategoryDeletedEvent.of(memberId, deletedTotalDuration));
+        }
+
         return CategoryResponse.of(category.getId());
     }
 }
