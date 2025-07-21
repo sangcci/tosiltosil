@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -91,6 +92,29 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(
                 400,
                 "파라미터가 누락되었습니다",
+                List.of(errorDetailResponse)
+        );
+    }
+
+    /**
+     *  쿠키 누락 예외 처리
+     *  - 필수 요청 cookie가 누락되었을 경우 발생
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ErrorResponse handleMissingRequestCookieException(MissingRequestCookieException e) {
+        ErrorDetailResponse errorDetailResponse = ErrorDetailResponse.of(
+                e.getCookieName(),
+                null,
+                "쿠키가 존재하지 않습니다."
+        );
+
+        InfoLog infoLog = InfoLog.of(e.getCookieName() + " 필수 쿠키 누락으로 실패");
+        infoLog.writeLog();
+
+        return ErrorResponse.of(
+                400,
+                "필수 쿠키가 누락되었습니다.",
                 List.of(errorDetailResponse)
         );
     }
