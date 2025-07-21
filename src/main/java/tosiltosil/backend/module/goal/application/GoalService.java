@@ -107,7 +107,7 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
-        if (orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
+        if (!orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
             renewOrderIndexes(memberId, goal.getCategoryId());
         }
 
