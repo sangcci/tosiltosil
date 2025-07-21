@@ -2,12 +2,14 @@ package tosiltosil.backend.module.goal.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.holder.TestTimeHolder;
+import tosiltosil.backend.module.goal.domain.GoalRepository;
 
 @SuppressWarnings("NonAsciiCharacters")
 class GoalDomainServiceTest {
@@ -17,7 +19,8 @@ class GoalDomainServiceTest {
     @BeforeEach
     void setUp() {
         TestTimeHolder testTimeHolder = new TestTimeHolder(LocalDate.of(2025, 7, 8));
-        goalDomainService = new GoalDomainService(testTimeHolder);
+        GoalRepository mockGoalRepository = mock(GoalRepository.class);
+        goalDomainService = new GoalDomainService(mockGoalRepository, testTimeHolder);
     }
 
     @Test
