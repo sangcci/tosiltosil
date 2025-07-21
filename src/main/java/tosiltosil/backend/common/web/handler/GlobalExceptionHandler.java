@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
         ErrorDetailResponse errorDetailResponse = ErrorDetailResponse.of(
                 e.getCookieName(),
                 null,
-                e.getMessage()
+                "쿠키가 존재하지 않습니다."
         );
 
         InfoLog infoLog = InfoLog.of(e.getCookieName() + " 필수 쿠키 누락으로 실패");
