@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -19,12 +20,13 @@ import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
+import tosiltosil.backend.common.domain.order.Orderable;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Goal extends BaseEntity {
+public class Goal extends BaseEntity implements Orderable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,8 +51,8 @@ public class Goal extends BaseEntity {
     @Column(nullable = false)
     private Duration duration;
 
-    @Column(nullable = false)
-    private int sequence;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal orderIndex;
 
     @Column(nullable = false)
     private Long iconId;
@@ -66,7 +68,7 @@ public class Goal extends BaseEntity {
             final Duration totalTime,
             final GoalStatus status,
             final Duration duration,
-            final int sequence,
+            final BigDecimal orderIndex,
             final Long iconId,
             final LocalDate date
     ) {
@@ -76,7 +78,7 @@ public class Goal extends BaseEntity {
         this.totalTime = totalTime;
         this.status = status;
         this.duration = duration;
-        this.sequence = sequence;
+        this.orderIndex = orderIndex;
         this.iconId = iconId;
         this.date = date;
     }
@@ -86,7 +88,7 @@ public class Goal extends BaseEntity {
             final Long categoryId,
             final String title,
             final Duration totalTime,
-            final int sequence,
+            final BigDecimal orderIndex,
             final Long iconId,
             final LocalDate date
     ) {
@@ -98,7 +100,7 @@ public class Goal extends BaseEntity {
                 .totalTime(totalTime)
                 .status(GoalStatus.BEFORE_STARTING)
                 .duration(Duration.ZERO)
-                .sequence(sequence)
+                .orderIndex(orderIndex)
                 .iconId(iconId)
                 .date(date)
                 .build();
@@ -153,5 +155,9 @@ public class Goal extends BaseEntity {
 
     public void addDuration(final Duration addedDuration) {
         this.duration = this.duration.plus(addedDuration);
+    }
+
+    public void updateOrderIndex(final BigDecimal orderIndex) {
+        this.orderIndex = orderIndex;
     }
 }

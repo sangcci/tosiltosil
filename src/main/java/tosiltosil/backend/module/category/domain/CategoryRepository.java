@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.category.domain;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,11 @@ public interface CategoryRepository {
 
     Long countCurrentCategory(UUID memberId);
 
+    Optional<BigDecimal> findLastOrderIndex(UUID memberId);
+
     Category save(Category category);
+
+    List<Category> saveAll(List<Category> categories);
 
     void delete(Category category);
 }

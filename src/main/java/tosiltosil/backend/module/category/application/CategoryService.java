@@ -1,5 +1,6 @@
 package tosiltosil.backend.module.category.application;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.YearMonth;
 import java.util.List;
@@ -8,14 +9,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.domain.order.OrderManager;
 import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.category.domain.Category;
 import tosiltosil.backend.module.category.domain.CategoryRepository;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
-import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
+import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
+import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
@@ -28,6 +31,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryDomainService categoryDomainService;
     private final GoalService goalService;
+    private final OrderManager orderManager;
 
     @Transactional(readOnly = true)
     public List<CurrentCategoryListResponse> getCategoriesByMemberId(
@@ -54,9 +58,11 @@ public class CategoryService {
     ) {
         categoryDomainService.validateCategoryCreation(memberId);
 
-        // TODO: 순서 구현
+        BigDecimal orderIndex = categoryRepository.findLastOrderIndex(memberId)
+                .map(lastIndex -> orderManager.generateOrderIndexBetween(lastIndex, null))
+                .orElse(orderManager.generateInitialOrderIndex());
 
-        Category category = request.toEntity(memberId);
+        Category category = request.toEntity(memberId, orderIndex);
         Category savedCategory = categoryRepository.save(category);
 
         return CategoryResponse.of(savedCategory.getId());
@@ -77,12 +83,32 @@ public class CategoryService {
     }
 
     @Transactional
-    public void changeSequence(
+    public CategoryOrderChangeResponse changeOrder(
             final UUID memberId,
             final Long categoryId,
-            final CategorySequenceChangeRequest request
+            final CategoryOrderChangeRequest request
     ) {
-        // TODO: 순서 구현
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
+        category.validateIsMine(memberId);
+
+        if (!orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
+            renewOrderIndexes(memberId);
+        }
+
+        BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
+        category.updateOrderIndex(newOrderIndex);
+
+        categoryRepository.save(category);
+
+        return CategoryOrderChangeResponse.of(newOrderIndex);
+    }
+
+    private void renewOrderIndexes(final UUID memberId) {
+        List<Category> categories = categoryRepository.findCurrentCategories(memberId);
+
+        List<Category> renewedCategories = orderManager.renewOrderIndexes(categories);
+
+        categoryRepository.saveAll(renewedCategories);
     }
 
     @Transactional

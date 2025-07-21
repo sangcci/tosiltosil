@@ -1,11 +1,13 @@
 package tosiltosil.backend.module.goal.infrastructure;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
@@ -16,6 +18,7 @@ public class GoalRepositoryImpl implements GoalRepository {
 
     private final GoalJpaRepository goalJpaRepository;
     private final GoalDslRepository goalDslRepository;
+    private final TimeHolder timeHolder;
 
     @Override
     public Optional<Goal> findById(final Long goalId) {
@@ -28,8 +31,18 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public List<Goal> findGoal(final UUID memberId, final Long categoryId) {
+    public List<Goal> findTotalGoals(final UUID memberId, final Long categoryId) {
         return goalJpaRepository.findByMemberIdAndCategoryId(memberId, categoryId);
+    }
+
+    @Override
+    public List<Goal> findTodayGoalsInCategory(final UUID memberId, final Long categoryId) {
+        return goalJpaRepository.findByMemberIdAndCategoryIdAndDateOrderByOrderIndexAsc(memberId, categoryId, timeHolder.getCurrentDate());
+    }
+
+    @Override
+    public Optional<BigDecimal> findLastOrderIndex(final UUID memberId) {
+        return goalJpaRepository.findMaxOrderIndexByMemberIdAndDate(memberId, timeHolder.getCurrentDate());
     }
 
     @Override

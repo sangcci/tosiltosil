@@ -21,9 +21,10 @@ import tosiltosil.backend.common.auth.annotation.LoginMember;
 import tosiltosil.backend.common.web.response.Response;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
-import tosiltosil.backend.module.category.domain.request.CategorySequenceChangeRequest;
+import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
+import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 
@@ -73,12 +74,13 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}/change-order")
-    public void changeCategorySequence(
+    public Response<CategoryOrderChangeResponse> changeCategoryOrder(
             @LoginMember final UUID memberId,
             @PathVariable final Long categoryId,
-            @RequestBody @Valid final CategorySequenceChangeRequest request
+            @RequestBody @Valid final CategoryOrderChangeRequest request
     ) {
-        categoryService.changeSequence(memberId, categoryId, request);
+        CategoryOrderChangeResponse response = categoryService.changeOrder(memberId, categoryId, request);
+        return Response.ok("카테고리 순서가 정상적으로 변경되었습니다.", response);
     }
 
     @DeleteMapping("/{categoryId}")
