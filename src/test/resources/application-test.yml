@@ -21,6 +21,38 @@ spring:
       host: localhost
       port: 6379
 
+  mail:
+    host: smtp.naver.com
+    port: 465
+    username: test_email@example.com
+    password: test_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: false
+          ssl:
+            enable: true
+          debug: true
+
+async:
+  core-pool-size: 5
+  max-pool-size: 10
+  queue-capacity: 25
+  thread-name-prefix: Email-
+
+email:
+  cookie:
+    name: "client-id"
+    expiration: 86400
+  auth:
+    redis-expiration: 86400
+    max-send-count: 5
+    max-attempt-count: 5
+  auth-number:
+    redis-expiration: 300
+
 jwt:
   secret-key:
     temporary: thisistemporarysecretkeyoftosiltosil
