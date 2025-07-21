@@ -1,0 +1,56 @@
+== 이메일 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:snippets: {snippets}
+
+=== 인증 이메일 전송
+
+인증 이메일 전송을 요청합니다.
+
+==== Request
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/response-fields.adoc[]
+
+==== 잘못된 형식의 이메일 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/이메일_형식이_아닌_경우_실패/response-body.adoc[]
+
+==== 인증 목적 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/이메일_인증_목적이_SIGN_UP_혹은_FORGOT_PASSWORD이_아닌_경우_실패/response-body.adoc[]
+
+=== 인증번호 검증
+
+사용자가 입력한 인증번호가 일치하는지 검증합니다.
+
+==== Request
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/http-response.adoc[]
+
+==== 잘못된 형식의 인증번호 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/잘못된_형식의_인증_번호에_검증_실패/response-body.adoc[]
+
+==== 필수 쿠키 누락으로 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_확인_시_clientId_쿠키가_없을_경우_실패/response-body.adoc[]
+
+==== 올바르지 않은 인증번호로 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/잘못된_인증_번호에_검증_실패/response-body.adoc[]

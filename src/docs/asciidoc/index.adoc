@@ -133,6 +133,10 @@
 
 
 [.lead]
+include::{docdir}/auth.adoc[]
+
+include::{docdir}/email.adoc[]
+
 include::{docdir}/goal.adoc[]
 
 include::{docdir}/category.adoc[]
