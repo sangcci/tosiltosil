@@ -22,14 +22,17 @@ public class FractionalOrderManager implements OrderManager {
             final BigDecimal prevOrderIndex,
             final BigDecimal nextOrderIndex
     ) {
+        // 처음 개체를 만들 경우
         if (prevOrderIndex == null && nextOrderIndex == null) {
             return INCREMENT;
         }
 
+        // 맨 처음 순서로 옮길 경우
         if (prevOrderIndex == null) {
             return getIndexBefore(nextOrderIndex);
         }
 
+        // 맨 마지막 순서로 옮길 경우
         if (nextOrderIndex == null) {
             return getIndexAfter(prevOrderIndex);
         }
@@ -64,7 +67,7 @@ public class FractionalOrderManager implements OrderManager {
     }
 
     private BigDecimal getIndexBefore(final BigDecimal nextIndex) {
-        return nextIndex.subtract(INCREMENT);
+        return nextIndex.divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP);
     }
 
     private BigDecimal getIndexAfter(final BigDecimal prevIndex) {

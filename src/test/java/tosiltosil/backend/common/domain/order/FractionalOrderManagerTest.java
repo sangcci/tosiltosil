@@ -35,15 +35,15 @@ public class FractionalOrderManagerTest {
     }
 
     @Test
-    void 이전_인덱스가_null인_경우_다음_인덱스에서_INCREMENT_빼기() {
+    void 이전_인덱스가_null인_경우_다음_인덱스를_반으로_나누기() {
         // given
-        BigDecimal nextIndex = BigDecimal.valueOf(2048);
+        BigDecimal nextIndex = BigDecimal.valueOf(1024);
 
         // when
         BigDecimal index = fractionalOrderManager.generateOrderIndexBetween(null, nextIndex);
 
         // then
-        assertThat(index).isEqualTo(BigDecimal.valueOf(1024)); // 2048 - 1024 = 1024
+        assertThat(index).isEqualTo(BigDecimal.valueOf(512)); // 1024 / 2 = 512
     }
 
     @Test
