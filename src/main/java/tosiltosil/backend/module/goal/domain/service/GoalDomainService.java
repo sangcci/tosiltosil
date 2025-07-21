@@ -46,8 +46,10 @@ public class GoalDomainService {
             return BigDecimal.ZERO;
         }
 
-        return BigDecimal.valueOf(achievedTimeInSeconds)
+        BigDecimal percentage = BigDecimal.valueOf(achievedTimeInSeconds)
                 .multiply(BigDecimal.valueOf(100))
                 .divide(BigDecimal.valueOf(totalTimeInSeconds), 2, RoundingMode.HALF_UP);
+
+        return percentage.min(new BigDecimal("100.00"));
     }
 }
