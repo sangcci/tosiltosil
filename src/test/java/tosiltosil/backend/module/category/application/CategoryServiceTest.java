@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import tosiltosil.backend.common.domain.holder.TestTimeHolder;
 import tosiltosil.backend.module.category.application.CategoryServiceTest.TestTimeHolderConfig;
+import tosiltosil.backend.module.category.domain.Category;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
@@ -45,7 +46,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
     
     @Autowired
     private GoalRepository goalRepository;
-    
+
     @Autowired
     private DurationService durationService;
 
@@ -130,6 +131,50 @@ class CategoryServiceTest extends IntegrationTestSupport {
         assertThat(response.categoryId()).isNotEqualTo(responseHasSameTitle.categoryId());
     }
 
+    @Test
+    void 카테고리_생성시_올바른_순서_인덱스_생성() {
+        // given
+        UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
+        
+        // when
+        CategoryResponse first = categoryService.createCategory(memberId, new CategoryCreateRequest("첫번째", "#FF0000"));
+        CategoryResponse second = categoryService.createCategory(memberId, new CategoryCreateRequest("두번째", "#00FF00"));
+        CategoryResponse third = categoryService.createCategory(memberId, new CategoryCreateRequest("세번째", "#0000FF"));
+        
+        // then
+        List<CurrentCategoryListResponse> categories = categoryService.getCategoriesByMemberId(memberId);
+        
+        assertSoftly(softly -> {
+            softly.assertThat(categories).hasSize(3);
+            // 순서대로 정렬되어야 함
+            softly.assertThat(categories.get(0).categoryId()).isEqualTo(first.categoryId());
+            softly.assertThat(categories.get(1).categoryId()).isEqualTo(second.categoryId());
+            softly.assertThat(categories.get(2).categoryId()).isEqualTo(third.categoryId());
+        });
+    }
+
+    @Test
+    void 여러_카테고리_생성시_순서_인덱스_순차적_증가() {
+        // given
+        UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
+        
+        // when
+        CategoryResponse first = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리1", "#FF0000"));
+        CategoryResponse second = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리2", "#00FF00"));
+        CategoryResponse third = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리3", "#0000FF"));
+        
+        // then
+        Category firstCategory = categoryJpaRepository.findById(first.categoryId()).get();
+        Category secondCategory = categoryJpaRepository.findById(second.categoryId()).get();
+        Category thirdCategory = categoryJpaRepository.findById(third.categoryId()).get();
+        
+        assertSoftly(softly -> {
+            // 순서 인덱스가 순차적으로 증가해야 함
+            softly.assertThat(firstCategory.getOrderIndex()).isLessThan(secondCategory.getOrderIndex());
+            softly.assertThat(secondCategory.getOrderIndex()).isLessThan(thirdCategory.getOrderIndex());
+        });
+    }
+    
     @Test
     @Disabled
     void 카테고리_삭제_시_카테고리에_속한_목표_전체_삭제() {

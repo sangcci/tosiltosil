@@ -32,12 +32,13 @@ public class GoalDslRepository {
                         goal.memberId.eq(memberId),
                         goal.date.eq(date)
                 )
-                .orderBy(category.sequence.asc(), goal.sequence.asc())
+                .orderBy(category.orderIndex.asc(), goal.orderIndex.asc())
                 .transform(GroupBy.groupBy(category.id).list(
                         Projections.constructor(DayGoalListResponse.class,
                                 category.id,
                                 category.title,
                                 category.color,
+                                category.orderIndex,
                                 GroupBy.list(
                                         Projections.constructor(DayGoalListResponse.GoalListResponse.class,
                                                 goal.id,
@@ -47,7 +48,8 @@ public class GoalDslRepository {
                                                 goal.status,
                                                 // ISO-8601 Duration 문자열(예: "PT2H")로 응답하기 위해 SQL에서 VARCHAR로 캐스팅
                                                 Expressions.stringTemplate("CAST({0} AS VARCHAR)", goal.totalTime),
-                                                Expressions.stringTemplate("CAST({0} AS VARCHAR)", goal.duration)
+                                                Expressions.stringTemplate("CAST({0} AS VARCHAR)", goal.duration),
+                                                goal.orderIndex
                                         )
                                 )
                         )

@@ -38,9 +38,8 @@ public class CategoryDslRepository {
                 .where(
                         goal.memberId.eq(memberId),
                         goal.date.between(yearMonth.atDay(1), yearMonth.atEndOfMonth())
-                        // TODO: 순서 조건 추가 및 목표 완료 상태 조건 추가
                 )
-                .orderBy(goal.date.asc(), category.color.asc())
+                .orderBy(goal.date.asc(), category.orderIndex.asc(), category.createdAt.asc())
                 .fetch();
 
         // 2. 날짜 별 색깔 grouping

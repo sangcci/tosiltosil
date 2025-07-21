@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -13,11 +14,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
+import tosiltosil.backend.common.domain.order.Orderable;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category extends BaseEntity {
+public class Category extends BaseEntity implements Orderable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,33 +34,33 @@ public class Category extends BaseEntity {
     @Column(nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private int sequence;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal orderIndex;
 
     @Builder
     private Category(
             final UUID memberId,
             final String title,
             final String color,
-            final int sequence
+            final BigDecimal orderIndex
     ) {
         this.memberId = memberId;
         this.title = title;
         this.color = color;
-        this.sequence = sequence;
+        this.orderIndex = orderIndex;
     }
 
     public static Category of(
             final UUID memberId,
             final String title,
-            final String color
-            //final int sequence
+            final String color,
+            final BigDecimal orderIndex
     ) {
         return Category.builder()
                 .memberId(memberId)
                 .title(title)
                 .color(color)
-                .sequence(0)
+                .orderIndex(orderIndex)
                 .build();
     }
 
@@ -71,5 +73,9 @@ public class Category extends BaseEntity {
     public void updateBasicInfo(final String title, final String color) {
         this.title = title;
         this.color = color;
+    }
+
+    public void updateOrderIndex(final BigDecimal orderIndex) {
+        this.orderIndex = orderIndex;
     }
 }

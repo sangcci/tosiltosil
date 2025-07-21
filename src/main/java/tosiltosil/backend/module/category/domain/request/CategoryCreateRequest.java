@@ -2,6 +2,7 @@ package tosiltosil.backend.module.category.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.util.UUID;
 import tosiltosil.backend.module.category.domain.Category;
 
@@ -15,9 +16,9 @@ public record CategoryCreateRequest(
 ) {
     
     public Category toEntity(
-            final UUID memberId
-            //final int sequence
+            final UUID memberId,
+            final BigDecimal orderIndex
     ) {
-        return Category.of(memberId, title, color);
+        return Category.of(memberId, title, color, orderIndex);
     }
 }
