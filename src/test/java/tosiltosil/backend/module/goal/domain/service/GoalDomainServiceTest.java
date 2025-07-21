@@ -13,25 +13,27 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.holder.TestTimeHolder;
+import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 
+@ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
 class GoalDomainServiceTest {
 
-    private GoalDomainService goalDomainService;
-    
     @Mock
     private GoalRepository goalRepository;
 
+    private GoalDomainService goalDomainService;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        TestTimeHolder testTimeHolder = new TestTimeHolder(LocalDate.of(2025, 7, 8));
+        TimeHolder testTimeHolder = new TestTimeHolder(LocalDate.of(2025, 7, 8));
         goalDomainService = new GoalDomainService(goalRepository, testTimeHolder);
     }
 
