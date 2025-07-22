@@ -52,7 +52,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         LocalDate date = LocalDate.of(2025, 7, 8);
         
         DayGoalsResponse response = new DayGoalsResponse(
-                BigDecimal.valueOf(41.67), // Overall achieved percentage
+                BigDecimal.valueOf(42),
                 List.of(
                         new DayGoalsResponse.GoalListPerCategoryResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024), List.of(
                                 new DayGoalsResponse.GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
@@ -80,7 +80,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 "status": 200,
                                 "message": "목표 리스트 조회 성공",
                                 "data": {
-                                    "achievedPercentage": 41.67,
+                                    "achievedPercentage": 42,
                                     "categories": [
                                         {
                                             "categoryId": 1,
@@ -145,7 +145,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메세지", "목표 리스트 조회 성공"),
                                 responseField("data", JsonFieldType.OBJECT, "일별 목표 응답", "{}"),
-                                responseField("data.achievedPercentage", JsonFieldType.NUMBER, "전체 목표 달성률 (%)", "41.67"),
+                                responseField("data.achievedPercentage", JsonFieldType.NUMBER, "전체 목표 달성률 (%), 정수 표시", "41"),
                                 responseField("data.categories", JsonFieldType.ARRAY, "카테고리별 목표 목록", "[]"),
                                 responseField("data.categories[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data.categories[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),

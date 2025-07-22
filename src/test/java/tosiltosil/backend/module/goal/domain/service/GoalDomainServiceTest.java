@@ -110,7 +110,7 @@ class GoalDomainServiceTest {
         BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
 
         // then
-        assertThat(percentage).isEqualTo(new BigDecimal("50.00"));
+        assertThat(percentage).isEqualTo(new BigDecimal("50"));
     }
 
     @Test
@@ -124,7 +124,7 @@ class GoalDomainServiceTest {
         BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
 
         // then
-        assertThat(percentage).isEqualTo(new BigDecimal("100.00"));
+        assertThat(percentage).isEqualTo(new BigDecimal("100"));
     }
 
     @Test
@@ -138,7 +138,7 @@ class GoalDomainServiceTest {
         BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
 
         // then
-        assertThat(percentage).isEqualTo(new BigDecimal("100.00"));
+        assertThat(percentage).isEqualTo(new BigDecimal("100"));
     }
 
     private Goal createGoal(UUID memberId, Duration totalTime, Duration duration) {
