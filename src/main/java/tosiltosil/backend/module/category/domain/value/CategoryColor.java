@@ -13,7 +13,7 @@ public enum CategoryColor {
     PURPLE("purple"),
     PINK("pink"),
     CORAL("coral"),
-    INDIGO("indigo"),;
+    INDIGO("indigo");
 
     private final String value;
 
@@ -23,7 +23,7 @@ public enum CategoryColor {
 
     @JsonValue
     public String getValue() {
-        return this.name().toLowerCase();
+        return this.value;
     }
 
     @Override
