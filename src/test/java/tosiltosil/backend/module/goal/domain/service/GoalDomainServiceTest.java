@@ -100,31 +100,17 @@ class GoalDomainServiceTest {
     }
 
     @Test
-    void 목표_달성률_계산_시_50퍼센트_달성했으면_50_반환() {
+    void 목표_달성률_계산_시_소수점_내림하여_반환() {
         // given
         UUID memberId = UUID.randomUUID();
-        Goal goal = createGoal(memberId, Duration.ofHours(2), Duration.ofHours(1));
+        Goal goal = createGoal(memberId, Duration.ofHours(3), Duration.ofHours(1));
         when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(goal));
 
         // when
         BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
 
         // then
-        assertThat(percentage).isEqualTo(new BigDecimal("50"));
-    }
-
-    @Test
-    void 목표_달성률_계산_시_100퍼센트_달성했으면_100_반환() {
-        // given
-        UUID memberId = UUID.randomUUID();
-        Goal goal = createGoal(memberId, Duration.ofHours(2), Duration.ofHours(2));
-        when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(goal));
-
-        // when
-        BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
-
-        // then
-        assertThat(percentage).isEqualTo(new BigDecimal("100"));
+        assertThat(percentage).isEqualTo(new BigDecimal("33"));
     }
 
     @Test
@@ -141,7 +127,7 @@ class GoalDomainServiceTest {
         assertThat(percentage).isEqualTo(new BigDecimal("100"));
     }
 
-    private Goal createGoal(UUID memberId, Duration totalTime, Duration duration) {
+    private Goal createGoal(final UUID memberId, final Duration totalTime, final Duration duration) {
         return Goal.builder()
                 .memberId(memberId)
                 .categoryId(1L)
