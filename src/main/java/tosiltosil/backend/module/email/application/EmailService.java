@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.UUID;
 
-import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.SIGN_UP;
+import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.FORGOT_PASSWORD;
 
 @Service
 @RequiredArgsConstructor
@@ -85,11 +85,9 @@ public class EmailService {
                 clientId == null ? generateAndSaveNewClientId() : clientId;
 
         validateSendCount(currentClientId);
-        EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
 
-        if (purpose.equals(SIGN_UP)) {
-            validateDuplicatedEmail(request.email());
-        }
+        EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
+        validateEmailIsExistByPurpose(request.email(), purpose);
 
         String authNumber = generateAndSaveAuthNumber(request.email());
 
@@ -97,16 +95,6 @@ public class EmailService {
         sendEmail(request.email(), EMAIL_TITLE, content);
 
         return EmailSendResponse.of(request.email(), currentClientId);
-    }
-
-    private String loadAuthTemplate(String authNumber) {
-        try {
-            ClassPathResource resource = new ClassPathResource("templates/email-auth-template.html");
-            String template = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
-            return template.replace("{{authNumber}}", authNumber);
-        } catch (Exception e) {
-            throw new RuntimeException("템플릿을 가져올 수 없습니다.", e);
-        }
     }
 
     public EmailAuthResponse verifyAuthEmail(
@@ -120,6 +108,16 @@ public class EmailService {
         deleteAuthNumber(request.email());
 
         return generateTemporaryToken(request.email());
+    }
+
+    private String loadAuthTemplate(String authNumber) {
+        try {
+            ClassPathResource resource = new ClassPathResource("templates/email-auth-template.html");
+            String template = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
+            return template.replace("{{authNumber}}", authNumber);
+        } catch (Exception e) {
+            throw new RuntimeException("템플릿을 가져올 수 없습니다.", e);
+        }
     }
 
     private UUID generateAndSaveNewClientId() {
@@ -159,8 +157,12 @@ public class EmailService {
         return emailAuthRedisRepository.get(clientId);
     }
 
-    private void validateDuplicatedEmail(String email) {
-        memberService.validateEmailNotDuplicated(email, "LOCAL");
+    private void validateEmailIsExistByPurpose(String email, EmailAuthPurpose purpose) {
+        if (purpose.equals(FORGOT_PASSWORD)) {
+            memberService.validateEmailIsExistForPasswordReset(email, "LOCAL");
+        } else {
+            memberService.validateEmailIsExist(email, "LOCAL");
+        }
     }
 
     private void validateAuthNumber(UUID clientId, String email, String authNumber, int authFailCount) {
