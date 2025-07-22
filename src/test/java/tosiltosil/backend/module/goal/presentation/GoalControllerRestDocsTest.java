@@ -25,7 +25,9 @@ import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
+import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListPerCategoryResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
@@ -51,18 +53,21 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
         LocalDate date = LocalDate.of(2025, 7, 8);
         
-        List<DayGoalListResponse> responses = List.of(
-                new DayGoalListResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024), List.of(
-                        new DayGoalListResponse.GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
-                        new DayGoalListResponse.GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M", BigDecimal.valueOf(2048))
-                )),
-                new DayGoalListResponse(2L, "공부", "#33C3F0", BigDecimal.valueOf(2048), List.of(
-                        new DayGoalListResponse.GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M", BigDecimal.valueOf(3072))
-                ))
+        DayGoalsResponse response = new DayGoalsResponse(
+                BigDecimal.valueOf(42),
+                List.of(
+                        new GoalListPerCategoryResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024), List.of(
+                                new GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
+                                new GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M", BigDecimal.valueOf(2048))
+                        )),
+                        new GoalListPerCategoryResponse(2L, "공부", "#33C3F0", BigDecimal.valueOf(2048), List.of(
+                                new GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M", BigDecimal.valueOf(3072))
+                        ))
+                )
         );
 
         given(goalService.getDayGoals(any(UUID.class), any(UUID.class), any(LocalDate.class)))
-                .willReturn(responses);
+                .willReturn(response);
 
         // when
         MvcTestResult testResult = mockMvcTester.get()
@@ -76,54 +81,57 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                             {
                                 "status": 200,
                                 "message": "목표 리스트 조회 성공",
-                                "data": [
-                                    {
-                                        "categoryId": 1,
-                                        "categoryTitle": "운동",
-                                        "categoryColor": "#FF5733",
-                                        "categoryOrderIndex": 1024,
-                                        "goals": [
-                                            {
-                                                "goalId": 1,
-                                                "categoryId": 1,
-                                                "iconId": 1,
-                                                "title": "운동하기",
-                                                "status": "시작 전",
-                                                "totalTime": "PT2H",
-                                                "duration": "PT0S",
-                                                "orderIndex": 1024
-                                            },
-                                            {
-                                                "goalId": 2,
-                                                "categoryId": 1,
-                                                "iconId": 2,
-                                                "title": "독서하기",
-                                                "status": "진행 중",
-                                                "totalTime": "PT1H30M",
-                                                "duration": "PT30M",
-                                                "orderIndex": 2048
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "categoryId": 2,
-                                        "categoryTitle": "공부",
-                                        "categoryColor": "#33C3F0",
-                                        "categoryOrderIndex": 2048,
-                                        "goals": [
-                                            {
-                                                "goalId": 3,
-                                                "categoryId": 2,
-                                                "iconId": 3,
-                                                "title": "코딩하기",
-                                                "status": "진행 중",
-                                                "totalTime": "PT3H",
-                                                "duration": "PT1H15M",
-                                                "orderIndex": 3072
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "data": {
+                                    "achievedPercentage": 42,
+                                    "categories": [
+                                        {
+                                            "categoryId": 1,
+                                            "categoryTitle": "운동",
+                                            "categoryColor": "#FF5733",
+                                            "categoryOrderIndex": 1024,
+                                            "goals": [
+                                                {
+                                                    "goalId": 1,
+                                                    "categoryId": 1,
+                                                    "iconId": 1,
+                                                    "title": "운동하기",
+                                                    "status": "시작 전",
+                                                    "totalTime": "PT2H",
+                                                    "duration": "PT0S",
+                                                    "orderIndex": 1024
+                                                },
+                                                {
+                                                    "goalId": 2,
+                                                    "categoryId": 1,
+                                                    "iconId": 2,
+                                                    "title": "독서하기",
+                                                    "status": "진행 중",
+                                                    "totalTime": "PT1H30M",
+                                                    "duration": "PT30M",
+                                                    "orderIndex": 2048
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "categoryId": 2,
+                                            "categoryTitle": "공부",
+                                            "categoryColor": "#33C3F0",
+                                            "categoryOrderIndex": 2048,
+                                            "goals": [
+                                                {
+                                                    "goalId": 3,
+                                                    "categoryId": 2,
+                                                    "iconId": 3,
+                                                    "title": "코딩하기",
+                                                    "status": "진행 중",
+                                                    "totalTime": "PT3H",
+                                                    "duration": "PT1H15M",
+                                                    "orderIndex": 3072
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
                             }
                         """);
 
@@ -138,20 +146,22 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메세지", "목표 리스트 조회 성공"),
-                                responseField("data", JsonFieldType.ARRAY, "카테고리별 목표 목록", "[]"),
-                                responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
-                                responseField("data[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "#FF5733"),
-                                responseField("data[].categoryOrderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024"),
-                                responseField("data[].goals", JsonFieldType.ARRAY, "카테고리에 속한 목표 목록", "[]"),
-                                responseField("data[].goals[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),
-                                responseField("data[].goals[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
-                                responseField("data[].goals[].iconId", JsonFieldType.NUMBER, "아이콘 ID", "1"),
-                                responseField("data[].goals[].title", JsonFieldType.STRING, "목표 제목", "운동하기"),
-                                responseField("data[].goals[].status", JsonFieldType.STRING, "목표 상태 (시작 전, 진행 중, 완료, 실패)", "시작 전"),
-                                responseField("data[].goals[].totalTime", JsonFieldType.STRING, "목표 총 시간 (ISO-8601 Duration 형식)", "PT2H"),
-                                responseField("data[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S"),
-                                responseField("data[].goals[].orderIndex", JsonFieldType.NUMBER, "목표 순서 인덱스", "1024")
+                                responseField("data", JsonFieldType.OBJECT, "일별 목표 응답", "{}"),
+                                responseField("data.achievedPercentage", JsonFieldType.NUMBER, "전체 목표 달성률 (%), 정수 표시", "41"),
+                                responseField("data.categories", JsonFieldType.ARRAY, "카테고리별 목표 목록", "[]"),
+                                responseField("data.categories[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
+                                responseField("data.categories[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),
+                                responseField("data.categories[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "#FF5733"),
+                                responseField("data.categories[].categoryOrderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024"),
+                                responseField("data.categories[].goals", JsonFieldType.ARRAY, "카테고리에 속한 목표 목록", "[]"),
+                                responseField("data.categories[].goals[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),
+                                responseField("data.categories[].goals[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
+                                responseField("data.categories[].goals[].iconId", JsonFieldType.NUMBER, "아이콘 ID", "1"),
+                                responseField("data.categories[].goals[].title", JsonFieldType.STRING, "목표 제목", "운동하기"),
+                                responseField("data.categories[].goals[].status", JsonFieldType.STRING, "목표 상태 (시작 전, 진행 중, 완료, 실패)", "시작 전"),
+                                responseField("data.categories[].goals[].totalTime", JsonFieldType.STRING, "목표 총 시간 (ISO-8601 Duration 형식)", "PT2H"),
+                                responseField("data.categories[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S"),
+                                responseField("data.categories[].goals[].orderIndex", JsonFieldType.NUMBER, "목표 순서 인덱스", "1024")
                         )
                 ));
     }
@@ -162,8 +172,10 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         UUID memberId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
         LocalDate date = LocalDate.of(2025, 7, 8);
 
+        DayGoalsResponse emptyResponse = new DayGoalsResponse(BigDecimal.ZERO, List.of());
+        
         given(goalService.getDayGoals(any(UUID.class), any(UUID.class), any(LocalDate.class)))
-                .willReturn(List.of());
+                .willReturn(emptyResponse);
 
         // when
         MvcTestResult testResult = mockMvcTester.get()
@@ -177,7 +189,10 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                             {
                                 "status": 200,
                                 "message": "목표 리스트 조회 성공",
-                                "data": []
+                                "data": {
+                                    "achievedPercentage": 0,
+                                    "categories": []
+                                }
                             }
                         """);
 

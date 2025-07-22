@@ -2,7 +2,6 @@ package tosiltosil.backend.module.goal.presentation;
 
 import jakarta.validation.Valid;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,7 @@ import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
+import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
@@ -36,13 +35,13 @@ public class GoalController {
     private final GoalService goalService;
 
     @GetMapping("/members/{memberId}")
-    public Response<List<DayGoalListResponse>> getGoalsByMemberId(
+    public Response<DayGoalsResponse> getGoalsByMemberId(
             @LoginMember final UUID memberOwnerId,
             @PathVariable final UUID memberId,
             @RequestParam @IsDate final LocalDate date
     ) {
-        List<DayGoalListResponse> responses = goalService.getDayGoals(memberOwnerId, memberId, date);
-        return Response.ok("목표 리스트 조회 성공", responses);
+        DayGoalsResponse response = goalService.getDayGoals(memberOwnerId, memberId, date);
+        return Response.ok("목표 리스트 조회 성공", response);
     }
 
     @PostMapping
