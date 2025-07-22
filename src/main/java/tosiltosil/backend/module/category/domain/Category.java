@@ -1,10 +1,7 @@
 package tosiltosil.backend.module.category.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
@@ -15,6 +12,7 @@ import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
 import tosiltosil.backend.common.domain.order.Orderable;
+import tosiltosil.backend.module.category.domain.value.CategoryColor;
 
 @Entity
 @Getter
@@ -32,7 +30,8 @@ public class Category extends BaseEntity implements Orderable {
     private String title;
 
     @Column(nullable = false)
-    private String color;
+    @Enumerated(EnumType.STRING)
+    private CategoryColor color;
 
     @Column(nullable = false, precision = 10, scale = 3)
     private BigDecimal orderIndex;
@@ -41,7 +40,7 @@ public class Category extends BaseEntity implements Orderable {
     private Category(
             final UUID memberId,
             final String title,
-            final String color,
+            final CategoryColor color,
             final BigDecimal orderIndex
     ) {
         this.memberId = memberId;
@@ -53,7 +52,7 @@ public class Category extends BaseEntity implements Orderable {
     public static Category of(
             final UUID memberId,
             final String title,
-            final String color,
+            final CategoryColor color,
             final BigDecimal orderIndex
     ) {
         return Category.builder()
@@ -70,7 +69,7 @@ public class Category extends BaseEntity implements Orderable {
         }
     }
 
-    public void updateBasicInfo(final String title, final String color) {
+    public void updateBasicInfo(final String title, final CategoryColor color) {
         this.title = title;
         this.color = color;
     }
