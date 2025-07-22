@@ -29,6 +29,7 @@ import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayRes
 import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
+import tosiltosil.backend.module.category.domain.value.CategoryColor;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 import tosiltosil.backend.support.RestDocsTestSupport;
@@ -49,8 +50,8 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
     void 회원_카테고리_목록_조회() {
         // given
         List<CurrentCategoryListResponse> responses = List.of(
-                new CurrentCategoryListResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024)),
-                new CurrentCategoryListResponse(2L, "공부", "#33FF57", BigDecimal.valueOf(2048))
+                new CurrentCategoryListResponse(1L, "운동", CategoryColor.RED, BigDecimal.valueOf(1024)),
+                new CurrentCategoryListResponse(2L, "공부", CategoryColor.ORANGE, BigDecimal.valueOf(2048))
         );
 
         given(categoryService.getCategoriesByMemberId(any(UUID.class)))
@@ -72,13 +73,13 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                     {
                                         "categoryId": 1,
                                         "title": "운동",
-                                        "color": "#FF5733",
+                                        "color": "RED",
                                         "orderIndex": 1024
                                     },
                                     {
                                         "categoryId": 2,
                                         "title": "공부",
-                                        "color": "#33FF57",
+                                        "color": "ORANGE",
                                         "orderIndex": 2048
                                     }
                                 ]
@@ -93,7 +94,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data", JsonFieldType.ARRAY, "카테고리 목록", "[]"),
                                 responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data[].title", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상 (HEX 코드)", "#FF5733"),
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상", "RED"),
                                 responseField("data[].orderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024")
                         )
                 ));
@@ -132,9 +133,9 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         int month = 7;
 
         List<CategoryColorPerDayResponse> responses = List.of(
-                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 8), List.of("#FF5733", "#33FF57")),
-                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 15), List.of("#3357FF")),
-                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 22), List.of("#FF33F5", "#FFAA33"))
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 8), List.of(CategoryColor.RED, CategoryColor.ORANGE)),
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 15), List.of(CategoryColor.BLUE)),
+                new CategoryColorPerDayResponse(LocalDate.of(2025, 7, 22), List.of(CategoryColor.PINK, CategoryColor.YELLOW))
         );
 
         given(categoryService.getCategoryColorPerMonth(any(UUID.class), eq(year), eq(month)))
@@ -155,15 +156,15 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 "data": [
                                     {
                                         "date": "2025-07-08",
-                                        "color": ["#FF5733", "#33FF57"]
+                                        "color": ["RED", "ORANGE"]
                                     },
                                     {
                                         "date": "2025-07-15",
-                                        "color": ["#3357FF"]
+                                        "color": ["BLUE"]
                                     },
                                     {
                                         "date": "2025-07-22",
-                                        "color": ["#FF33F5", "#FFAA33"]
+                                        "color": ["PINK", "YELLOW"]
                                     }
                                 ]
                             }
@@ -180,7 +181,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "월 별 카테고리 색상 조회 성공"),
                                 responseField("data", JsonFieldType.ARRAY, "카테고리 색상 목록", "[]"),
                                 responseField("data[].date", JsonFieldType.STRING, "날짜 (YYYY-MM-DD 형식)", "2025-07-08"),
-                                responseField("data[].color", JsonFieldType.ARRAY, "해당 날짜의 카테고리 색상 리스트", "[\"#FF5733\", \"#33FF57\"]")
+                                responseField("data[].color", JsonFieldType.ARRAY, "해당 날짜의 카테고리 색상 리스트", "[\"RED\", \"ORANGE\"]")
                         )
                 ));
     }
@@ -220,7 +221,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         String request = """
                     {
                         "title": "운동",
-                        "color": "#FF5733"
+                        "color": "RED"
                     }
                 """;
         CategoryResponse response = CategoryResponse.of(1L);
@@ -252,7 +253,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                 .apply(documentHandler.document(
                         requestFields(
                                 requestField("title", JsonFieldType.STRING, "카테고리 제목", true, "1글자 이상 10글자 이하", "운동"),
-                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "HEX 색상 코드", "#FF5733")
+                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "카테고리 색상 내", "RED")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "201"),
@@ -269,7 +270,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         String request = """
                     {
                         "title": "운동",
-                        "color": "#FF5733"
+                        "color": "RED"
                     }
                 """;
         given(categoryService.createCategory(any(UUID.class), any(CategoryCreateRequest.class)))
@@ -303,7 +304,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         String request = """
                     {
                         "title": "공부",
-                        "color": "#33FF57"
+                        "color": "ORANGE"
                     }
                 """;
         CategoryResponse response = CategoryResponse.of(categoryId);
@@ -338,7 +339,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                         ),
                         requestFields(
                                 requestField("title", JsonFieldType.STRING, "카테고리 제목", true, "1글자 이상 10글자 이하", "공부"),
-                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "HEX 색상 코드", "#33FF57")
+                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "카테고리 색상 내", "ORANGE")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),

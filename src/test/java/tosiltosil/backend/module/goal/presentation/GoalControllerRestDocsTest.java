@@ -21,6 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
+import tosiltosil.backend.module.category.domain.value.CategoryColor;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
@@ -56,11 +57,11 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         DayGoalsResponse response = new DayGoalsResponse(
                 BigDecimal.valueOf(42),
                 List.of(
-                        new GoalListPerCategoryResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024), List.of(
+                        new GoalListPerCategoryResponse(1L, "운동", CategoryColor.RED, BigDecimal.valueOf(1024), List.of(
                                 new GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
                                 new GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M", BigDecimal.valueOf(2048))
                         )),
-                        new GoalListPerCategoryResponse(2L, "공부", "#33C3F0", BigDecimal.valueOf(2048), List.of(
+                        new GoalListPerCategoryResponse(2L, "공부", CategoryColor.ORANGE, BigDecimal.valueOf(2048), List.of(
                                 new GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M", BigDecimal.valueOf(3072))
                         ))
                 )
@@ -87,7 +88,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                         {
                                             "categoryId": 1,
                                             "categoryTitle": "운동",
-                                            "categoryColor": "#FF5733",
+                                            "categoryColor": "RED",
                                             "categoryOrderIndex": 1024,
                                             "goals": [
                                                 {
@@ -115,7 +116,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                         {
                                             "categoryId": 2,
                                             "categoryTitle": "공부",
-                                            "categoryColor": "#33C3F0",
+                                            "categoryColor": "ORANGE",
                                             "categoryOrderIndex": 2048,
                                             "goals": [
                                                 {
@@ -151,7 +152,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.categories", JsonFieldType.ARRAY, "카테고리별 목표 목록", "[]"),
                                 responseField("data.categories[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data.categories[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data.categories[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "#FF5733"),
+                                responseField("data.categories[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "RED"),
                                 responseField("data.categories[].categoryOrderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024"),
                                 responseField("data.categories[].goals", JsonFieldType.ARRAY, "카테고리에 속한 목표 목록", "[]"),
                                 responseField("data.categories[].goals[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),
@@ -173,7 +174,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         LocalDate date = LocalDate.of(2025, 7, 8);
 
         DayGoalsResponse emptyResponse = new DayGoalsResponse(BigDecimal.ZERO, List.of());
-        
+
         given(goalService.getDayGoals(any(UUID.class), any(UUID.class), any(LocalDate.class)))
                 .willReturn(emptyResponse);
 
