@@ -88,7 +88,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                         {
                                             "categoryId": 1,
                                             "categoryTitle": "운동",
-                                            "categoryColor": "RED",
+                                            "categoryColor": "red",
                                             "categoryOrderIndex": 1024,
                                             "goals": [
                                                 {
@@ -116,7 +116,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                         {
                                             "categoryId": 2,
                                             "categoryTitle": "공부",
-                                            "categoryColor": "ORANGE",
+                                            "categoryColor": "orange",
                                             "categoryOrderIndex": 2048,
                                             "goals": [
                                                 {
@@ -152,7 +152,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.categories", JsonFieldType.ARRAY, "카테고리별 목표 목록", "[]"),
                                 responseField("data.categories[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data.categories[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data.categories[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "RED"),
+                                responseField("data.categories[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "red"),
                                 responseField("data.categories[].categoryOrderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024"),
                                 responseField("data.categories[].goals", JsonFieldType.ARRAY, "카테고리에 속한 목표 목록", "[]"),
                                 responseField("data.categories[].goals[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),

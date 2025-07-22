@@ -73,13 +73,13 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                     {
                                         "categoryId": 1,
                                         "title": "운동",
-                                        "color": "RED",
+                                        "color": "red",
                                         "orderIndex": 1024
                                     },
                                     {
                                         "categoryId": 2,
                                         "title": "공부",
-                                        "color": "ORANGE",
+                                        "color": "orange",
                                         "orderIndex": 2048
                                     }
                                 ]
@@ -94,7 +94,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data", JsonFieldType.ARRAY, "카테고리 목록", "[]"),
                                 responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data[].title", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상", "RED"),
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상", "red"),
                                 responseField("data[].orderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024")
                         )
                 ));
@@ -156,15 +156,15 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 "data": [
                                     {
                                         "date": "2025-07-08",
-                                        "color": ["RED", "ORANGE"]
+                                        "color": ["red", "orange"]
                                     },
                                     {
                                         "date": "2025-07-15",
-                                        "color": ["BLUE"]
+                                        "color": ["blue"]
                                     },
                                     {
                                         "date": "2025-07-22",
-                                        "color": ["PINK", "YELLOW"]
+                                        "color": ["pink", "yellow"]
                                     }
                                 ]
                             }
@@ -181,7 +181,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "월 별 카테고리 색상 조회 성공"),
                                 responseField("data", JsonFieldType.ARRAY, "카테고리 색상 목록", "[]"),
                                 responseField("data[].date", JsonFieldType.STRING, "날짜 (YYYY-MM-DD 형식)", "2025-07-08"),
-                                responseField("data[].color", JsonFieldType.ARRAY, "해당 날짜의 카테고리 색상 리스트", "[\"RED\", \"ORANGE\"]")
+                                responseField("data[].color", JsonFieldType.ARRAY, "해당 날짜의 카테고리 색상 리스트", "[\"red\", \"orange\"]")
                         )
                 ));
     }
@@ -221,7 +221,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         String request = """
                     {
                         "title": "운동",
-                        "color": "RED"
+                        "color": "red"
                     }
                 """;
         CategoryResponse response = CategoryResponse.of(1L);
@@ -253,7 +253,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                 .apply(documentHandler.document(
                         requestFields(
                                 requestField("title", JsonFieldType.STRING, "카테고리 제목", true, "1글자 이상 10글자 이하", "운동"),
-                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "카테고리 색상 내", "RED")
+                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "카테고리 색상 내", "red")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "201"),
@@ -270,7 +270,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         String request = """
                     {
                         "title": "운동",
-                        "color": "RED"
+                        "color": "red"
                     }
                 """;
         given(categoryService.createCategory(any(UUID.class), any(CategoryCreateRequest.class)))
@@ -304,7 +304,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         String request = """
                     {
                         "title": "공부",
-                        "color": "ORANGE"
+                        "color": "orange"
                     }
                 """;
         CategoryResponse response = CategoryResponse.of(categoryId);
@@ -339,7 +339,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                         ),
                         requestFields(
                                 requestField("title", JsonFieldType.STRING, "카테고리 제목", true, "1글자 이상 10글자 이하", "공부"),
-                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "카테고리 색상 내", "ORANGE")
+                                requestField("color", JsonFieldType.STRING, "카테고리 색상", true, "카테고리 색상 내", "orange")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
