@@ -17,6 +17,8 @@ import tosiltosil.backend.module.goal.domain.GoalRepository;
 @RequiredArgsConstructor
 public class GoalDomainService {
 
+    private static final BigDecimal MAX_PERCENTAGE = new BigDecimal("100");
+
     private final GoalRepository goalRepository;
     private final TimeHolder timeHolder;
 
@@ -50,6 +52,6 @@ public class GoalDomainService {
                 .multiply(BigDecimal.valueOf(100))
                 .divide(BigDecimal.valueOf(totalTimeInSeconds), RoundingMode.HALF_UP);
 
-        return percentage.min(new BigDecimal("100"));
+        return percentage.min(MAX_PERCENTAGE);
     }
 }
