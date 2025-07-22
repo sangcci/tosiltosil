@@ -10,6 +10,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
+import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
 import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.module.email.application.EmailService;
@@ -169,6 +170,82 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                                         "reason": "파라미터 값이 유효하지 않습니다."
                                     }
                                 ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
+
+    @Test
+    void 가입되지_않은_이메일로_비밀번호_찾기_인증_이메일_요청_시_실패() {
+        // given
+        String request = """
+                {
+                    "email": "test@example.com",
+                    "purpose": "FORGOT_PASSWORD"
+                }
+                """;
+
+        UUID testClientId = UUID.randomUUID();
+
+        given(emailService.sendAuthEmail(any(), any(EmailSendRequest.class)))
+                .willThrow(new BadRequestException("등록되지 않은 이메일입니다."));
+
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/auth/email/send")
+                .contentType(MediaType.APPLICATION_JSON)
+                .cookie(new Cookie("client-id", testClientId.toString()))
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 400,
+                                "message": "등록되지 않은 이메일입니다.",
+                                "errors": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
+
+    @Test
+    void 가입된_이메일로_회원가입_인증_이메일_요청_시_실패() {
+        // given
+        String request = """
+                {
+                    "email": "test@example.com",
+                    "purpose": "SIGN_UP"
+                }
+                """;
+
+        UUID testClientId = UUID.randomUUID();
+
+        given(emailService.sendAuthEmail(any(), any(EmailSendRequest.class)))
+                .willThrow(new ConflictException("이미 등록된 이메일입니다."));
+
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/auth/email/send")
+                .contentType(MediaType.APPLICATION_JSON)
+                .cookie(new Cookie("client-id", testClientId.toString()))
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 409,
+                                "message": "이미 등록된 이메일입니다.",
+                                "errors": []
                             }
                         """);
 
