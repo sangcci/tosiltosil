@@ -10,7 +10,6 @@ public record CategoryUpdateRequest(
         @Size(min = 1, max = 10, message = "제목은 1글자 이상 10글자 이하여야 합니다.")
         String title,
 
-        @NotBlank(message = "색깔은 필수입니다.")
         @IsEnum(enumClass = CategoryColor.class)
         String color
 ) {
