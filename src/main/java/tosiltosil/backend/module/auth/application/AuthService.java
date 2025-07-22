@@ -42,7 +42,7 @@ public class AuthService {
         termsService.validateTerms(request.terms());
 
         String email = getEmailFromRedis(temporaryToken);
-        memberService.validateEmailNotDuplicated(email, "LOCAL");
+        memberService.validateEmailIsExist(email, "LOCAL");
 
         String code = memberService.generateRandomCode();
         String profileImgUrl = "https://example.com/profile.png"; // S3 구현 후 수정

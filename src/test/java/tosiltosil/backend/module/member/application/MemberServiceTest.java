@@ -37,7 +37,7 @@ class MemberServiceTest {
                 .thenReturn(true);
 
         // when & then
-        Throwable thrown = catchThrowable(() -> memberService.validateEmailNotDuplicated(email, "LOCAL"));
+        Throwable thrown = catchThrowable(() -> memberService.validateEmailIsExist(email, "LOCAL"));
 
         assertThat(thrown)
                 .isInstanceOf(ConflictException.class)

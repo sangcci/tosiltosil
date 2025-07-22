@@ -3,6 +3,7 @@ package tosiltosil.backend.module.member.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
@@ -49,10 +50,17 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public void validateEmailNotDuplicated(String email, String loginType) {
+    public void validateEmailIsExist(String email, String loginType) {
         LoginType loginTypeEnum = LoginType.valueOf(loginType);
         if (memberRepository.existsByEmailAndLoginType(email, loginTypeEnum))
             throw new ConflictException("이미 등록된 이메일입니다.");
+    }
+
+    @Transactional(readOnly = true)
+    public void validateEmailIsExistForPasswordReset(String email, String loginType) {
+        LoginType loginTypeEnum = LoginType.valueOf(loginType);
+        if (!memberRepository.existsByEmailAndLoginType(email, loginTypeEnum))
+            throw new BadRequestException("등록되지 않은 이메일입니다.");
     }
 
     @Transactional(readOnly = true)
