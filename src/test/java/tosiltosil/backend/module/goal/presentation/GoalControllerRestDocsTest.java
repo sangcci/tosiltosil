@@ -26,6 +26,8 @@ import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListPerCategoryResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
@@ -54,12 +56,12 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         DayGoalsResponse response = new DayGoalsResponse(
                 BigDecimal.valueOf(42),
                 List.of(
-                        new DayGoalsResponse.GoalListPerCategoryResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024), List.of(
-                                new DayGoalsResponse.GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
-                                new DayGoalsResponse.GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M", BigDecimal.valueOf(2048))
+                        new GoalListPerCategoryResponse(1L, "운동", "#FF5733", BigDecimal.valueOf(1024), List.of(
+                                new GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
+                                new GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M", BigDecimal.valueOf(2048))
                         )),
-                        new DayGoalsResponse.GoalListPerCategoryResponse(2L, "공부", "#33C3F0", BigDecimal.valueOf(2048), List.of(
-                                new DayGoalsResponse.GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M", BigDecimal.valueOf(3072))
+                        new GoalListPerCategoryResponse(2L, "공부", "#33C3F0", BigDecimal.valueOf(2048), List.of(
+                                new GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M", BigDecimal.valueOf(3072))
                         ))
                 )
         );

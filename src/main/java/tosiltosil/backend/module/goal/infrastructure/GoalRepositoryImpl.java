@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
-import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListPerCategoryResponse;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public List<DayGoalsResponse.GoalListPerCategoryResponse> findDayGoals(final UUID memberId, final LocalDate date) {
+    public List<GoalListPerCategoryResponse> findDayGoals(final UUID memberId, final LocalDate date) {
         return goalDslRepository.findDayGoals(memberId, date);
     }
 
