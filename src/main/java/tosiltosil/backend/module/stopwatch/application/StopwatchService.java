@@ -37,7 +37,7 @@ public class StopwatchService {
         // 오늘 총 진행 시간 가져오기 - 방금 시작된 스톱워치 시간은 제외
         Duration todayDuration = durationService.getTodayDuration(memberId);
 
-        // 스탑워치 정지 메세지 전송
+        // 스탑워치 시작 메세지 전송
         Events.raise(
                 StopwatchStartedEvent.of(memberId, stopwatch, todayDuration)
         );
