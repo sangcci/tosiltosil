@@ -22,6 +22,7 @@ import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeRes
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
+import tosiltosil.backend.module.category.domain.value.CategoryColor;
 import tosiltosil.backend.module.goal.application.GoalService;
 
 @Service
@@ -77,7 +78,7 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        category.updateBasicInfo(request.title(), request.color());
+        category.updateBasicInfo(request.title(), CategoryColor.valueOf(request.color()));
 
         return CategoryResponse.of(category.getId());
     }

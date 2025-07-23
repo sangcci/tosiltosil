@@ -2,11 +2,12 @@ package tosiltosil.backend.module.category.domain.response;
 
 import java.math.BigDecimal;
 import tosiltosil.backend.module.category.domain.Category;
+import tosiltosil.backend.module.category.domain.value.CategoryColor;
 
 public record CurrentCategoryListResponse(
         Long categoryId,
         String title,
-        String color,
+        CategoryColor color,
         BigDecimal orderIndex
 ) {
 

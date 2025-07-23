@@ -22,6 +22,7 @@ import tosiltosil.backend.module.category.application.CategoryServiceTest.TestTi
 import tosiltosil.backend.module.category.domain.Category;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
+import tosiltosil.backend.module.category.domain.value.CategoryColor;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.infrastructure.CategoryJpaRepository;
@@ -86,11 +87,11 @@ class CategoryServiceTest extends IntegrationTestSupport {
         UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
         
         // 현재 카테고리 생성
-        CategoryCreateRequest currentCategoryRequest = new CategoryCreateRequest("현재 카테고리", "#FF0000");
+        CategoryCreateRequest currentCategoryRequest = new CategoryCreateRequest("현재 카테고리", "RED");
         CategoryResponse currentCategory = categoryService.createCategory(memberId, currentCategoryRequest);
         
         // 삭제될 카테고리 생성
-        CategoryCreateRequest deletedCategoryRequest = new CategoryCreateRequest("삭제될 카테고리", "#00FF00");
+        CategoryCreateRequest deletedCategoryRequest = new CategoryCreateRequest("삭제될 카테고리", "ORANGE");
         CategoryResponse deletedCategory = categoryService.createCategory(memberId, deletedCategoryRequest);
         
         // 카테고리 삭제 (지난 카테고리로 만들기)
@@ -105,7 +106,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
             softly.assertThat(currentCategories).hasSize(1);
             softly.assertThat(currentCategories.get(0).categoryId()).isEqualTo(currentCategory.categoryId());
             softly.assertThat(currentCategories.get(0).title()).isEqualTo("현재 카테고리");
-            softly.assertThat(currentCategories.get(0).color()).isEqualTo("#FF0000");
+            softly.assertThat(currentCategories.get(0).color()).isEqualTo(CategoryColor.RED);
             
             // 삭제된 카테고리는 포함되지 않아야 함
             List<Long> categoryIds = currentCategories.stream()
@@ -120,8 +121,8 @@ class CategoryServiceTest extends IntegrationTestSupport {
         // given
         UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
         
-        CategoryCreateRequest request = new CategoryCreateRequest("자기개발", "#FF0000");
-        CategoryCreateRequest requestHasSameTitle = new CategoryCreateRequest("자기개발", "#0000FF");
+        CategoryCreateRequest request = new CategoryCreateRequest("자기개발", "RED");
+        CategoryCreateRequest requestHasSameTitle = new CategoryCreateRequest("자기개발", "BLUE");
         
         // when
         CategoryResponse response = categoryService.createCategory(memberId, request);
@@ -137,9 +138,9 @@ class CategoryServiceTest extends IntegrationTestSupport {
         UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
         
         // when
-        CategoryResponse first = categoryService.createCategory(memberId, new CategoryCreateRequest("첫번째", "#FF0000"));
-        CategoryResponse second = categoryService.createCategory(memberId, new CategoryCreateRequest("두번째", "#00FF00"));
-        CategoryResponse third = categoryService.createCategory(memberId, new CategoryCreateRequest("세번째", "#0000FF"));
+        CategoryResponse first = categoryService.createCategory(memberId, new CategoryCreateRequest("첫번째", "RED"));
+        CategoryResponse second = categoryService.createCategory(memberId, new CategoryCreateRequest("두번째", "ORANGE"));
+        CategoryResponse third = categoryService.createCategory(memberId, new CategoryCreateRequest("세번째", "BLUE"));
         
         // then
         List<CurrentCategoryListResponse> categories = categoryService.getCategoriesByMemberId(memberId);
@@ -159,9 +160,9 @@ class CategoryServiceTest extends IntegrationTestSupport {
         UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
         
         // when
-        CategoryResponse first = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리1", "#FF0000"));
-        CategoryResponse second = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리2", "#00FF00"));
-        CategoryResponse third = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리3", "#0000FF"));
+        CategoryResponse first = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리1", "RED"));
+        CategoryResponse second = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리2", "ORANGE"));
+        CategoryResponse third = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리3", "BLUE"));
         
         // then
         Category firstCategory = categoryJpaRepository.findById(first.categoryId()).get();
@@ -190,7 +191,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
         UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
         
         // 1. 카테고리 생성
-        CategoryCreateRequest categoryRequest = new CategoryCreateRequest("자기개발", "#FF0000");
+        CategoryCreateRequest categoryRequest = new CategoryCreateRequest("자기개발", "RED");
         CategoryResponse category = categoryService.createCategory(memberId, categoryRequest);
         
         // 2. 목표 생성
