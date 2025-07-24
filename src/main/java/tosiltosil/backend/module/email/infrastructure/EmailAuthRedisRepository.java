@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Repository
@@ -19,15 +18,15 @@ public class EmailAuthRedisRepository {
     private static final String SEND_COUNT_FIELD = "sendCount";
     private static final String AUTH_FAIL_COUNT_FIELD = "authFailCount";
 
-    public void save(UUID clientId, int sendCount, int authFailCount, long expirationTime) {
-        String key = createKey(clientId);
+    public void save(String email, int sendCount, int authFailCount, long expirationTime) {
+        String key = createKey(email);
         redisTemplate.opsForHash().put(key, SEND_COUNT_FIELD, String.valueOf(sendCount));
         redisTemplate.opsForHash().put(key, AUTH_FAIL_COUNT_FIELD, String.valueOf(authFailCount));
         redisTemplate.expire(key, expirationTime, TimeUnit.SECONDS);
     }
 
-    public EmailAuthMeta get(UUID clientId) {
-        String key = createKey(clientId);
+    public EmailAuthMeta get(String email) {
+        String key = createKey(email);
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
 
         int sendCount = parseOrDefault(entries.get(SEND_COUNT_FIELD));
@@ -36,23 +35,23 @@ public class EmailAuthRedisRepository {
         return new EmailAuthMeta(sendCount, authFailCount);
     }
 
-    public void delete(UUID clientId) {
-        String key = createKey(clientId);
+    public void delete(String email) {
+        String key = createKey(email);
         redisTemplate.delete(key);
     }
 
-    public void increaseSendCount(UUID clientId) {
-        String key = createKey(clientId);
+    public void increaseSendCount(String email) {
+        String key = createKey(email);
         redisTemplate.opsForHash().increment(key, SEND_COUNT_FIELD, 1);
     }
 
-    public void increaseAuthFailCount(UUID clientId) {
-        String key = createKey(clientId);
+    public void increaseAuthFailCount(String email) {
+        String key = createKey(email);
         redisTemplate.opsForHash().increment(key, AUTH_FAIL_COUNT_FIELD, 1);
     }
 
-    private String createKey(UUID clientId) {
-        return String.format(EMAIL_AUTH_CNT_KEY, clientId.toString());
+    private String createKey(String email) {
+        return String.format(EMAIL_AUTH_CNT_KEY, email);
     }
 
     private int parseOrDefault(Object value) {

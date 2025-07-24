@@ -14,8 +14,6 @@ import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
 import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
 import tosiltosil.backend.module.email.domain.response.EmailSendResponse;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/v1/auth/email")
 @RequiredArgsConstructor
@@ -26,26 +24,19 @@ public class EmailController {
 
     @PostMapping("/send")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Response<EmailSendResponse>> sendEmail(
-            @CookieValue(name = "client-id", required = false) final UUID clientId,
+    public Response<EmailSendResponse> sendEmail(
             @Valid @RequestBody final EmailSendRequest request
     ) {
-        EmailSendResponse response = emailService.sendAuthEmail(clientId, request);
-
-        HttpHeaders headers = cookieUtil.generateClientIdCookie(response.clientId());
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .body(Response.ok("정상적으로 이메일을 전송했습니다.", response));
+        EmailSendResponse response = emailService.sendAuthEmail(request);
+        return Response.ok("정상적으로 이메일을 전송했습니다.", response);
     }
 
     @PostMapping("/verify")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Response<?>> verifyEmailAuth(
-            @CookieValue(name = "client-id") final UUID clientId,
             @Valid @RequestBody final EmailAuthRequest request
     ) {
-        EmailAuthResponse response = emailService.verifyAuthEmail(clientId, request);
+        EmailAuthResponse response = emailService.verifyAuthEmail(request);
         String temporaryToken = response.temporaryToken();
 
         HttpHeaders headers = cookieUtil.generateTemporaryTokenCookies(temporaryToken);

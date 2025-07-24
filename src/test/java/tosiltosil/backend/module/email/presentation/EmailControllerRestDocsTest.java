@@ -1,6 +1,5 @@
 package tosiltosil.backend.module.email.presentation;
 
-import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -20,12 +19,11 @@ import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
 import tosiltosil.backend.module.email.domain.response.EmailSendResponse;
 import tosiltosil.backend.support.RestDocsTestSupport;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.cookies.CookieDocumentation.*;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
@@ -49,23 +47,15 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
-        EmailSendResponse response = EmailSendResponse.of("test@example.com", testClientId);
+        EmailSendResponse response = EmailSendResponse.of("test@example.com");
 
-        given(emailService.sendAuthEmail(any(), any(EmailSendRequest.class)))
+        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willReturn(response);
-
-        HttpHeaders mockHeaders = new HttpHeaders();
-        mockHeaders.add(HttpHeaders.SET_COOKIE, "client-id=" + testClientId + "; Path=/; HttpOnly; Max-Age=86400");
-
-        given(cookieUtil.generateClientIdCookie(any(UUID.class)))
-                .willReturn(mockHeaders);
 
         // when
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/send")
                 .contentType(MediaType.APPLICATION_JSON)
-                .cookie(new Cookie("client-id", testClientId.toString()))
                 .content(request)
                 .exchange();
 
@@ -73,12 +63,6 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         assertThat(testResult)
                 .hasStatus(HttpStatus.OK)
                 .apply(documentHandler.document(
-                        requestCookies(
-                                cookieWithName("client-id").description("클라이언트 식별 ID 쿠키").optional()
-                        ),
-                        responseCookies(
-                                cookieWithName("client-id").description("클라이언트 식별 ID 쿠키")
-                        ),
                         requestFields(
                                 requestField("email", JsonFieldType.STRING, "이메일 주소", false, "이메일 형식만 가능", "test@example.com"),
                                 requestField("purpose", JsonFieldType.STRING, "이메일 인증 목적", false, "SIGN_UP 혹은 PASSWORD_RESET만 가능", "SIGN_UP")
@@ -101,16 +85,13 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
-
-        given(emailService.sendAuthEmail(any(), any(EmailSendRequest.class)))
+        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new BadRequestException("파라미터 값이 잘못되었습니다"));
 
         // when
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/send")
                 .contentType(MediaType.APPLICATION_JSON)
-                .cookie(new Cookie("client-id", testClientId.toString()))
                 .content(request)
                 .exchange();
 
@@ -144,16 +125,13 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
-
-        given(emailService.sendAuthEmail(any(), any(EmailSendRequest.class)))
+        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new BadRequestException("파라미터 값이 유효하지 않습니다."));
 
         // when
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/send")
                 .contentType(MediaType.APPLICATION_JSON)
-                .cookie(new Cookie("client-id", testClientId.toString()))
                 .content(request)
                 .exchange();
 
@@ -187,9 +165,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
-
-        given(emailService.sendAuthEmail(any(), any(EmailSendRequest.class)))
+        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new BadRequestException("등록되지 않은 이메일입니다."));
 
 
@@ -197,7 +173,6 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/send")
                 .contentType(MediaType.APPLICATION_JSON)
-                .cookie(new Cookie("client-id", testClientId.toString()))
                 .content(request)
                 .exchange();
 
@@ -225,9 +200,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
-
-        given(emailService.sendAuthEmail(any(), any(EmailSendRequest.class)))
+        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new ConflictException("이미 등록된 이메일입니다."));
 
 
@@ -235,7 +208,6 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/send")
                 .contentType(MediaType.APPLICATION_JSON)
-                .cookie(new Cookie("client-id", testClientId.toString()))
                 .content(request)
                 .exchange();
 
@@ -263,10 +235,9 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
         String temporaryToken = "temporary-token"; // 임시 토큰 예시
 
-        given(emailService.verifyAuthEmail(any(UUID.class), any(EmailAuthRequest.class)))
+        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willReturn(EmailAuthResponse.of(temporaryToken));
 
         HttpHeaders mockHeaders = new HttpHeaders();
@@ -278,7 +249,6 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         // when
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/verify")
-                .cookie(new Cookie("client-id", testClientId.toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
                 .exchange();
@@ -287,9 +257,6 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         assertThat(testResult)
                 .hasStatus(HttpStatus.OK)
                 .apply(documentHandler.document(
-                        requestCookies(
-                                cookieWithName("client-id").description("클라이언트 식별 ID 쿠키")
-                        ),
                         responseCookies(
                                 cookieWithName("temporary-token").description("임시 엑세스 토큰 쿠키")
                         ),
@@ -306,41 +273,6 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 인증_번호_확인_시_clientId_쿠키가_없을_경우_실패() {
-        // when
-        MvcTestResult testResult = mockMvcTester.post()
-                .uri("/api/v1/auth/email/verify")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {
-                            "email": "test@example.com",
-                            "authNumber": "123456"
-                        }
-                        """)
-                .exchange();
-
-        // then
-        assertThat(testResult)
-                .hasStatus(HttpStatus.BAD_REQUEST)
-                .bodyJson().isEqualTo("""
-                            {
-                                "status": 400,
-                                "message": "필수 쿠키가 누락되었습니다.",
-                                "errors": [
-                                    {
-                                        "field": "client-id",
-                                        "value": null,
-                                        "reason": "쿠키가 존재하지 않습니다."
-                                    }
-                                ]
-                            }
-                        """);
-
-        assertThat(testResult)
-                .apply(documentHandler.document());
-    }
-
-    @Test
     void 잘못된_형식의_인증_번호에_검증_실패() {
         // given
         String request = """
@@ -350,15 +282,13 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
-
-        given(emailService.verifyAuthEmail(any(UUID.class), any(EmailAuthRequest.class)))
+        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willThrow(new BadRequestException("파라미터 값이 잘못되었습니다"));
 
         // when
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/verify")
-                .cookie(new Cookie("client-id", testClientId.toString()))
+
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
                 .exchange();
@@ -393,16 +323,14 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        UUID testClientId = UUID.randomUUID();
         int currentFailCount = 1;
 
-        given(emailService.verifyAuthEmail(any(UUID.class), any(EmailAuthRequest.class)))
+        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willThrow(new InvalidEmailCodeException(currentFailCount));
 
         // when
         MvcTestResult testResult = mockMvcTester.post()
                 .uri("/api/v1/auth/email/verify")
-                .cookie(new Cookie("client-id", testClientId.toString()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request)
                 .exchange();

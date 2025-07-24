@@ -9,7 +9,6 @@ import tosiltosil.backend.module.email.infrastructure.EmailAuthRedisRepository;
 import tosiltosil.backend.support.IntegrationTestSupport;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -28,16 +27,15 @@ class EmailServiceTest extends IntegrationTestSupport {
     @Test
     void 인증번호_검증_성공() {
         // given
-        UUID clientId = UUID.randomUUID();
         String email = "verify@example.com";
         String authNumber = "123456";
         EmailAuthRequest request = new EmailAuthRequest(email, authNumber);
 
-        emailAuthRedisRepository.save(clientId, 1, 0, 300L);
+        emailAuthRedisRepository.save(email, 1, 0, 300L);
         authNumberRedisRepository.save(email, authNumber, 300L);
 
         // when
-        EmailAuthResponse response = emailService.verifyAuthEmail(clientId, request);
+        EmailAuthResponse response = emailService.verifyAuthEmail(request);
 
         // then
         assertThat(response.temporaryToken()).isNotBlank();

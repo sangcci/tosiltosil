@@ -55,10 +55,6 @@ include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/h
 
 include::{snippets}/email-controller-rest-docs-test/잘못된_형식의_인증_번호에_검증_실패/response-body.adoc[]
 
-==== 필수 쿠키 누락으로 검증 실패 (400)
-
-include::{snippets}/email-controller-rest-docs-test/인증_번호_확인_시_clientId_쿠키가_없을_경우_실패/response-body.adoc[]
-
 ==== 올바르지 않은 인증번호로 검증 실패 (400)
 
 include::{snippets}/email-controller-rest-docs-test/잘못된_인증_번호에_검증_실패/response-body.adoc[]

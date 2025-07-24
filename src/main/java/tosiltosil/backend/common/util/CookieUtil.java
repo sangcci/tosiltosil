@@ -6,8 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 public class CookieUtil {
@@ -21,9 +19,6 @@ public class CookieUtil {
     @Value("${jwt.cookie.name.temporary}")
     private String temporaryCookieName;
 
-    @Value("${email.cookie.name}")
-    private String clientIdCookieName;
-
     @Value("${jwt.expiration.access}")
     private long accessTtl;
 
@@ -32,9 +27,6 @@ public class CookieUtil {
 
     @Value("${jwt.expiration.temporary}")
     private long temporaryTtl;
-
-    @Value("${email.cookie.expiration}")
-    private long clientIdTtl;
 
     @Value("${jwt.cookie.secure}")
     private boolean secure;
@@ -58,14 +50,6 @@ public class CookieUtil {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, temporaryTokenCookie.toString());
-        return headers;
-    }
-
-    public HttpHeaders generateClientIdCookie(UUID clientId) {
-        ResponseCookie clientIdCookie = generateCookie(clientIdCookieName, clientId.toString(), clientIdTtl);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.SET_COOKIE, clientIdCookie.toString());
         return headers;
     }
 

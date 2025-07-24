@@ -25,7 +25,6 @@ import tosiltosil.backend.module.member.application.MemberService;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.UUID;
 
 import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.FORGOT_PASSWORD;
 
@@ -78,13 +77,9 @@ public class EmailService {
     }
 
     public EmailSendResponse sendAuthEmail(
-            final UUID clientId,
             final EmailSendRequest request
     ) {
-        UUID currentClientId =
-                clientId == null ? generateAndSaveNewClientId() : clientId;
-
-        validateSendCount(currentClientId);
+        validateSendCount(request.email());
 
         EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
         validateEmailIsExistByPurpose(request.email(), purpose);
@@ -94,16 +89,17 @@ public class EmailService {
         String content = loadAuthTemplate(authNumber);
         sendEmail(request.email(), EMAIL_TITLE, content);
 
-        return EmailSendResponse.of(request.email(), currentClientId);
+        generateEmailAttemptsRedisData(request.email());
+
+        return EmailSendResponse.of(request.email());
     }
 
     public EmailAuthResponse verifyAuthEmail(
-            final UUID clientId,
             final EmailAuthRequest request
     ) {
-        int authFailCount = validateAndGetAuthFailCount(clientId);
+        int authFailCount = validateAndGetAuthFailCount(request.email());
 
-        validateAuthNumber(clientId, request.email(), request.authNumber(), authFailCount);
+        validateAuthNumber(request.email(), request.authNumber(), authFailCount);
 
         deleteAuthNumber(request.email());
 
@@ -120,20 +116,18 @@ public class EmailService {
         }
     }
 
-    private UUID generateAndSaveNewClientId() {
-        UUID newClientId = UUID.randomUUID();
-        emailAuthRedisRepository.save(newClientId, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, emailAuthExpiration);
-        return newClientId;
+    private void generateEmailAttemptsRedisData(String email) {
+        emailAuthRedisRepository.save(email, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, emailAuthExpiration);
     }
 
-    private void validateSendCount(UUID clientId) {
-        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(clientId);
+    private void validateSendCount(String email) {
+        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
         if (emailAuthMeta.sendCount() > maxSendCount) {
             throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
         }
 
-        emailAuthRedisRepository.increaseSendCount(clientId);
+        emailAuthRedisRepository.increaseSendCount(email);
     }
 
     private String generateAndSaveAuthNumber(String email) {
@@ -142,8 +136,8 @@ public class EmailService {
         return authNumber;
     }
 
-    private int validateAndGetAuthFailCount(UUID clientId) {
-        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(clientId);
+    private int validateAndGetAuthFailCount(String email) {
+        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
         int authFailCount = emailAuthMeta.authFailCount();
 
@@ -153,8 +147,8 @@ public class EmailService {
         return authFailCount;
     }
 
-    private EmailAuthMeta getEmailAuthMeta(UUID clientId) {
-        return emailAuthRedisRepository.get(clientId);
+    private EmailAuthMeta getEmailAuthMeta(String email) {
+        return emailAuthRedisRepository.get(email);
     }
 
     private void validateEmailIsExistByPurpose(String email, EmailAuthPurpose purpose) {
@@ -165,18 +159,18 @@ public class EmailService {
         }
     }
 
-    private void validateAuthNumber(UUID clientId, String email, String authNumber, int authFailCount) {
+    private void validateAuthNumber(String email, String authNumber, int authFailCount) {
         String savedAuthNumber = authNumberRedisRepository.get(email)
                 .orElseThrow(() -> new NotFoundException("인증번호 데이터를 찾을 수 없습니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
-            increaseAuthFailCount(clientId);
+            increaseAuthFailCount(email);
             throw new InvalidEmailCodeException(++authFailCount);
         }
     }
 
-    private void increaseAuthFailCount(UUID clientId) {
-        emailAuthRedisRepository.increaseAuthFailCount(clientId);
+    private void increaseAuthFailCount(String email) {
+        emailAuthRedisRepository.increaseAuthFailCount(email);
     }
 
     private void deleteAuthNumber(String email) {
