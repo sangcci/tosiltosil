@@ -123,6 +123,7 @@ public class Goal extends BaseEntity implements Orderable {
         }
     }
 
+    // basic info
     public void updateBasicInfo(
             final String title,
             final Long categoryId,
@@ -137,26 +138,51 @@ public class Goal extends BaseEntity implements Orderable {
         this.date = date;
     }
 
+    // status
     public void changeStatusToStarted() {
-        if (this.status == GoalStatus.BEFORE_STARTING || this.status == GoalStatus.PAUSED) {
-            this.status = GoalStatus.RUNNING;
-        } else {
-            throw new ConflictException("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
-        }
+        validateNotCompleted();
+        validateNotFailed();
+        validateNotRunning();
+        this.status = GoalStatus.RUNNING;
     }
 
     public void changeStatusToPaused() {
+        validateNotCompleted();
+        validateNotFailed();
+        validateNotPaused();
+        this.status = GoalStatus.PAUSED;
+    }
+
+    private void validateNotCompleted() {
+        if (this.status == GoalStatus.COMPLETED) {
+            throw new ConflictException("이미 완료된 목표입니다.");
+        }
+    }
+
+    private void validateNotFailed() {
+        if (this.status == GoalStatus.FAILED) {
+            throw new ConflictException("기간이 지나 실패한 목표입니다.");
+        }
+    }
+
+    private void validateNotRunning() {
         if (this.status == GoalStatus.RUNNING) {
-            this.status = GoalStatus.PAUSED;
-        } else {
+            throw new ConflictException("스톱워치가 이미 실행중입니다.");
+        }
+    }
+
+    private void validateNotPaused() {
+        if (this.status == GoalStatus.BEFORE_STARTING || this.status == GoalStatus.PAUSED) {
             throw new ConflictException("스톱워치가 이미 정지되었습니다.");
         }
     }
 
+    // duration
     public void addDuration(final Duration addedDuration) {
         this.duration = this.duration.plus(addedDuration);
     }
 
+    // order index
     public void updateOrderIndex(final BigDecimal orderIndex) {
         this.orderIndex = orderIndex;
     }
