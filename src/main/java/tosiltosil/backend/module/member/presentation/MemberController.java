@@ -17,7 +17,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/check-email")
+    @GetMapping("/email/exists")
     public Response<Map<String, Object>> validateEmailNotDuplicated(
             @RequestParam("email") final String email,
             @RequestParam("type") final String loginType
