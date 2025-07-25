@@ -9,19 +9,19 @@ public record StopwatchStartedEvent(
         UUID memberId,
         String type,
         LocalDateTime startTime,
-        Duration totalTime
+        Duration memberTodayDuration
 ) {
 
     public static StopwatchStartedEvent of(
             final UUID memberId,
             final Stopwatch stopwatch,
-            final Duration totalTime
+            final Duration memberTodayDuration
     ) {
         return new StopwatchStartedEvent(
                 memberId,
                 "STARTED",
                 stopwatch.getStartedAt(),
-                totalTime
+                memberTodayDuration
         );
     }
 }

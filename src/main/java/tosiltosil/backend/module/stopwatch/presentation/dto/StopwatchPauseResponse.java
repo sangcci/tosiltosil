@@ -10,7 +10,7 @@ public record StopwatchPauseResponse(
         String type,
         LocalDateTime startTime,
         LocalDateTime endTime,
-        Duration totalTime
+        Duration memberTodayDuration
 ) {
 
     public static StopwatchPauseResponse fromPausedEvent(final StopwatchPausedEvent event) {
@@ -19,7 +19,7 @@ public record StopwatchPauseResponse(
                 event.type(),
                 event.startTime(),
                 event.endTime(),
-                event.totalTime()
+                event.memberTodayDuration()
         );
     }
 }

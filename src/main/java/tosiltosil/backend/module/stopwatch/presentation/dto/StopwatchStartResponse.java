@@ -9,7 +9,7 @@ public record StopwatchStartResponse(
         UUID memberId,
         String type,
         LocalDateTime startTime,
-        Duration totalTime
+        Duration memberTodayDuration
 ) {
 
     public static StopwatchStartResponse fromStartedEvent(final StopwatchStartedEvent event) {
@@ -17,7 +17,7 @@ public record StopwatchStartResponse(
                 event.memberId(),
                 event.type(),
                 event.startTime(),
-                event.totalTime()
+                event.memberTodayDuration()
         );
     }
 }
