@@ -38,7 +38,7 @@ public class EmailService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JavaMailSender mailSender;
 
-    private static final int INITIAL_SEND_COUNT = 1;
+    private static final int INITIAL_SEND_COUNT = 0;
     private static final int INITIAL_FAIL_COUNT = 0;
     private static final int CODE_LENGTH = 6;
     private static final String EMAIL_TITLE = "토실토실 인증번호";
@@ -79,19 +79,23 @@ public class EmailService {
     public EmailSendResponse sendAuthEmail(
             final EmailSendRequest request
     ) {
-        validateSendCount(request.email());
-
+        String email = request.email();
         EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
-        validateEmailIsExistByPurpose(request.email(), purpose);
 
-        String authNumber = generateAndSaveAuthNumber(request.email());
+        initEmailAttemptsIfAbsent(email);
+
+        validateSendCount(email);
+
+        validateEmailIsExistByPurpose(email, purpose);
+
+        String authNumber = generateAndSaveAuthNumber(email);
 
         String content = loadAuthTemplate(authNumber);
-        sendEmail(request.email(), EMAIL_TITLE, content);
+        sendEmail(email, EMAIL_TITLE, content);
 
-        generateEmailAttemptsRedisData(request.email());
+        increaseSendCount(email);
 
-        return EmailSendResponse.of(request.email());
+        return EmailSendResponse.of(email);
     }
 
     public EmailAuthResponse verifyAuthEmail(
@@ -120,13 +124,21 @@ public class EmailService {
         emailAuthRedisRepository.save(email, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, emailAuthExpiration);
     }
 
+    private void initEmailAttemptsIfAbsent(String email) {
+        if (emailAuthRedisRepository.get(email) == null) {
+            generateEmailAttemptsRedisData(email);
+        }
+    }
+
     private void validateSendCount(String email) {
         EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
         if (emailAuthMeta.sendCount() > maxSendCount) {
             throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
         }
+    }
 
+    private void increaseSendCount(String email) {
         emailAuthRedisRepository.increaseSendCount(email);
     }
 
