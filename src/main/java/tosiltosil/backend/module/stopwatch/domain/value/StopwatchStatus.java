@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.member.domain.value;
+package tosiltosil.backend.module.stopwatch.domain.value;
 
 public enum StopwatchStatus {
     ACTIVE,
