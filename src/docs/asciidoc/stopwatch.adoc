@@ -31,6 +31,8 @@ include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_시작_시_
 
 === 스톱워치 정지
 
+！ 스톱워치를 완료했을 경우, 별도로 완료 API가 존재하지 않고 정지 API를 사용합니다.
+
 ==== Request
 
 include::{snippets}/stopwatch-controller-rest-docs-test/스톱워치_정지하기/http-request.adoc[]
