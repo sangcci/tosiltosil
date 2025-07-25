@@ -151,6 +151,46 @@ class GoalTest {
                 .hasMessage("기간이 지나 실패한 목표입니다.");
     }
 
+    @Test
+    void 목표의_진행_시간이_총_시간보다_크거나_같으면_완료_상태로_변경한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal goal = createGoalWithDuration(memberId, Duration.ofHours(2), Duration.ofHours(2));
+        
+        // when
+        goal.changeStatusToCompleted();
+        
+        // then
+        assertThat(goal.getStatus()).isEqualTo(GoalStatus.COMPLETED);
+    }
+
+    @Test
+    void 목표의_진행_시간이_총_시간보다_많아도_완료_상태로_변경한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal goal = createGoalWithDuration(memberId, Duration.ofHours(2), Duration.ofHours(3));
+        
+        // when
+        goal.changeStatusToCompleted();
+        
+        // then
+        assertThat(goal.getStatus()).isEqualTo(GoalStatus.COMPLETED);
+    }
+
+    @Test
+    void 목표의_진행_시간이_총_시간보다_적으면_완료_상태로_변경되지_않는다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        GoalStatus originalStatus = GoalStatus.RUNNING;
+        Goal goal = createGoalWithDuration(memberId, Duration.ofHours(2), Duration.ofMinutes(30));
+        
+        // when
+        goal.changeStatusToCompleted();
+        
+        // then
+        assertThat(goal.getStatus()).isEqualTo(originalStatus);
+    }
+
     private Goal createGoalWithStatus(UUID memberId, GoalStatus status) {
         return Goal.builder()
                 .memberId(memberId)
@@ -159,6 +199,20 @@ class GoalTest {
                 .totalTime(Duration.ofHours(2))
                 .status(status)
                 .duration(Duration.ZERO)
+                .orderIndex(BigDecimal.valueOf(100000.0))
+                .iconId(1L)
+                .date(LocalDate.now())
+                .build();
+    }
+
+    private Goal createGoalWithDuration(UUID memberId, Duration totalTime, Duration duration) {
+        return Goal.builder()
+                .memberId(memberId)
+                .categoryId(1L)
+                .title("Test Goal")
+                .totalTime(totalTime)
+                .status(GoalStatus.RUNNING)
+                .duration(duration)
                 .orderIndex(BigDecimal.valueOf(100000.0))
                 .iconId(1L)
                 .date(LocalDate.now())

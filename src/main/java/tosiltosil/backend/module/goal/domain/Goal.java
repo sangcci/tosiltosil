@@ -153,6 +153,12 @@ public class Goal extends BaseEntity implements Orderable {
         this.status = GoalStatus.PAUSED;
     }
 
+    public void changeStatusToCompleted() {
+        if (this.duration.compareTo(this.totalTime) >= 0) {
+            this.status = GoalStatus.COMPLETED;
+        }
+    }
+
     private void validateNotCompleted() {
         if (this.status == GoalStatus.COMPLETED) {
             throw new ConflictException("이미 완료된 목표입니다.");

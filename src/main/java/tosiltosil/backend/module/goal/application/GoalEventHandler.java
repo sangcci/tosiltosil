@@ -23,5 +23,8 @@ public class GoalEventHandler {
 
         Duration addedDuration = Duration.between(event.startTime(), event.endTime());
         goal.addDuration(addedDuration);
+
+        // 목표 완료되었는지 체크 및 반영
+        goal.changeStatusToCompleted();
     }
 }
