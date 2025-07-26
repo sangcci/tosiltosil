@@ -176,13 +176,13 @@ public class EmailService {
                 .orElseThrow(() -> new NotFoundException("인증번호 데이터를 찾을 수 없습니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
-            increaseAuthFailCount(email);
-            throw new InvalidEmailCodeException(++authFailCount);
+            int failCount = increaseAuthFailCount(email);
+            throw new InvalidEmailCodeException(failCount);
         }
     }
 
-    private void increaseAuthFailCount(String email) {
-        emailAuthRedisRepository.increaseAuthFailCount(email);
+    private int increaseAuthFailCount(String email) {
+        return emailAuthRedisRepository.increaseAuthFailCount(email);
     }
 
     private void deleteAuthNumber(String email) {
