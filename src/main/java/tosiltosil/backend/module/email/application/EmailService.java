@@ -133,7 +133,7 @@ public class EmailService {
     private void validateSendCount(String email) {
         EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
-        if (emailAuthMeta.sendCount() > maxSendCount) {
+        if (emailAuthMeta.sendCount() >= maxSendCount) {
             throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
         }
     }
