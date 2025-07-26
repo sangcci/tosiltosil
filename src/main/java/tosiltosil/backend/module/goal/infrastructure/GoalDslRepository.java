@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListPerCategoryResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class GoalDslRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<DayGoalListResponse> findDayGoals(
+    public List<GoalListPerCategoryResponse> findDayGoals(
             final UUID memberId,
             final LocalDate date
     ) {
@@ -34,13 +35,13 @@ public class GoalDslRepository {
                 )
                 .orderBy(category.orderIndex.asc(), goal.orderIndex.asc())
                 .transform(GroupBy.groupBy(category.id).list(
-                        Projections.constructor(DayGoalListResponse.class,
+                        Projections.constructor(GoalListPerCategoryResponse.class,
                                 category.id,
                                 category.title,
                                 category.color,
                                 category.orderIndex,
                                 GroupBy.list(
-                                        Projections.constructor(DayGoalListResponse.GoalListResponse.class,
+                                        Projections.constructor(GoalListResponse.class,
                                                 goal.id,
                                                 category.id,
                                                 goal.iconId,

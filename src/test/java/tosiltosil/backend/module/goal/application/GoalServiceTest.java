@@ -79,7 +79,7 @@ class GoalServiceTest extends IntegrationTestSupport {
     void 기존_목표_있는_상태에서_새_목표_생성시_마지막_순서_다음으로_생성() {
         // given
         UUID memberId = UUID.fromString("55797505-42ee-421c-a89e-5103c845e71b");
-        CategoryResponse category = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리", "#FF0000"));
+        CategoryResponse category = categoryService.createCategory(memberId, new CategoryCreateRequest("카테고리", "RED"));
         
         // 기존 목표 생성
         GoalCreateRequest existingRequest = new GoalCreateRequest("기존 목표", 1L, category.categoryId(), List.of("2025-07-08"), "PT1H");

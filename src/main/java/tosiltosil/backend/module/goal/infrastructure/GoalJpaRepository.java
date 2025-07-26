@@ -16,6 +16,8 @@ public interface GoalJpaRepository extends JpaRepository<Goal, Long> {
 
     List<Goal> findByMemberIdAndCategoryIdAndDateOrderByOrderIndexAsc(UUID memberId, Long categoryId, LocalDate date);
 
+    List<Goal> findByMemberIdAndDate(UUID memberId, LocalDate date);
+
     @Query("SELECT MAX(g.orderIndex) FROM Goal g WHERE g.memberId = :memberId AND g.date = :date")
     Optional<BigDecimal> findMaxOrderIndexByMemberIdAndDate(@Param("memberId") UUID memberId, @Param("date") LocalDate date);
 }

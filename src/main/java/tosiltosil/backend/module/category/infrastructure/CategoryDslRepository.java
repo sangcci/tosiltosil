@@ -18,6 +18,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
+import tosiltosil.backend.module.category.domain.value.CategoryColor;
 
 @Repository
 @RequiredArgsConstructor
@@ -43,13 +44,13 @@ public class CategoryDslRepository {
                 .fetch();
 
         // 2. 날짜 별 색깔 grouping
-        Map<LocalDate, List<String>> grouping = fetch
+        Map<LocalDate, List<CategoryColor>> grouping = fetch
                 .stream()
                 .collect(groupingBy(
                         tuple -> Objects.requireNonNull(tuple.get(goal.date)),
                         LinkedHashMap::new,
                         mapping(
-                                tuple -> Objects.requireNonNull(tuple.get(category.color)),
+                                tuple -> tuple.get(category.color),
                                 toList()
                         )
                 ));

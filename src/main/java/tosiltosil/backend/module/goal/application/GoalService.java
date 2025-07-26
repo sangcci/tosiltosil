@@ -16,7 +16,8 @@ import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
-import tosiltosil.backend.module.goal.domain.response.DayGoalListResponse;
+import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
+import tosiltosil.backend.module.goal.domain.response.GoalListPerCategoryResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
@@ -31,14 +32,18 @@ public class GoalService {
     private final OrderManager orderManager;
 
     @Transactional(readOnly = true)
-    public List<DayGoalListResponse> getDayGoals(
+    public DayGoalsResponse getDayGoals(
             final UUID memberOwnerId,
             final UUID memberId,
             final LocalDate date
     ) {
         // TODO: 친구 관계 검증
+        
+        List<GoalListPerCategoryResponse> categoryResponses = goalRepository.findDayGoals(memberId, date);
 
-        return goalRepository.findDayGoals(memberId, date);
+        BigDecimal overallPercentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
+
+        return DayGoalsResponse.of(overallPercentage, categoryResponses);
     }
 
     @Transactional
