@@ -24,7 +24,6 @@ import tosiltosil.backend.module.email.infrastructure.EmailAuthRedisRepository;
 import tosiltosil.backend.module.member.application.MemberService;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.FORGOT_PASSWORD;
 import static tosiltosil.backend.module.member.domain.value.LoginType.LOCAL;
@@ -114,7 +113,7 @@ public class EmailService {
     private String loadAuthTemplate(String authNumber) {
         try {
             ClassPathResource resource = new ClassPathResource("templates/email-auth-template.html");
-            String template = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
+            String template = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             return template.replace("{{authNumber}}", authNumber);
         } catch (Exception e) {
             throw new RuntimeException("템플릿을 가져올 수 없습니다.", e);
