@@ -37,7 +37,7 @@ public class AuthController {
         CreateLocalMemberResponse response = authService.localSignUp(temporaryToken, request, profileImage);
         HttpHeaders headers = cookieUtil.deleteTemporaryCookies();
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.CREATED)
                 .headers(headers)
                 .body(Response.create("정상적으로 일반 회원가입 되었습니다.", response));
     }
