@@ -65,7 +65,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 .apply(documentHandler.document(
                         requestFields(
                                 requestField("email", JsonFieldType.STRING, "이메일 주소", false, "이메일 형식만 가능", "test@example.com"),
-                                requestField("purpose", JsonFieldType.STRING, "이메일 인증 목적", false, "SIGN_UP 혹은 PASSWORD_RESET만 가능", "SIGN_UP")
+                                requestField("purpose", JsonFieldType.STRING, "이메일 인증 목적", false, "SIGN_UP 혹은 FORGOT_PASSWORD만 가능", "SIGN_UP")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
