@@ -43,9 +43,6 @@ async:
   thread-name-prefix: Email-
 
 email:
-  cookie:
-    name: "client-id"
-    expiration: 86400
   auth:
     redis-expiration: 86400
     max-send-count: 5
