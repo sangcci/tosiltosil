@@ -1,6 +1,7 @@
 package tosiltosil.backend.module.email.presentation;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,12 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
     private CookieUtil cookieUtil;
+
+    @Value( "${email.max-send-count}")
+    private int maxSendCount;
+
+    @Value( "${email.max-auth-count}")
+    private int maxAuthCount;
 
     @Test
     void 인증_이메일_전송하기() {
@@ -73,6 +80,40 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.email", JsonFieldType.STRING, "인증 이메일이 전송된 이메일 주소", "test@example.com")
                         )
                 ));
+    }
+
+    @Test
+    void 이메일_전송_및_인증_시도_횟수_초과로_이메일_전송_실패() {
+        // given
+        String request = """
+                {
+                    "email": "test@example.com",
+                    "purpose": "SIGN_UP"
+                }
+                """;
+
+        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
+                .willThrow(new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다."));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/auth/email/send")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 400,
+                                "message": "일일 이메일 인증 횟수를 초과하였습니다.",
+                                "errors": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
     }
 
     @Test
@@ -270,6 +311,40 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}")
                         )
                 ));
+    }
+
+    @Test
+    void 이메일_인증_시도_횟수_초과로_인증번호_검증_실패() {
+        // given
+        String request = """
+                {
+                    "email": "test@example.com",
+                    "authNumber": "123456"
+                }
+                """;
+
+        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+                .willThrow(new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다."));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/auth/email/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 400,
+                                "message": "일일 이메일 인증 횟수를 초과하였습니다.",
+                                "errors": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
     }
 
     @Test
