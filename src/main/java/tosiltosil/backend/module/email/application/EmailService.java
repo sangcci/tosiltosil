@@ -77,7 +77,7 @@ public class EmailService {
         String email = request.email();
         EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
 
-        validateSendCount(email);
+        validateSendAndAuthCount(email);
 
         validateEmailIsExistByPurpose(email, purpose);
 
@@ -113,11 +113,11 @@ public class EmailService {
         }
     }
 
-    private void validateSendCount(String email) {
+    private void validateSendAndAuthCount(String email) {
         EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
-        if (emailAuthMeta.sendCount() >= maxSendCount) {
-            throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
+        if (emailAuthMeta.sendCount() >= maxSendCount || emailAuthMeta.authFailCount() >= maxAuthAttemptCount) {
+            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
         }
     }
 
