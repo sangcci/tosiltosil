@@ -42,10 +42,10 @@ class EmailServiceTest extends IntegrationTestSupport {
     @Autowired
     private AuthNumberRedisRepository authNumberRedisRepository;
 
-    @Value( "${email.max-send-count}")
+    @Value( "${email.auth.max-send-count}")
     private int maxSendCount;
 
-    @Value( "${email.max-auth-count}")
+    @Value( "${email.auth.max-attempt-count}")
     private int maxAuthCount;
 
     private String email;

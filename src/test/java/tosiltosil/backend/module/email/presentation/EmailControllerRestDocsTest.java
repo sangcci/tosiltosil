@@ -1,7 +1,6 @@
 package tosiltosil.backend.module.email.presentation;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,12 +36,6 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
     private CookieUtil cookieUtil;
-
-    @Value( "${email.max-send-count}")
-    private int maxSendCount;
-
-    @Value( "${email.max-auth-count}")
-    private int maxAuthCount;
 
     @Test
     void 인증_이메일_전송하기() {
