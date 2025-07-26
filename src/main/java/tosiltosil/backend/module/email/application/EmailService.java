@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.FORGOT_PASSWORD;
+import static tosiltosil.backend.module.member.domain.value.LoginType.LOCAL;
 
 @Service
 @RequiredArgsConstructor
@@ -165,9 +166,9 @@ public class EmailService {
 
     private void validateEmailIsExistByPurpose(String email, EmailAuthPurpose purpose) {
         if (purpose.equals(FORGOT_PASSWORD)) {
-            memberService.validateEmailIsExistForPasswordReset(email, "LOCAL");
+            memberService.validateEmailIsExistForPasswordReset(email, LOCAL.name());
         } else {
-            memberService.validateEmailIsExist(email, "LOCAL");
+            memberService.validateEmailIsExist(email, LOCAL.name());
         }
     }
 

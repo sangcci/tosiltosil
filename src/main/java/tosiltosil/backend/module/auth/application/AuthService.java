@@ -20,6 +20,8 @@ import tosiltosil.backend.module.terms.application.TermsService;
 
 import java.util.UUID;
 
+import static tosiltosil.backend.module.member.domain.value.LoginType.LOCAL;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -42,7 +44,7 @@ public class AuthService {
         termsService.validateTerms(request.terms());
 
         String email = getEmailFromRedis(temporaryToken);
-        memberService.validateEmailIsExist(email, "LOCAL");
+        memberService.validateEmailIsExist(email, LOCAL.name());
 
         String code = memberService.generateRandomCode();
         String profileImgUrl = "https://example.com/profile.png"; // S3 구현 후 수정
