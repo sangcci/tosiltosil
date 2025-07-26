@@ -38,13 +38,8 @@ public class EmailService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JavaMailSender mailSender;
 
-    private static final int INITIAL_SEND_COUNT = 0;
-    private static final int INITIAL_FAIL_COUNT = 0;
     private static final int CODE_LENGTH = 6;
     private static final String EMAIL_TITLE = "토실토실 인증번호";
-
-    @Value("${email.auth.redis-expiration}")
-    private long emailAuthExpiration;
 
     @Value("${email.auth-number.redis-expiration}")
     private long authNumberExpiration;
@@ -82,8 +77,6 @@ public class EmailService {
         String email = request.email();
         EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
 
-        initEmailAttemptsIfAbsent(email);
-
         validateSendCount(email);
 
         validateEmailIsExistByPurpose(email, purpose);
@@ -117,16 +110,6 @@ public class EmailService {
             return template.replace("{{authNumber}}", authNumber);
         } catch (Exception e) {
             throw new RuntimeException("템플릿을 가져올 수 없습니다.", e);
-        }
-    }
-
-    private void generateEmailAttemptsRedisData(String email) {
-        emailAuthRedisRepository.save(email, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, emailAuthExpiration);
-    }
-
-    private void initEmailAttemptsIfAbsent(String email) {
-        if (emailAuthRedisRepository.get(email) == null) {
-            generateEmailAttemptsRedisData(email);
         }
     }
 
