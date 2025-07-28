@@ -87,6 +87,10 @@ public class JwtTokenProvider {
         }
     }
 
+    public void deleteTemporaryTokenFromRedis(String email) {
+        temporaryTokenRedisRepository.delete(email);
+    }
+
     private String createAccessToken(UUID memberId)  {
         return jwtUtil.generateAccessToken(memberId);
     }
@@ -121,10 +125,6 @@ public class JwtTokenProvider {
 
     private String getRefreshTokenFromRedis(UUID memberId) {
         return refreshTokenRedisRepository.get(memberId);
-    }
-
-    private void deleteTemporaryTokenFromRedis(String email) {
-        temporaryTokenRedisRepository.delete(email);
     }
 
     private void deleteRefreshTokenFromRedis(UUID memberId) {

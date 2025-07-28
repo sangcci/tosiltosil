@@ -1,9 +1,10 @@
-package tosiltosil.backend.module.auth.infrastructure;
+package tosiltosil.backend.module.email.infrastructure;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Repository
@@ -19,9 +20,10 @@ public class AuthNumberRedisRepository {
         redisTemplate.opsForValue().set(key, authNumber, expirationTime, TimeUnit.SECONDS);
     }
 
-    public String get(String email) {
+    public Optional<String> get(String email) {
         String key = createKey(email);
-        return (String) redisTemplate.opsForValue().get(key);
+        return Optional.ofNullable(
+                (String) redisTemplate.opsForValue().get(key));
     }
 
     public void delete(String email) {

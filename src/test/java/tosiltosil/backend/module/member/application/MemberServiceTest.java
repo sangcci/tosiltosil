@@ -32,13 +32,12 @@ class MemberServiceTest {
     void 중복_이메일_예외처리() {
         //given
         String email = "duplicate@example.com";
-        LoginType local = LoginType.LOCAL;
 
-        when(memberRepository.existsByEmailAndLoginType(email, local))
+        when(memberRepository.existsByEmailAndLoginType(email, LoginType.valueOf("LOCAL")))
                 .thenReturn(true);
 
         // when & then
-        Throwable thrown = catchThrowable(() -> memberService.validateEmail(email, local));
+        Throwable thrown = catchThrowable(() -> memberService.validateEmailIsExist(email, "LOCAL"));
 
         assertThat(thrown)
                 .isInstanceOf(ConflictException.class)

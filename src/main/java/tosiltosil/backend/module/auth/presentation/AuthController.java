@@ -22,19 +22,24 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class AuthController implements AuthApiSpecification {
+public class AuthController {
 
     private final AuthService authService;
     private final CookieUtil cookieUtil;
 
     @PostMapping(value = "/signup/local", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Response<CreateLocalMemberResponse> localSignUp(
+    public ResponseEntity<Response<CreateLocalMemberResponse>> localSignUp(
+            @CookieValue(name = "temporary-token") final String temporaryToken,
             @RequestPart("memberInfo") @Valid final CreateLocalMemberRequest request,
             @RequestPart(value = "profileImage", required = false) final MultipartFile profileImage
     ) {
-        CreateLocalMemberResponse response = authService.localSignUp(request, profileImage);
-        return Response.create("정상적으로 일반 회원가입 되었습니다.", response);
+        CreateLocalMemberResponse response = authService.localSignUp(temporaryToken, request, profileImage);
+        HttpHeaders headers = cookieUtil.deleteTemporaryCookies();
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .headers(headers)
+                .body(Response.create("정상적으로 일반 회원가입 되었습니다.", response));
     }
 
     @PostMapping("/login/local")

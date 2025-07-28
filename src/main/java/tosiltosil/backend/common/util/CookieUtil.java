@@ -34,7 +34,6 @@ public class CookieUtil {
     @Value("${jwt.cookie.same-site}")
     private String sameSite;
 
-
     public HttpHeaders generateAccessAndRefreshTokenCookies(String accessToken, String refreshToken) {
         ResponseCookie accessTokenCookie = generateCookie(accessCookieName, accessToken, accessTtl);
         ResponseCookie refreshTokenCookie = generateCookie(refreshCookieName, refreshToken, refreshTtl);

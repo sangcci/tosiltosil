@@ -1,0 +1,72 @@
+== 이메일 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:snippets: {snippets}
+
+=== 인증 이메일 전송
+
+인증 이메일 전송을 요청합니다.
+
+==== Request
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-response.adoc[]
+
+Response Fields
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/response-fields.adoc[]
+
+==== 잘못된 형식의 이메일 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/이메일_형식이_아닌_경우_실패/response-body.adoc[]
+
+==== 인증 목적 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/이메일_인증_목적이_SIGN_UP_혹은_FORGOT_PASSWORD이_아닌_경우_실패/response-body.adoc[]
+
+==== 이미 가입된 이메일로 회원가입용 인증 이메일 요청으로 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/가입된_이메일로_회원가입_인증_이메일_요청_시_실패/response-body.adoc[]
+
+==== 가입되지 않은 이메일로 비밀번호 찾기용 인증 이메일 요청으로 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/가입되지_않은_이메일로_비밀번호_찾기_인증_이메일_요청_시_실패/response-body.adoc[]
+
+==== 이메일 전송 및 인증번호 검증 시도 횟수 초과로 이메일 전송 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/이메일_전송_및_인증_시도_횟수_초과로_이메일_전송_실패/response-body.adoc[]
+
+=== 인증번호 검증
+
+사용자가 입력한 인증번호가 일치하는지 검증합니다.
+
+==== Request
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/http-response.adoc[]
+
+==== 잘못된 형식의 인증번호 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/잘못된_형식의_인증_번호에_검증_실패/response-body.adoc[]
+
+==== 올바르지 않은 인증번호로 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/잘못된_인증_번호에_검증_실패/response-body.adoc[]
+
+==== 이메일 인증번호 검증 시도 횟수 초과로 인증번호 검증 실패 (400)
+
+include::{snippets}/email-controller-rest-docs-test/이메일_인증_시도_횟수_초과로_인증번호_검증_실패/response-body.adoc[]
+
+==== 인증번호 만료 및 Redis 데이터가 존재하지 않아 인증번호 검증 실패 (404)
+
+include::{snippets}/email-controller-rest-docs-test/인증번호_유효_시간_만료_및_Redis_데이터가_존재하지않아_검증_실패/response-body.adoc[]

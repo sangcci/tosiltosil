@@ -7,7 +7,7 @@ public record TemporaryTokenInfo(
         String token
 ) {
     public static TemporaryTokenInfo from(String token, Claims claims) {
-        String email = claims.get("email", String.class);
+        String email = claims.getSubject();
         return new TemporaryTokenInfo(email, token);
     }
 }
