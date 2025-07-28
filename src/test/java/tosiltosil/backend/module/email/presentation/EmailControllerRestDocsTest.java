@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
+import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.module.email.application.EmailService;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
@@ -416,6 +417,40 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                                         "reason": "금일 총 1회 틀렸습니다. 하루 최대 5회까지 가능합니다."
                                     }
                                 ]
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
+
+    @Test
+    void 인증번호_유효_시간_만료_및_Redis_데이터가_존재하지않아_검증_실패() {
+        // given
+        String request = """
+                {
+                    "email": "test@example.com",
+                    "authNumber": "125526"
+                }
+                """;
+
+        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+                .willThrow(new NotFoundException("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다."));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/auth/email/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 404,
+                                "message": "인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다.",
+                                "errors": []
                             }
                         """);
 

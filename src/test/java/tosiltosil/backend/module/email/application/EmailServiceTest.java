@@ -9,6 +9,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
+import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
 import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
@@ -172,5 +173,19 @@ class EmailServiceTest extends IntegrationTestSupport {
         assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("일일 이메일 인증 횟수를 초과하였습니다.");
+    }
+
+    @Test
+    void 인증번호_유효_시간_만료_및_Redis_데이터가_존재하지않아_검증_실패() {
+        // given
+        String authNumber = "123456";
+        EmailAuthRequest request = new EmailAuthRequest(email, authNumber);
+
+        // when & then
+        assertThat(authNumberRedisRepository.get(email)).isEmpty();
+
+        assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다.");
     }
 }

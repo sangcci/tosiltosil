@@ -156,7 +156,7 @@ public class EmailService {
 
     private void validateAuthNumber(String email, String authNumber, int authFailCount) {
         String savedAuthNumber = authNumberRedisRepository.get(email)
-                .orElseThrow(() -> new NotFoundException("인증번호 데이터를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
             int failCount = increaseAuthFailCount(email);
