@@ -41,11 +41,13 @@ public class StopwatchService {
         Duration todayDuration = durationService.getTodayDuration(memberId);
 
         // 사용자 스탑워치 활성 상태로 변경
-        stopwatchRepository.findStopwatchActivityByMemberId(memberId)
-                .ifPresentOrElse(
-                        StopwatchActivity::changeToActive,
-                        () -> log.warn("사용자의 Stopwatch Activity 데이터가 존재하지 않습니다. memberId: {}", memberId)
-                );
+        StopwatchActivity stopwatchActivity = stopwatchRepository.findStopwatchActivityByMemberId(memberId)
+                .orElseGet(() -> {
+                    log.warn("사용자의 Stopwatch Activity 데이터가 존재하지 않아 자동 생성합니다. 회원가입이 정상적으로 이루어졌는지 확인해주세요");
+                    return StopwatchActivity.of(memberId);
+                });
+        stopwatchActivity.changeToActive();
+        stopwatchRepository.saveStopwatchActivity(stopwatchActivity);
 
         // 스탑워치 시작 메세지 전송
         Events.raise(
@@ -69,11 +71,13 @@ public class StopwatchService {
         Duration updatedTodayDuration = durationService.updateTodayDuration(memberId, stopwatch.getDuration());
 
         // 사용자 스탑워치 비활성 상태로 변경
-        stopwatchRepository.findStopwatchActivityByMemberId(memberId)
-                .ifPresentOrElse(
-                        StopwatchActivity::changeToInactive,
-                        () -> log.warn("사용자의 Stopwatch Activity 데이터가 존재하지 않습니다. memberId: {}", memberId)
-                );
+        StopwatchActivity stopwatchActivity = stopwatchRepository.findStopwatchActivityByMemberId(memberId)
+                .orElseGet(() -> {
+                    log.warn("사용자의 Stopwatch Activity 데이터가 존재하지 않아 자동 생성합니다. 회원가입이 정상적으로 이루어졌는지 확인해주세요");
+                    return StopwatchActivity.of(memberId);
+                });
+        stopwatchActivity.changeToInactive();
+        stopwatchRepository.saveStopwatchActivity(stopwatchActivity);
 
         // 스탑워치 정지 메세지 전송 + 목표 진행 시간 업데이트
         Events.raise(
