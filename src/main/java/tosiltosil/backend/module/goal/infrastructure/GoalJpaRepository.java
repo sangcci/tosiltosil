@@ -20,4 +20,6 @@ public interface GoalJpaRepository extends JpaRepository<Goal, Long> {
 
     @Query("SELECT MAX(g.orderIndex) FROM Goal g WHERE g.memberId = :memberId AND g.date = :date")
     Optional<BigDecimal> findMaxOrderIndexByMemberIdAndDate(@Param("memberId") UUID memberId, @Param("date") LocalDate date);
+
+    void deleteAllByMemberIdAndCategoryId(UUID memberId, Long categoryId);
 }

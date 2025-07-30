@@ -65,4 +65,9 @@ public class GoalRepositoryImpl implements GoalRepository {
     public void delete(final Goal goal) {
         goalJpaRepository.delete(goal);
     }
+
+    @Override
+    public void deleteAllByMemberIdAndCategoryId(UUID memberId, Long categoryId) {
+        goalJpaRepository.deleteAllByMemberIdAndCategoryId(memberId, categoryId);
+    }
 }

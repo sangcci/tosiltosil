@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
@@ -23,5 +24,11 @@ public class GoalEventHandler {
 
         Duration addedDuration = Duration.between(event.startTime(), event.endTime());
         goal.addDuration(addedDuration);
+    }
+    
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleCategoryDeletedEvent(final CategoryDeletedEvent event) {
+        // 카테고리에 속한 목표 모두 삭제
+        goalRepository.deleteAllByMemberIdAndCategoryId(event.memberId(), event.categoryId());
     }
 }

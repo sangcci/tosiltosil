@@ -49,6 +49,18 @@ public class GoalService {
     }
 
     @Transactional
+    public Duration getGoalTotalDuration(
+            final UUID memberId,
+            final Long categoryId
+    ) {
+        List<Goal> goalsToDelete = goalRepository.findTotalGoals(memberId, categoryId);
+
+        return goalsToDelete.stream()
+                .map(Goal::getDuration)
+                .reduce(Duration.ZERO, Duration::plus);
+    }
+
+    @Transactional
     public GoalIdsResponse createGoal(
             final UUID memberId,
             final GoalCreateRequest request
@@ -151,19 +163,6 @@ public class GoalService {
         );
 
         return GoalIdResponse.of(goal.getId());
-    }
-
-    @Transactional
-    public Duration deleteGoalsAndCalculateTotalDuration(final UUID memberId, final Long categoryId) {
-        List<Goal> goalsToDelete = goalRepository.findTotalGoals(memberId, categoryId);
-
-        Duration totalDuration = goalsToDelete.stream()
-                .map(Goal::getDuration)
-                .reduce(Duration.ZERO, Duration::plus);
-
-        goalsToDelete.forEach(goalRepository::delete);
-
-        return totalDuration;
     }
 
     @Transactional
