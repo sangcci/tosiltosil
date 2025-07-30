@@ -21,6 +21,7 @@ import tosiltosil.backend.common.domain.holder.TestTimeHolder;
 import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
+import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -86,10 +87,10 @@ class GoalDomainServiceTest {
     }
 
     @Test
-    void 목표_달성률_계산_시_총_시간이_0이면_0_반환() {
+    void 목표_달성률_계산_시_완료된_목표가_없으면_0_반환() {
         // given
         UUID memberId = UUID.randomUUID();
-        Goal goal = createGoal(memberId, Duration.ZERO, Duration.ofHours(1));
+        Goal goal = createGoalWithStatus(memberId, GoalStatus.BEFORE_STARTING);
         when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(goal));
 
         // when
@@ -103,8 +104,10 @@ class GoalDomainServiceTest {
     void 목표_달성률_계산_시_소수점_내림하여_반환() {
         // given
         UUID memberId = UUID.randomUUID();
-        Goal goal = createGoal(memberId, Duration.ofHours(3), Duration.ofHours(1));
-        when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(goal));
+        Goal completedGoal = createGoalWithStatus(memberId, GoalStatus.COMPLETED);
+        Goal runningGoal = createGoalWithStatus(memberId, GoalStatus.RUNNING);
+        Goal beforeStartGoal = createGoalWithStatus(memberId, GoalStatus.BEFORE_STARTING);
+        when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(completedGoal, runningGoal, beforeStartGoal));
 
         // when
         BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
@@ -114,11 +117,12 @@ class GoalDomainServiceTest {
     }
 
     @Test
-    void 목표_달성률_계산_시_목표_시간을_초과했으면_100_반환() {
+    void 목표_달성률_계산_시_모든_목표가_완료되면_100_반환() {
         // given
         UUID memberId = UUID.randomUUID();
-        Goal goal = createGoal(memberId, Duration.ofHours(1), Duration.ofHours(2));
-        when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(goal));
+        Goal completedGoal1 = createGoalWithStatus(memberId, GoalStatus.COMPLETED);
+        Goal completedGoal2 = createGoalWithStatus(memberId, GoalStatus.COMPLETED);
+        when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(completedGoal1, completedGoal2));
 
         // when
         BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
@@ -127,13 +131,29 @@ class GoalDomainServiceTest {
         assertThat(percentage).isEqualTo(new BigDecimal("100"));
     }
 
-    private Goal createGoal(final UUID memberId, final Duration totalTime, final Duration duration) {
+    @Test
+    void 목표_달성률_계산_시_목표_2개_중_1개_완료하면_50_반환() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal completedGoal = createGoalWithStatus(memberId, GoalStatus.COMPLETED);
+        Goal runningGoal = createGoalWithStatus(memberId, GoalStatus.RUNNING);
+        when(goalRepository.findTodayGoals(memberId)).thenReturn(List.of(completedGoal, runningGoal));
+
+        // when
+        BigDecimal percentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
+
+        // then
+        assertThat(percentage).isEqualTo(new BigDecimal("50"));
+    }
+
+    private Goal createGoalWithStatus(final UUID memberId, final GoalStatus status) {
         return Goal.builder()
                 .memberId(memberId)
                 .categoryId(1L)
                 .title("테스트 목표")
-                .totalTime(totalTime)
-                .duration(duration)
+                .totalTime(Duration.ofHours(1))
+                .status(status)
+                .duration(Duration.ZERO)
                 .orderIndex(BigDecimal.ONE)
                 .iconId(1L)
                 .date(LocalDate.of(2025, 7, 8))
