@@ -29,7 +29,7 @@ class GoalTest {
     }
 
     @Test
-    void BEFORE_STARTING_상태에서_시작_상태로_변경한다() {
+    void 목표가_시작_전일_때_시작_상태로_변경한다() {
         // given
         UUID memberId = UUID.randomUUID();
         Goal goal = createGoalWithStatus(memberId, GoalStatus.BEFORE_STARTING);
@@ -42,57 +42,69 @@ class GoalTest {
     }
 
     @Test
-    void PAUSED_상태에서_시작_상태로_변경한다() {
+    void 정지_상태에서_시작_상태로_변경한다() {
         // given
         UUID memberId = UUID.randomUUID();
         Goal goal = createGoalWithStatus(memberId, GoalStatus.PAUSED);
-        
+
         // when
         goal.changeStatusToStarted();
-        
+
         // then
         assertThat(goal.getStatus()).isEqualTo(GoalStatus.RUNNING);
     }
 
     @Test
-    void RUNNING_상태에서_시작_상태로_변경하면_예외가_발생한다() {
+    void 목표가_진행_중일_때_시작_상태로_변경하면_예외가_발생한다() {
         // given
         UUID memberId = UUID.randomUUID();
         Goal goal = createGoalWithStatus(memberId, GoalStatus.RUNNING);
-        
+
         // when & then
         assertThatThrownBy(goal::changeStatusToStarted)
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
+                .hasMessage("스톱워치가 이미 실행중입니다.");
     }
 
     @Test
-    void COMPLETED_상태에서_시작_상태로_변경하면_예외가_발생한다() {
+    void 완료된_목표를_시작_상태로_변경하면_예외가_발생한다() {
         // given
         UUID memberId = UUID.randomUUID();
         Goal goal = createGoalWithStatus(memberId, GoalStatus.COMPLETED);
-        
+
         // when & then
         assertThatThrownBy(goal::changeStatusToStarted)
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("스톱워치가 이미 실행되거나 기간이 지난 상태입니다.");
+                .hasMessage("이미 완료된 목표입니다.");
     }
 
     @Test
-    void RUNNING_상태에서_일시정지_상태로_변경한다() {
+    void 실패한_목표를_시작_상태로_변경하면_예외가_발생한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal goal = createGoalWithStatus(memberId, GoalStatus.FAILED);
+
+        // when & then
+        assertThatThrownBy(goal::changeStatusToStarted)
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("기간이 지나 실패한 목표입니다.");
+    }
+
+    @Test
+    void 목표가_진행_중일_때_정지_상태로_변경한다() {
         // given
         UUID memberId = UUID.randomUUID();
         Goal goal = createGoalWithStatus(memberId, GoalStatus.RUNNING);
-        
+
         // when
         goal.changeStatusToPaused();
-        
+
         // then
         assertThat(goal.getStatus()).isEqualTo(GoalStatus.PAUSED);
     }
 
     @Test
-    void BEFORE_STARTING_상태에서_일시정지_상태로_변경하면_예외가_발생한다() {
+    void 목표가_시작_전일_때_정지_상태로_변경하면_예외가_발생한다() {
         // given
         UUID memberId = UUID.randomUUID();
         Goal goal = createGoalWithStatus(memberId, GoalStatus.BEFORE_STARTING);
@@ -104,7 +116,7 @@ class GoalTest {
     }
 
     @Test
-    void PAUSED_상태에서_일시정지_상태로_변경하면_예외가_발생한다() {
+    void 정지_상태에서_정지_상태로_변경하면_예외가_발생한다() {
         // given
         UUID memberId = UUID.randomUUID();
         Goal goal = createGoalWithStatus(memberId, GoalStatus.PAUSED);
@@ -113,6 +125,70 @@ class GoalTest {
         assertThatThrownBy(goal::changeStatusToPaused)
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("스톱워치가 이미 정지되었습니다.");
+    }
+
+    @Test
+    void 완료된_목표를_정지_상태로_변경하면_예외가_발생한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal goal = createGoalWithStatus(memberId, GoalStatus.COMPLETED);
+        
+        // when & then
+        assertThatThrownBy(goal::changeStatusToPaused)
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("이미 완료된 목표입니다.");
+    }
+
+    @Test
+    void 실패한_목표를_정지_상태로_변경하면_예외가_발생한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal goal = createGoalWithStatus(memberId, GoalStatus.FAILED);
+        
+        // when & then
+        assertThatThrownBy(goal::changeStatusToPaused)
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("기간이 지나 실패한 목표입니다.");
+    }
+
+    @Test
+    void 목표의_진행_시간이_총_시간보다_크거나_같으면_완료_상태로_변경한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal goal = createGoalWithDuration(memberId, Duration.ofHours(2), Duration.ofHours(2));
+        
+        // when
+        goal.changeStatusToCompleted();
+        
+        // then
+        assertThat(goal.getStatus()).isEqualTo(GoalStatus.COMPLETED);
+    }
+
+    @Test
+    void 목표의_진행_시간이_총_시간보다_많아도_완료_상태로_변경한다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        Goal goal = createGoalWithDuration(memberId, Duration.ofHours(2), Duration.ofHours(3));
+        
+        // when
+        goal.changeStatusToCompleted();
+        
+        // then
+        assertThat(goal.getStatus()).isEqualTo(GoalStatus.COMPLETED);
+    }
+
+    @Test
+    void 목표의_진행_시간이_총_시간보다_적으면_완료_상태로_변경되지_않는다() {
+        // given
+        UUID memberId = UUID.randomUUID();
+        GoalStatus originalStatus = GoalStatus.RUNNING;
+        Goal goal = createGoalWithDuration(memberId, Duration.ofHours(2), Duration.ofMinutes(30));
+        
+        // when
+        goal.changeStatusToCompleted();
+        
+        // then
+        assertThat(goal.getStatus()).isEqualTo(originalStatus);
     }
 
     private Goal createGoalWithStatus(UUID memberId, GoalStatus status) {
@@ -123,6 +199,20 @@ class GoalTest {
                 .totalTime(Duration.ofHours(2))
                 .status(status)
                 .duration(Duration.ZERO)
+                .orderIndex(BigDecimal.valueOf(100000.0))
+                .iconId(1L)
+                .date(LocalDate.now())
+                .build();
+    }
+
+    private Goal createGoalWithDuration(UUID memberId, Duration totalTime, Duration duration) {
+        return Goal.builder()
+                .memberId(memberId)
+                .categoryId(1L)
+                .title("Test Goal")
+                .totalTime(totalTime)
+                .status(GoalStatus.RUNNING)
+                .duration(duration)
                 .orderIndex(BigDecimal.valueOf(100000.0))
                 .iconId(1L)
                 .date(LocalDate.now())

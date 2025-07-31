@@ -3,6 +3,7 @@ package tosiltosil.backend.module.stopwatch.application;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
@@ -10,10 +11,12 @@ import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.duration.application.DurationService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.stopwatch.domain.Stopwatch;
+import tosiltosil.backend.module.stopwatch.domain.StopwatchActivity;
 import tosiltosil.backend.module.stopwatch.domain.StopwatchRepository;
 import tosiltosil.backend.module.stopwatch.domain.event.StopwatchPausedEvent;
 import tosiltosil.backend.module.stopwatch.domain.event.StopwatchStartedEvent;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -37,7 +40,16 @@ public class StopwatchService {
         // 오늘 총 진행 시간 가져오기 - 방금 시작된 스톱워치 시간은 제외
         Duration todayDuration = durationService.getTodayDuration(memberId);
 
-        // 스탑워치 정지 메세지 전송
+        // 사용자 스탑워치 활성 상태로 변경
+        StopwatchActivity stopwatchActivity = stopwatchRepository.findStopwatchActivityByMemberId(memberId)
+                .orElseGet(() -> {
+                    log.warn("사용자의 Stopwatch Activity 데이터가 존재하지 않아 자동 생성합니다. 회원가입이 정상적으로 이루어졌는지 확인해주세요");
+                    return StopwatchActivity.of(memberId);
+                });
+        stopwatchActivity.changeToActive();
+        stopwatchRepository.saveStopwatchActivity(stopwatchActivity);
+
+        // 스탑워치 시작 메세지 전송
         Events.raise(
                 StopwatchStartedEvent.of(memberId, stopwatch, todayDuration)
         );
@@ -57,6 +69,15 @@ public class StopwatchService {
 
         // 오늘 총 진행 시간 업데이트
         Duration updatedTodayDuration = durationService.updateTodayDuration(memberId, stopwatch.getDuration());
+
+        // 사용자 스탑워치 비활성 상태로 변경
+        StopwatchActivity stopwatchActivity = stopwatchRepository.findStopwatchActivityByMemberId(memberId)
+                .orElseGet(() -> {
+                    log.warn("사용자의 Stopwatch Activity 데이터가 존재하지 않아 자동 생성합니다. 회원가입이 정상적으로 이루어졌는지 확인해주세요");
+                    return StopwatchActivity.of(memberId);
+                });
+        stopwatchActivity.changeToInactive();
+        stopwatchRepository.saveStopwatchActivity(stopwatchActivity);
 
         // 스탑워치 정지 메세지 전송 + 목표 진행 시간 업데이트
         Events.raise(

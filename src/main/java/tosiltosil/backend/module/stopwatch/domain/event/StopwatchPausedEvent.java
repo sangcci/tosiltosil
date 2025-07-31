@@ -11,14 +11,14 @@ public record StopwatchPausedEvent(
         String type,
         LocalDateTime startTime,
         LocalDateTime endTime,
-        Duration totalTime
+        Duration todayDuration
 ) {
 
     public static StopwatchPausedEvent of(
             final UUID memberId,
             final Long goalId,
             final Stopwatch stopwatch,
-            final Duration totalTime
+            final Duration todayDuration
     ) {
         return new StopwatchPausedEvent(
                 memberId,
@@ -26,7 +26,7 @@ public record StopwatchPausedEvent(
                 "PAUSED",
                 stopwatch.getStartedAt(),
                 stopwatch.getEndedAt(),
-                totalTime
+                todayDuration
         );
     }
 }
