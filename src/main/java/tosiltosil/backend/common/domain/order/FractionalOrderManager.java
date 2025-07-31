@@ -79,6 +79,22 @@ public class FractionalOrderManager implements OrderManager {
         }
 
         // prevOrderIndex와 nextOrderIndex 계산
+        IndexBoundary boundary = calculateBoundaryIndexes(entities, targetPosition);
+
+        // 인덱스 재정렬이 필요한지 확인
+        if (!validateIndexBounds(boundary.prevOrderIndex(), boundary.nextOrderIndex())) {
+            renewOrderIndexes(entities);
+            // 재정렬 후 다시 인덱스 계산
+            boundary = calculateBoundaryIndexes(entities, targetPosition);
+        }
+
+        return generateOrderIndexBetween(boundary.prevOrderIndex(), boundary.nextOrderIndex());
+    }
+
+    private <T extends Orderable> IndexBoundary calculateBoundaryIndexes(
+            final List<T> entities,
+            final int targetPosition
+    ) {
         BigDecimal prevOrderIndex = null;
         BigDecimal nextOrderIndex = null;
 
@@ -89,24 +105,10 @@ public class FractionalOrderManager implements OrderManager {
             nextOrderIndex = entities.get(targetPosition - 1).getOrderIndex();
         }
 
-        // 인덱스 재정렬이 필요한지 확인
-        if (!validateIndexBounds(prevOrderIndex, nextOrderIndex)) {
-            renewOrderIndexes(entities);
-            // 재정렬 후 다시 인덱스 계산
-            if (targetPosition > 1) {
-                prevOrderIndex = entities.get(targetPosition - 2).getOrderIndex();
-            } else {
-                prevOrderIndex = null;
-            }
-            if (targetPosition <= entities.size()) {
-                nextOrderIndex = entities.get(targetPosition - 1).getOrderIndex();
-            } else {
-                nextOrderIndex = null;
-            }
-        }
-
-        return generateOrderIndexBetween(prevOrderIndex, nextOrderIndex);
+        return new IndexBoundary(prevOrderIndex, nextOrderIndex);
     }
+
+    private record IndexBoundary(BigDecimal prevOrderIndex, BigDecimal nextOrderIndex) {}
 
     @Override
     public List<BigDecimal> generateSequentialOrderIndexes(final BigDecimal lastOrderIndex, final int count) {

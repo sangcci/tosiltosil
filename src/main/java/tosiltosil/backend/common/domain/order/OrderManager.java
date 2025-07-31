@@ -24,7 +24,6 @@ public interface OrderManager {
 
     /**
      * 순서 INDEX가 넘지 않았는지 확인하는 메서드입니다.
-     *
      * 만일 순서를 넘었다면 {@link FractionalOrderManager} 순서 재정렬 메서드를 반드시 거쳐야 합니다.
      *
      * @param prevIndex 검증할 이전 인덱스
