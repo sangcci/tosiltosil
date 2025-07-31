@@ -2,8 +2,10 @@ package tosiltosil.backend.common.domain.order;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 
 @Component
 public class FractionalOrderManager implements OrderManager {
@@ -64,6 +66,63 @@ public class FractionalOrderManager implements OrderManager {
         }
 
         return entities;
+    }
+
+    @Override
+    public <T extends Orderable> BigDecimal calculateOrderIndexForPosition(
+            final List<T> entities,
+            final int targetPosition
+    ) {
+        // targetPosition이 유효한 범위인지 확인
+        if (targetPosition < 1 || targetPosition > entities.size()) {
+            throw new BadRequestException("타겟 포지션 정보가 올바르지 않습니다.");
+        }
+
+        // prevOrderIndex와 nextOrderIndex 계산
+        BigDecimal prevOrderIndex = null;
+        BigDecimal nextOrderIndex = null;
+
+        if (targetPosition > 1) {
+            prevOrderIndex = entities.get(targetPosition - 2).getOrderIndex();
+        }
+        if (targetPosition <= entities.size()) {
+            nextOrderIndex = entities.get(targetPosition - 1).getOrderIndex();
+        }
+
+        // 인덱스 재정렬이 필요한지 확인
+        if (!validateIndexBounds(prevOrderIndex, nextOrderIndex)) {
+            renewOrderIndexes(entities);
+            // 재정렬 후 다시 인덱스 계산
+            if (targetPosition > 1) {
+                prevOrderIndex = entities.get(targetPosition - 2).getOrderIndex();
+            } else {
+                prevOrderIndex = null;
+            }
+            if (targetPosition <= entities.size()) {
+                nextOrderIndex = entities.get(targetPosition - 1).getOrderIndex();
+            } else {
+                nextOrderIndex = null;
+            }
+        }
+
+        return generateOrderIndexBetween(prevOrderIndex, nextOrderIndex);
+    }
+
+    @Override
+    public List<BigDecimal> generateSequentialOrderIndexes(final BigDecimal lastOrderIndex, final int count) {
+        if (count <= 0) {
+            return List.of();
+        }
+
+        List<BigDecimal> indexes = new ArrayList<>();
+        BigDecimal currentIndex = lastOrderIndex != null ? lastOrderIndex : generateInitialOrderIndex();
+
+        for (int i = 0; i < count; i++) {
+            currentIndex = generateOrderIndexBetween(currentIndex, null);
+            indexes.add(currentIndex);
+        }
+
+        return indexes;
     }
 
     private BigDecimal getIndexBefore(final BigDecimal nextIndex) {

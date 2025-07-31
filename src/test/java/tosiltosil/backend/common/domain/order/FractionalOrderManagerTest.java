@@ -1,11 +1,13 @@
 package tosiltosil.backend.common.domain.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import tosiltosil.backend.common.domain.exception.BadRequestException;
 
 @SuppressWarnings("NonAsciiCharacters")
 public class FractionalOrderManagerTest {
@@ -151,6 +153,166 @@ public class FractionalOrderManagerTest {
 
         // when
         List<TestOrderableEntity> result = fractionalOrderManager.renewOrderIndexes(entities);
+
+        // then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void 첫번째_위치로_순서_변경() {
+        // given
+        TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1024));
+        TestOrderableEntity entity2 = new TestOrderableEntity(BigDecimal.valueOf(2048));
+        TestOrderableEntity entity3 = new TestOrderableEntity(BigDecimal.valueOf(3072));
+        List<TestOrderableEntity> entities = List.of(entity1, entity2, entity3);
+
+        // when
+        BigDecimal result = fractionalOrderManager.calculateOrderIndexForPosition(entities, 1);
+
+        // then
+        assertThat(result).isEqualTo(BigDecimal.valueOf(512)); // 1024 / 2 = 512
+    }
+
+    @Test
+    void 중간_위치로_순서_변경() {
+        // given
+        TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1024));
+        TestOrderableEntity entity2 = new TestOrderableEntity(BigDecimal.valueOf(2048));
+        TestOrderableEntity entity3 = new TestOrderableEntity(BigDecimal.valueOf(3072));
+        List<TestOrderableEntity> entities = List.of(entity1, entity2, entity3);
+
+        // when
+        BigDecimal result = fractionalOrderManager.calculateOrderIndexForPosition(entities, 2);
+
+        // then
+        assertThat(result).isEqualTo(BigDecimal.valueOf(1536)); // (1024 + 2048) / 2 = 1536
+    }
+
+    @Test
+    void 마지막_위치로_순서_변경() {
+        // given
+        TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1024));
+        TestOrderableEntity entity2 = new TestOrderableEntity(BigDecimal.valueOf(2048));
+        TestOrderableEntity entity3 = new TestOrderableEntity(BigDecimal.valueOf(3072));
+        List<TestOrderableEntity> entities = List.of(entity1, entity2, entity3);
+
+        // when
+        BigDecimal result = fractionalOrderManager.calculateOrderIndexForPosition(entities, 3);
+
+        // then
+        assertThat(result).isEqualTo(BigDecimal.valueOf(2560)); // (2048 + 3072) / 2 = 2560
+    }
+
+    @Test
+    void 마지막_다음_위치로_순서_변경() {
+        // given
+        TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1024));
+        TestOrderableEntity entity2 = new TestOrderableEntity(BigDecimal.valueOf(2048));
+        List<TestOrderableEntity> entities = List.of(entity1, entity2);
+
+        // when
+        BigDecimal result = fractionalOrderManager.calculateOrderIndexForPosition(entities, 2);
+
+        // then
+        assertThat(result).isEqualTo(BigDecimal.valueOf(1536)); // (1024 + 2048) / 2 = 1536
+    }
+
+    @Test
+    void 잘못된_위치_범위인_경우_예외_발생() {
+        // given
+        TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1024));
+        List<TestOrderableEntity> entities = List.of(entity1);
+
+        // when & then
+        assertThatThrownBy(() -> fractionalOrderManager.calculateOrderIndexForPosition(entities, 0))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("타겟 포지션 정보가 올바르지 않습니다.");
+
+        assertThatThrownBy(() -> fractionalOrderManager.calculateOrderIndexForPosition(entities, 2))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("타겟 포지션 정보가 올바르지 않습니다.");
+    }
+
+    @Test
+    void 단일_엔티티_순서_변경() {
+        // given
+        TestOrderableEntity entity1 = new TestOrderableEntity(BigDecimal.valueOf(1024));
+        List<TestOrderableEntity> entities = List.of(entity1);
+
+        // when
+        BigDecimal result = fractionalOrderManager.calculateOrderIndexForPosition(entities, 1);
+
+        // then
+        assertThat(result).isEqualTo(BigDecimal.valueOf(512)); // 1024 / 2 = 512
+    }
+
+    @Test
+    void 연속적인_순서_인덱스_생성_첫번째_인덱스_없는_경우() {
+        // given
+        BigDecimal lastOrderIndex = null;
+        int count = 3;
+
+        // when
+        List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(lastOrderIndex, count);
+
+        // then
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isEqualTo(BigDecimal.valueOf(2048)); // 1024 + 1024
+        assertThat(result.get(1)).isEqualTo(BigDecimal.valueOf(3072)); // 2048 + 1024
+        assertThat(result.get(2)).isEqualTo(BigDecimal.valueOf(4096)); // 3072 + 1024
+    }
+
+    @Test
+    void 연속적인_순서_인덱스_생성_기존_인덱스_이후() {
+        // given
+        BigDecimal lastOrderIndex = BigDecimal.valueOf(1024);
+        int count = 3;
+
+        // when
+        List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(lastOrderIndex, count);
+
+        // then
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).isEqualTo(BigDecimal.valueOf(2048)); // 1024 + 1024
+        assertThat(result.get(1)).isEqualTo(BigDecimal.valueOf(3072)); // 2048 + 1024
+        assertThat(result.get(2)).isEqualTo(BigDecimal.valueOf(4096)); // 3072 + 1024
+    }
+
+    @Test
+    void 연속적인_순서_인덱스_생성_단일_개수() {
+        // given
+        BigDecimal lastOrderIndex = BigDecimal.valueOf(2048);
+        int count = 1;
+
+        // when
+        List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(lastOrderIndex, count);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isEqualTo(BigDecimal.valueOf(3072)); // 2048 + 1024
+    }
+
+    @Test
+    void 연속적인_순서_인덱스_생성_개수가_0인_경우() {
+        // given
+        BigDecimal lastOrderIndex = BigDecimal.valueOf(1024);
+        int count = 0;
+
+        // when
+        List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(lastOrderIndex, count);
+
+        // then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void 연속적인_순서_인덱스_생성_음수_개수인_경우() {
+        // given
+        BigDecimal lastOrderIndex = BigDecimal.valueOf(1024);
+        int count = -1;
+
+        // when
+        List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(lastOrderIndex, count);
 
         // then
         assertThat(result).isEmpty();
