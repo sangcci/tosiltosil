@@ -53,9 +53,9 @@ public class GoalService {
             final UUID memberId,
             final Long categoryId
     ) {
-        List<Goal> goalsToDelete = goalRepository.findTotalGoals(memberId, categoryId);
+        List<Goal> goals = goalRepository.findTotalGoals(memberId, categoryId);
 
-        return goalsToDelete.stream()
+        return goals.stream()
                 .map(Goal::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);
     }
