@@ -54,12 +54,12 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         DayGoalsResponse response = new DayGoalsResponse(
                 BigDecimal.valueOf(42),
                 List.of(
-                        new GoalListPerCategoryResponse(1L, "운동", CategoryColor.RED, BigDecimal.valueOf(1024), List.of(
-                                new GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S", BigDecimal.valueOf(1024)),
-                                new GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M", BigDecimal.valueOf(2048))
+                        new GoalListPerCategoryResponse(1L, "운동", CategoryColor.RED, List.of(
+                                new GoalListResponse(1L, 1L, 1L, "운동하기", GoalStatus.BEFORE_STARTING, "PT2H", "PT0S"),
+                                new GoalListResponse(2L, 1L, 2L, "독서하기", GoalStatus.RUNNING, "PT1H30M", "PT30M")
                         )),
-                        new GoalListPerCategoryResponse(2L, "공부", CategoryColor.ORANGE, BigDecimal.valueOf(2048), List.of(
-                                new GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M", BigDecimal.valueOf(3072))
+                        new GoalListPerCategoryResponse(2L, "공부", CategoryColor.ORANGE, List.of(
+                                new GoalListResponse(3L, 2L, 3L, "코딩하기", GoalStatus.RUNNING, "PT3H", "PT1H15M")
                         ))
                 )
         );
@@ -86,7 +86,6 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                             "categoryId": 1,
                                             "categoryTitle": "운동",
                                             "categoryColor": "red",
-                                            "categoryOrderIndex": 1024,
                                             "goals": [
                                                 {
                                                     "goalId": 1,
@@ -95,8 +94,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                     "title": "운동하기",
                                                     "status": "시작 전",
                                                     "totalTime": "PT2H",
-                                                    "duration": "PT0S",
-                                                    "orderIndex": 1024
+                                                    "duration": "PT0S"
                                                 },
                                                 {
                                                     "goalId": 2,
@@ -105,8 +103,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                     "title": "독서하기",
                                                     "status": "진행 중",
                                                     "totalTime": "PT1H30M",
-                                                    "duration": "PT30M",
-                                                    "orderIndex": 2048
+                                                    "duration": "PT30M"
                                                 }
                                             ]
                                         },
@@ -114,7 +111,6 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                             "categoryId": 2,
                                             "categoryTitle": "공부",
                                             "categoryColor": "orange",
-                                            "categoryOrderIndex": 2048,
                                             "goals": [
                                                 {
                                                     "goalId": 3,
@@ -123,8 +119,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                                     "title": "코딩하기",
                                                     "status": "진행 중",
                                                     "totalTime": "PT3H",
-                                                    "duration": "PT1H15M",
-                                                    "orderIndex": 3072
+                                                    "duration": "PT1H15M"
                                                 }
                                             ]
                                         }
@@ -150,7 +145,6 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.categories[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data.categories[].categoryTitle", JsonFieldType.STRING, "카테고리 제목", "운동"),
                                 responseField("data.categories[].categoryColor", JsonFieldType.STRING, "카테고리 색상", "red"),
-                                responseField("data.categories[].categoryOrderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024"),
                                 responseField("data.categories[].goals", JsonFieldType.ARRAY, "카테고리에 속한 목표 목록", "[]"),
                                 responseField("data.categories[].goals[].goalId", JsonFieldType.NUMBER, "목표 ID", "1"),
                                 responseField("data.categories[].goals[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
@@ -158,8 +152,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data.categories[].goals[].title", JsonFieldType.STRING, "목표 제목", "운동하기"),
                                 responseField("data.categories[].goals[].status", JsonFieldType.STRING, "목표 상태 (시작 전, 진행 중, 완료, 실패)", "시작 전"),
                                 responseField("data.categories[].goals[].totalTime", JsonFieldType.STRING, "목표 총 시간 (ISO-8601 Duration 형식)", "PT2H"),
-                                responseField("data.categories[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S"),
-                                responseField("data.categories[].goals[].orderIndex", JsonFieldType.NUMBER, "목표 순서 인덱스", "1024")
+                                responseField("data.categories[].goals[].duration", JsonFieldType.STRING, "현재까지 진행된 시간 (ISO-8601 Duration 형식)", "PT0S")
                         )
                 ));
     }
