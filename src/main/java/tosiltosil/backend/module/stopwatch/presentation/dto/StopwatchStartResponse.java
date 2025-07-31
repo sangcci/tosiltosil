@@ -17,7 +17,7 @@ public record StopwatchStartResponse(
                 event.memberId(),
                 event.type(),
                 event.startTime(),
-                event.memberTodayDuration()
+                event.todayDuration()
         );
     }
 }
