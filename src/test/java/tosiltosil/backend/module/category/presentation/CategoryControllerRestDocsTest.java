@@ -10,7 +10,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -48,8 +47,8 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
     void 회원_카테고리_목록_조회() {
         // given
         List<CurrentCategoryListResponse> responses = List.of(
-                new CurrentCategoryListResponse(1L, "운동", CategoryColor.RED, BigDecimal.valueOf(1024)),
-                new CurrentCategoryListResponse(2L, "공부", CategoryColor.ORANGE, BigDecimal.valueOf(2048))
+                new CurrentCategoryListResponse(1L, "운동", CategoryColor.RED),
+                new CurrentCategoryListResponse(2L, "공부", CategoryColor.ORANGE)
         );
 
         given(categoryService.getCategoriesByMemberId(any(UUID.class)))
@@ -71,14 +70,12 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                     {
                                         "categoryId": 1,
                                         "title": "운동",
-                                        "color": "red",
-                                        "orderIndex": 1024
+                                        "color": "red"
                                     },
                                     {
                                         "categoryId": 2,
                                         "title": "공부",
-                                        "color": "orange",
-                                        "orderIndex": 2048
+                                        "color": "orange"
                                     }
                                 ]
                             }
@@ -92,8 +89,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data", JsonFieldType.ARRAY, "카테고리 목록", "[]"),
                                 responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data[].title", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상", "red"),
-                                responseField("data[].orderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024")
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상", "red")
                         )
                 ));
     }
