@@ -193,7 +193,7 @@ public class FractionalOrderManagerUnitTest {
             }
 
             @Test
-            void 타겟_포지션이_엔티티_사이즈보다_크면_예외를_발생시킨다() {
+            void 타겟_포지션이_엔티티_범위보다_크면_예외를_발생시킨다() {
                 // given
                 List<TestOrderableEntity> entities = List.of(
                         new TestOrderableEntity(BigDecimal.valueOf(1024)),
@@ -201,7 +201,7 @@ public class FractionalOrderManagerUnitTest {
                 );
 
                 // when & then
-                assertThatThrownBy(() -> fractionalOrderManager.calculateOrderIndexForPosition(entities, 3))
+                assertThatThrownBy(() -> fractionalOrderManager.calculateOrderIndexForPosition(entities, 4))
                         .isInstanceOf(BadRequestException.class)
                         .hasMessage("타겟 포지션 정보가 올바르지 않습니다.");
             }
