@@ -125,7 +125,7 @@ public class FractionalOrderManager implements OrderManager {
      * @throws BadRequestException 타겟 포지션이 유효하지 않은 경우
      */
     private <T extends Orderable> void validateTargetPosition(final List<T> entities, final int targetPosition) {
-        if (targetPosition < 1 || targetPosition > entities.size()) {
+        if (targetPosition < 1 || targetPosition > entities.size() + 1) {
             throw new BadRequestException("타겟 포지션 정보가 올바르지 않습니다.");
         }
     }
