@@ -15,7 +15,7 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 
 @SuppressWarnings("NonAsciiCharacters")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class FractionalOrderManagerTest {
+public class FractionalOrderManagerUnitTest {
 
     private final FractionalOrderManager fractionalOrderManager = new FractionalOrderManager();
 
