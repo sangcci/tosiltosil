@@ -62,10 +62,10 @@ public class CategoryService {
 
         // 순서 인덱스 생성
         BigDecimal lastOrderIndex = categoryRepository.findLastOrderIndex(memberId).orElse(null);
-        BigDecimal orderIndex = orderManager.generateOrderIndex(lastOrderIndex);
+        BigDecimal newOrderIndex = orderManager.generateOrderIndex(lastOrderIndex);
 
         // 엔티티 생성 후 저장
-        Category category = request.toEntity(memberId, orderIndex);
+        Category category = request.toEntity(memberId, newOrderIndex);
         Category savedCategory = categoryRepository.save(category);
 
         return CategoryResponse.of(savedCategory.getId());

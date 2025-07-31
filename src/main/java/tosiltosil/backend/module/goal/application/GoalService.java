@@ -73,7 +73,7 @@ public class GoalService {
 
         // 날짜에 맞는 순서 인덱스 생성
         BigDecimal lastOrderIndex = goalRepository.findLastOrderIndex(memberId).orElse(null);
-        List<BigDecimal> orderIndexes = orderManager.generateSequentialOrderIndexes(lastOrderIndex, request.dates().size());
+        List<BigDecimal> newOrderIndexes = orderManager.generateSequentialOrderIndexes(lastOrderIndex, request.dates().size());
 
         // 목표 생성 시 순서 인덱스 부여
         List<Goal> goals = IntStream.range(0, request.dates().size())
@@ -82,7 +82,7 @@ public class GoalService {
                         request.categoryId(),
                         request.title(),
                         Duration.parse(request.time()),
-                        orderIndexes.get(i),
+                        newOrderIndexes.get(i),
                         request.iconId(),
                         LocalDate.parse(request.dates().get(i))
                 ))
