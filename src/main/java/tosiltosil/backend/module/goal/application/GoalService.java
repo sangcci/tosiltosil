@@ -48,7 +48,7 @@ public class GoalService {
         return DayGoalsResponse.of(overallPercentage, categoryResponses);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Duration getGoalTotalDuration(
             final UUID memberId,
             final Long categoryId
