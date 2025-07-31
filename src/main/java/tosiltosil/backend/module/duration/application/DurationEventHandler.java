@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import tosiltosil.backend.module.category.domain.event.CategoryDeletedEvent;
+import tosiltosil.backend.module.goal.domain.event.GoalDeletedEvent;
 
 @Component
 @RequiredArgsConstructor
@@ -16,5 +17,10 @@ public class DurationEventHandler {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCategoryDeletedEvent(final CategoryDeletedEvent event) {
         durationService.subtractTodayDuration(event.memberId(), event.deletedTotalDuration());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleGoalDeletedEvent(final GoalDeletedEvent event) {
+        durationService.subtractTodayDuration(event.memberId(), event.deletedDuration());
     }
 }

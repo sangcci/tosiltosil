@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.domain.order.OrderManager;
+import tosiltosil.backend.common.messaging.Events;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
+import tosiltosil.backend.module.goal.domain.event.GoalDeletedEvent;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
@@ -44,6 +46,18 @@ public class GoalService {
         BigDecimal overallPercentage = goalDomainService.calculateGoalAchievedPercentage(memberId);
 
         return DayGoalsResponse.of(overallPercentage, categoryResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public Duration getGoalTotalDuration(
+            final UUID memberId,
+            final Long categoryId
+    ) {
+        List<Goal> goals = goalRepository.findTotalGoals(memberId, categoryId);
+
+        return goals.stream()
+                .map(Goal::getDuration)
+                .reduce(Duration.ZERO, Duration::plus);
     }
 
     @Transactional
@@ -140,21 +154,15 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
+        // 목표 삭제
         goalRepository.delete(goal);
+
+        // 사용자 목표 성취 시간 차감
+        Events.raise(
+                GoalDeletedEvent.of(memberId, goal.getDuration())
+        );
+
         return GoalIdResponse.of(goal.getId());
-    }
-
-    @Transactional
-    public Duration deleteGoalsAndCalculateTotalDuration(final UUID memberId, final Long categoryId) {
-        List<Goal> goalsToDelete = goalRepository.findTotalGoals(memberId, categoryId);
-
-        Duration totalDuration = goalsToDelete.stream()
-                .map(Goal::getDuration)
-                .reduce(Duration.ZERO, Duration::plus);
-
-        goalsToDelete.forEach(goalRepository::delete);
-
-        return totalDuration;
     }
 
     @Transactional

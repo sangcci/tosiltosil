@@ -117,16 +117,20 @@ public class CategoryService {
             final UUID memberId,
             final Long categoryId
     ) {
+        // 카테고리 본인 로직인지 확인
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        Duration deletedTotalDuration = goalService.deleteGoalsAndCalculateTotalDuration(memberId, categoryId);
+        // 카테고리 내 목표의 총 성취 시간 계산
+        Duration deletedTotalDuration = goalService.getGoalTotalDuration(memberId, categoryId);
 
+        // 카테고리에 속한 목표 전부 삭제(커밋 이전) + 사용자 목표 성취 시간 차감(커밋 이후)
+        Events.raise(
+                CategoryDeletedEvent.of(memberId, categoryId, deletedTotalDuration)
+        );
+
+        // 카테고리 삭제
         categoryRepository.delete(category);
-
-        if (deletedTotalDuration.compareTo(Duration.ZERO) > 0) {
-            Events.raise(CategoryDeletedEvent.of(memberId, deletedTotalDuration));
-        }
 
         return CategoryResponse.of(category.getId());
     }

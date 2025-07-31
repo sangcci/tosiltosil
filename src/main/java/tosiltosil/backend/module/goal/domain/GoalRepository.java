@@ -26,4 +26,6 @@ public interface GoalRepository {
     List<Goal> saveAll(List<Goal> goals);
 
     void delete(Goal goal);
+
+    void deleteAllByMemberIdAndCategoryId(UUID memberId, Long categoryId);
 }
