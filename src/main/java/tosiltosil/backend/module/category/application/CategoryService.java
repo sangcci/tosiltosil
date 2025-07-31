@@ -99,7 +99,7 @@ public class CategoryService {
         List<Category> categories = categoryRepository.findCurrentCategories(memberId);
 
         // OrderManager를 사용하여 새로운 순서 인덱스 계산
-        BigDecimal newOrderIndex = orderManager.calculateOrderIndexForPosition(categories, request.nextOrder());
+        BigDecimal newOrderIndex = orderManager.calculateOrderIndexForPosition(categories, request.targetPosition());
         category.updateOrderIndex(newOrderIndex);
 
         // 저장

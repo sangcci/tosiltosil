@@ -128,7 +128,7 @@ public class GoalService {
         List<Goal> goals = goalRepository.findTodayGoalsInCategory(memberId, goal.getCategoryId());
         
         // OrderManager를 사용하여 새로운 순서 인덱스 계산
-        BigDecimal newOrderIndex = orderManager.calculateOrderIndexForPosition(goals, request.nextOrder());
+        BigDecimal newOrderIndex = orderManager.calculateOrderIndexForPosition(goals, request.targetPosition());
         goal.updateOrderIndex(newOrderIndex);
 
         // 저장
