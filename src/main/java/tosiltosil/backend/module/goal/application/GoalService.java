@@ -3,9 +3,9 @@ package tosiltosil.backend.module.goal.application;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,37 +65,34 @@ public class GoalService {
             final UUID memberId,
             final GoalCreateRequest request
     ) {
+        // 날짜 검증
         request.dates().forEach(dateString -> {
             LocalDate date = LocalDate.parse(dateString);
             goalDomainService.validateGoalDate(date);
         });
 
-        // 마지막 저장된 Goal 순서 가져오기
-        BigDecimal lastOrderIndex = goalRepository.findLastOrderIndex(memberId)
-                .orElse(orderManager.generateInitialOrderIndex());
+        // 날짜에 맞는 순서 인덱스 생성
+        BigDecimal lastOrderIndex = goalRepository.findLastOrderIndex(memberId).orElse(null);
+        List<BigDecimal> orderIndexes = orderManager.generateSequentialOrderIndexes(lastOrderIndex, request.dates().size());
 
-        List<Goal> goals = new ArrayList<>();
-        for (String date : request.dates()) {
-            // 마지막 순서 불러오기
-            BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(lastOrderIndex, null);
-            Goal goal = Goal.of(
-                    memberId,
-                    request.categoryId(),
-                    request.title(),
-                    Duration.parse(request.time()),
-                    // 마지막 순서 다음으로 저장
-                    newOrderIndex,
-                    request.iconId(),
-                    LocalDate.parse(date)
-            );
-            goals.add(goal);
-            // lastOrderIndex 업데이트
-            lastOrderIndex = newOrderIndex;
-        }
+        // 목표 생성 시 순서 인덱스 부여
+        List<Goal> goals = IntStream.range(0, request.dates().size())
+                .mapToObj(i -> Goal.of(
+                        memberId,
+                        request.categoryId(),
+                        request.title(),
+                        Duration.parse(request.time()),
+                        orderIndexes.get(i),
+                        request.iconId(),
+                        LocalDate.parse(request.dates().get(i))
+                ))
+                .toList();
 
+        // 저장
         List<Long> savedGoalIds = goalRepository.saveAll(goals).stream()
                 .map(Goal::getId)
                 .toList();
+
         return GoalIdsResponse.of(savedGoalIds);
     }
 
@@ -123,27 +120,21 @@ public class GoalService {
             final Long goalId,
             final GoalOrderChangeRequest request
     ) {
+        // 목표 본인 것인지 검증
         Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException("목표가 존재하지 않습니다."));
         goal.validateIsMine(memberId);
 
-        if (!orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
-            renewOrderIndexes(memberId, goal.getCategoryId());
-        }
-
-        BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
-        goal.updateOrderIndex(newOrderIndex);
+        // 해당 카테고리의 오늘 목표들을 순서대로 가져오기
+        List<Goal> goals = goalRepository.findTodayGoalsInCategory(memberId, goal.getCategoryId());
         
+        // OrderManager를 사용하여 새로운 순서 인덱스 계산
+        BigDecimal newOrderIndex = orderManager.calculateOrderIndexForPosition(goals, request.nextOrder());
+        goal.updateOrderIndex(newOrderIndex);
+
+        // 저장
         goalRepository.save(goal);
 
         return GoalOrderChangeResponse.of(newOrderIndex);
-    }
-
-    private void renewOrderIndexes(final UUID memberId, final Long categoryId) {
-        List<Goal> goals = goalRepository.findTodayGoalsInCategory(memberId, categoryId);
-
-        List<Goal> renewedGoals = orderManager.renewOrderIndexes(goals);
-
-        goalRepository.saveAll(renewedGoals);
     }
 
     @Transactional
