@@ -18,7 +18,6 @@ import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
@@ -86,7 +85,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryOrderChangeResponse changeOrder(
+    public void changeOrder(
             final UUID memberId,
             final Long categoryId,
             final CategoryOrderChangeRequest request
@@ -104,8 +103,6 @@ public class CategoryService {
 
         // 저장
         categoryRepository.save(category);
-
-        return CategoryOrderChangeResponse.of(newOrderIndex);
     }
 
 

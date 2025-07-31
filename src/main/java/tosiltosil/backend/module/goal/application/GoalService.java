@@ -22,7 +22,6 @@ import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalListPerCategoryResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
-import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
 import tosiltosil.backend.module.goal.domain.service.GoalDomainService;
 
 @Service
@@ -115,7 +114,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalOrderChangeResponse changeOrder(
+    public void changeOrder(
             final UUID memberId,
             final Long goalId,
             final GoalOrderChangeRequest request
@@ -133,8 +132,6 @@ public class GoalService {
 
         // 저장
         goalRepository.save(goal);
-
-        return GoalOrderChangeResponse.of(newOrderIndex);
     }
 
     @Transactional

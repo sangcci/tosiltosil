@@ -23,10 +23,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
-import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.value.CategoryColor;
@@ -356,14 +354,9 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         Long categoryId = 1L;
         String request = """
                     {
-                        "prevOrderIndex": 1024,
-                        "nextOrderIndex": 2048
+                        "targetPosition": 2
                     }
                 """;
-        CategoryOrderChangeResponse response = CategoryOrderChangeResponse.of(BigDecimal.valueOf(1536));
-
-        given(categoryService.changeOrder(any(UUID.class), eq(categoryId), any(CategoryOrderChangeRequest.class)))
-                .willReturn(response);
 
         // when
         MvcTestResult testResult = mockMvcTester.patch()
@@ -379,9 +372,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                             {
                                 "status": 200,
                                 "message": "카테고리 순서가 정상적으로 변경되었습니다.",
-                                "data": {
-                                    "orderIndex": 1536
-                                }
+                                "data": {}
                             }
                         """);
 
@@ -391,14 +382,12 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 pathParameter("categoryId", "순서를 변경할 카테고리 ID")
                         ),
                         requestFields(
-                                requestField("prevOrderIndex", JsonFieldType.NUMBER, "이전 순서 인덱스 (null일 경우 맨 처음)", true, "", "1024"),
-                                requestField("nextOrderIndex", JsonFieldType.NUMBER, "다음 순서 인덱스 (null일 경우 맨 마지막)", true, "", "2048")
+                                requestField("targetPosition", JsonFieldType.NUMBER, "카테고리 위치 (1부터 시작)", true, "1 이상의 정수", "2")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "카테고리 순서가 정상적으로 변경되었습니다."),
-                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
-                                responseField("data.orderIndex", JsonFieldType.NUMBER, "변경된 순서 인덱스", "1536")
+                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}")
                         )
                 ));
     }

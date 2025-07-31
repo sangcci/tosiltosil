@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,6 @@ import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 
@@ -74,13 +74,13 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}/change-order")
-    public Response<CategoryOrderChangeResponse> changeCategoryOrder(
+    public Response<Map<String, Object>> changeCategoryOrder(
             @LoginMember final UUID memberId,
             @PathVariable final Long categoryId,
             @RequestBody @Valid final CategoryOrderChangeRequest request
     ) {
-        CategoryOrderChangeResponse response = categoryService.changeOrder(memberId, categoryId, request);
-        return Response.ok("카테고리 순서가 정상적으로 변경되었습니다.", response);
+        categoryService.changeOrder(memberId, categoryId, request);
+        return Response.ok("카테고리 순서가 정상적으로 변경되었습니다.");
     }
 
     @DeleteMapping("/{categoryId}")

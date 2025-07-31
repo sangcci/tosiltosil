@@ -2,7 +2,6 @@ package tosiltosil.backend.module.goal.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -24,14 +23,12 @@ import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.value.CategoryColor;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
-import tosiltosil.backend.module.goal.domain.request.GoalOrderChangeRequest;
 import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalListPerCategoryResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalListResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
-import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 import tosiltosil.backend.module.stopwatch.application.StopwatchService;
 import tosiltosil.backend.support.RestDocsTestSupport;
@@ -472,14 +469,9 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
         Long goalId = 1L;
         String request = """
                     {
-                        "prevOrderIndex": 1024,
-                        "nextOrderIndex": 2048
+                        "targetPosition": 2
                     }
                 """;
-        GoalOrderChangeResponse response = GoalOrderChangeResponse.of(BigDecimal.valueOf(1536));
-
-        given(goalService.changeOrder(any(UUID.class), eq(goalId), any(GoalOrderChangeRequest.class)))
-                .willReturn(response);
 
         // when
         MvcTestResult testResult = mockMvcTester.patch()
@@ -495,9 +487,7 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                             {
                                 "status": 200,
                                 "message": "목표 순서가 정상적으로 변경되었습니다.",
-                                "data": {
-                                    "orderIndex": 1536
-                                }
+                                "data": {}
                             }
                         """);
 
@@ -507,14 +497,12 @@ class GoalControllerRestDocsTest extends RestDocsTestSupport {
                                 pathParameter("goalId", "순서를 변경할 목표 ID")
                         ),
                         requestFields(
-                                requestField("prevOrderIndex", JsonFieldType.NUMBER, "이전 순서 인덱스 (null일 경우 맨 처음)", true, "", "1024"),
-                                requestField("nextOrderIndex", JsonFieldType.NUMBER, "다음 순서 인덱스 (null일 경우 맨 마지막)", true, "", "2048")
+                                requestField("targetPosition", JsonFieldType.NUMBER, "목표 위치 (1부터 시작)", true, "1 이상의 정수", "2")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "목표 순서가 정상적으로 변경되었습니다."),
-                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
-                                responseField("data.orderIndex", JsonFieldType.NUMBER, "변경된 순서 인덱스", "1536")
+                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}")
                         )
                 ));
     }

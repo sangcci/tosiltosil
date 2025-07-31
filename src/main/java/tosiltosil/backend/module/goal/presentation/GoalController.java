@@ -2,6 +2,7 @@ package tosiltosil.backend.module.goal.presentation;
 
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,6 @@ import tosiltosil.backend.module.goal.domain.request.GoalUpdateRequest;
 import tosiltosil.backend.module.goal.domain.response.DayGoalsResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdResponse;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
-import tosiltosil.backend.module.goal.domain.response.GoalOrderChangeResponse;
 
 @RestController
 @RequestMapping("/api/v1/goals")
@@ -65,13 +65,13 @@ public class GoalController {
     }
 
     @PatchMapping("/{goalId}/change-order")
-    public Response<GoalOrderChangeResponse> changeGoalOrder(
+    public Response<Map<String, Object>> changeGoalOrder(
             @LoginMember final UUID memberId,
             @PathVariable final Long goalId,
             @RequestBody @Valid final GoalOrderChangeRequest request
     ) {
-        GoalOrderChangeResponse response = goalService.changeOrder(memberId, goalId, request);
-        return Response.ok("목표 순서가 정상적으로 변경되었습니다.", response);
+        goalService.changeOrder(memberId, goalId, request);
+        return Response.ok("목표 순서가 정상적으로 변경되었습니다.");
     }
 
     @DeleteMapping("/{goalId}")
