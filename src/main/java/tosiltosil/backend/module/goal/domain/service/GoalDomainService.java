@@ -37,8 +37,8 @@ public class GoalDomainService {
 
         long totalGoalCount = todayGoals.size();
         long completedGoalCount = todayGoals.stream()
-                .mapToLong(goal -> goal.getStatus() == GoalStatus.COMPLETED ? 1 : 0)
-                .sum();
+                .filter(goal -> goal.getStatus() == GoalStatus.COMPLETED)
+                .count();
 
         return BigDecimal.valueOf(completedGoalCount)
                 .multiply(BigDecimal.valueOf(100))
