@@ -12,12 +12,11 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.holder.TimeHolder;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
+import tosiltosil.backend.module.goal.domain.value.GoalStatus;
 
 @Component
 @RequiredArgsConstructor
 public class GoalDomainService {
-
-    private static final BigDecimal MAX_PERCENTAGE = new BigDecimal("100");
 
     private final GoalRepository goalRepository;
     private final TimeHolder timeHolder;
@@ -36,22 +35,13 @@ public class GoalDomainService {
             return BigDecimal.ZERO;
         }
 
-        long totalTimeInSeconds = todayGoals.stream()
-                .mapToLong(goal -> goal.getTotalTime().toSeconds())
-                .sum();
+        long totalGoalCount = todayGoals.size();
+        long completedGoalCount = todayGoals.stream()
+                .filter(goal -> goal.getStatus() == GoalStatus.COMPLETED)
+                .count();
 
-        long achievedTimeInSeconds = todayGoals.stream()
-                .mapToLong(goal -> goal.getDuration().toSeconds())
-                .sum();
-
-        if (totalTimeInSeconds == 0) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal percentage = BigDecimal.valueOf(achievedTimeInSeconds)
+        return BigDecimal.valueOf(completedGoalCount)
                 .multiply(BigDecimal.valueOf(100))
-                .divide(BigDecimal.valueOf(totalTimeInSeconds), RoundingMode.DOWN);
-
-        return percentage.min(MAX_PERCENTAGE);
+                .divide(BigDecimal.valueOf(totalGoalCount), RoundingMode.DOWN);
     }
 }
