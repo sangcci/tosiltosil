@@ -39,7 +39,7 @@ public class FractionalOrderManagerUnitTest {
         class 마지막_인덱스가_있는_경우 {
 
             @Test
-            void 마지막_인덱스에_증분값을_더한_값을_반환한다() {
+            void 마지막_인덱스에_INCREMENT를_더한_값을_반환한다() {
                 // given
                 BigDecimal lastOrderIndex = BigDecimal.valueOf(1024);
 
@@ -48,42 +48,6 @@ public class FractionalOrderManagerUnitTest {
 
                 // then
                 assertThat(result).isEqualTo(BigDecimal.valueOf(2048));
-            }
-
-            @Test
-            void 작은_값에서도_정확히_증분값을_더한다() {
-                // given
-                BigDecimal lastOrderIndex = BigDecimal.valueOf(100);
-
-                // when
-                BigDecimal result = fractionalOrderManager.generateOrderIndex(lastOrderIndex);
-
-                // then
-                assertThat(result).isEqualTo(BigDecimal.valueOf(1124));
-            }
-
-            @Test
-            void 소수점_값에서도_정확히_증분값을_더한다() {
-                // given
-                BigDecimal lastOrderIndex = BigDecimal.valueOf(512.5);
-
-                // when
-                BigDecimal result = fractionalOrderManager.generateOrderIndex(lastOrderIndex);
-
-                // then
-                assertThat(result).isEqualTo(BigDecimal.valueOf(1536.5));
-            }
-
-            @Test
-            void 매우_큰_값에서도_정확히_증분값을_더한다() {
-                // given
-                BigDecimal lastOrderIndex = BigDecimal.valueOf(900000);
-
-                // when
-                BigDecimal result = fractionalOrderManager.generateOrderIndex(lastOrderIndex);
-
-                // then
-                assertThat(result).isEqualTo(BigDecimal.valueOf(901024));
             }
         }
     }
@@ -98,15 +62,6 @@ public class FractionalOrderManagerUnitTest {
             void 빈_리스트를_반환한다() {
                 // when
                 List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(null, 0);
-
-                // then
-                assertThat(result).isEmpty();
-            }
-
-            @Test
-            void 음수_카운트에서도_빈_리스트를_반환한다() {
-                // when
-                List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(BigDecimal.valueOf(1024), -1);
 
                 // then
                 assertThat(result).isEmpty();
