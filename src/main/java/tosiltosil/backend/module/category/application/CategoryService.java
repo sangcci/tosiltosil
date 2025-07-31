@@ -57,12 +57,14 @@ public class CategoryService {
             final UUID memberId,
             final CategoryCreateRequest request
     ) {
+        // 생성 제한 검증
         categoryDomainService.validateCategoryCreation(memberId);
 
-        BigDecimal orderIndex = categoryRepository.findLastOrderIndex(memberId)
-                .map(lastIndex -> orderManager.generateOrderIndexBetween(lastIndex, null))
-                .orElse(orderManager.generateInitialOrderIndex());
+        // 순서 인덱스 생성
+        BigDecimal lastOrderIndex = categoryRepository.findLastOrderIndex(memberId).orElse(null);
+        BigDecimal orderIndex = orderManager.generateOrderIndex(lastOrderIndex);
 
+        // 엔티티 생성 후 저장
         Category category = request.toEntity(memberId, orderIndex);
         Category savedCategory = categoryRepository.save(category);
 
@@ -89,28 +91,23 @@ public class CategoryService {
             final Long categoryId,
             final CategoryOrderChangeRequest request
     ) {
+        // 카테고리 본인 것인지 검증
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        if (!orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
-            renewOrderIndexes(memberId);
-        }
+        // 해당 카테고리 순서대로 가져오기
+        List<Category> categories = categoryRepository.findCurrentCategories(memberId);
 
-        BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
+        // OrderManager를 사용하여 새로운 순서 인덱스 계산
+        BigDecimal newOrderIndex = orderManager.calculateOrderIndexForPosition(categories, request.nextOrder());
         category.updateOrderIndex(newOrderIndex);
 
+        // 저장
         categoryRepository.save(category);
 
         return CategoryOrderChangeResponse.of(newOrderIndex);
     }
 
-    private void renewOrderIndexes(final UUID memberId) {
-        List<Category> categories = categoryRepository.findCurrentCategories(memberId);
-
-        List<Category> renewedCategories = orderManager.renewOrderIndexes(categories);
-
-        categoryRepository.saveAll(renewedCategories);
-    }
 
     @Transactional
     public CategoryResponse deleteCategory(
