@@ -18,7 +18,6 @@ import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.service.CategoryDomainService;
@@ -57,13 +56,15 @@ public class CategoryService {
             final UUID memberId,
             final CategoryCreateRequest request
     ) {
+        // 생성 제한 검증
         categoryDomainService.validateCategoryCreation(memberId);
 
-        BigDecimal orderIndex = categoryRepository.findLastOrderIndex(memberId)
-                .map(lastIndex -> orderManager.generateOrderIndexBetween(lastIndex, null))
-                .orElse(orderManager.generateInitialOrderIndex());
+        // 순서 인덱스 생성
+        BigDecimal lastOrderIndex = categoryRepository.findLastOrderIndex(memberId).orElse(null);
+        BigDecimal newOrderIndex = orderManager.generateOrderIndex(lastOrderIndex);
 
-        Category category = request.toEntity(memberId, orderIndex);
+        // 엔티티 생성 후 저장
+        Category category = request.toEntity(memberId, newOrderIndex);
         Category savedCategory = categoryRepository.save(category);
 
         return CategoryResponse.of(savedCategory.getId());
@@ -84,33 +85,26 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryOrderChangeResponse changeOrder(
+    public void changeOrder(
             final UUID memberId,
             final Long categoryId,
             final CategoryOrderChangeRequest request
     ) {
+        // 카테고리 본인 것인지 검증
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         category.validateIsMine(memberId);
 
-        if (!orderManager.validateIndexBounds(request.prevOrderIndex(), request.nextOrderIndex())) {
-            renewOrderIndexes(memberId);
-        }
-
-        BigDecimal newOrderIndex = orderManager.generateOrderIndexBetween(request.prevOrderIndex(), request.nextOrderIndex());
-        category.updateOrderIndex(newOrderIndex);
-
-        categoryRepository.save(category);
-
-        return CategoryOrderChangeResponse.of(newOrderIndex);
-    }
-
-    private void renewOrderIndexes(final UUID memberId) {
+        // 해당 카테고리 순서대로 가져오기
         List<Category> categories = categoryRepository.findCurrentCategories(memberId);
 
-        List<Category> renewedCategories = orderManager.renewOrderIndexes(categories);
+        // OrderManager를 사용하여 새로운 순서 인덱스 계산
+        BigDecimal newOrderIndex = orderManager.calculateOrderIndexForPosition(categories, request.targetPosition());
+        category.updateOrderIndex(newOrderIndex);
 
-        categoryRepository.saveAll(renewedCategories);
+        // 저장
+        categoryRepository.save(category);
     }
+
 
     @Transactional
     public CategoryResponse deleteCategory(

@@ -10,7 +10,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -23,10 +22,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.module.category.application.CategoryService;
 import tosiltosil.backend.module.category.domain.request.CategoryCreateRequest;
-import tosiltosil.backend.module.category.domain.request.CategoryOrderChangeRequest;
 import tosiltosil.backend.module.category.domain.request.CategoryUpdateRequest;
 import tosiltosil.backend.module.category.domain.response.CategoryColorPerDayResponse;
-import tosiltosil.backend.module.category.domain.response.CategoryOrderChangeResponse;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.domain.value.CategoryColor;
@@ -50,8 +47,8 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
     void 회원_카테고리_목록_조회() {
         // given
         List<CurrentCategoryListResponse> responses = List.of(
-                new CurrentCategoryListResponse(1L, "운동", CategoryColor.RED, BigDecimal.valueOf(1024)),
-                new CurrentCategoryListResponse(2L, "공부", CategoryColor.ORANGE, BigDecimal.valueOf(2048))
+                new CurrentCategoryListResponse(1L, "운동", CategoryColor.RED),
+                new CurrentCategoryListResponse(2L, "공부", CategoryColor.ORANGE)
         );
 
         given(categoryService.getCategoriesByMemberId(any(UUID.class)))
@@ -73,14 +70,12 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                     {
                                         "categoryId": 1,
                                         "title": "운동",
-                                        "color": "red",
-                                        "orderIndex": 1024
+                                        "color": "red"
                                     },
                                     {
                                         "categoryId": 2,
                                         "title": "공부",
-                                        "color": "orange",
-                                        "orderIndex": 2048
+                                        "color": "orange"
                                     }
                                 ]
                             }
@@ -94,8 +89,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 responseField("data", JsonFieldType.ARRAY, "카테고리 목록", "[]"),
                                 responseField("data[].categoryId", JsonFieldType.NUMBER, "카테고리 ID", "1"),
                                 responseField("data[].title", JsonFieldType.STRING, "카테고리 제목", "운동"),
-                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상", "red"),
-                                responseField("data[].orderIndex", JsonFieldType.NUMBER, "카테고리 순서 인덱스", "1024")
+                                responseField("data[].color", JsonFieldType.STRING, "카테고리 색상", "red")
                         )
                 ));
     }
@@ -356,14 +350,9 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
         Long categoryId = 1L;
         String request = """
                     {
-                        "prevOrderIndex": 1024,
-                        "nextOrderIndex": 2048
+                        "targetPosition": 2
                     }
                 """;
-        CategoryOrderChangeResponse response = CategoryOrderChangeResponse.of(BigDecimal.valueOf(1536));
-
-        given(categoryService.changeOrder(any(UUID.class), eq(categoryId), any(CategoryOrderChangeRequest.class)))
-                .willReturn(response);
 
         // when
         MvcTestResult testResult = mockMvcTester.patch()
@@ -379,9 +368,7 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                             {
                                 "status": 200,
                                 "message": "카테고리 순서가 정상적으로 변경되었습니다.",
-                                "data": {
-                                    "orderIndex": 1536
-                                }
+                                "data": {}
                             }
                         """);
 
@@ -391,14 +378,12 @@ class CategoryControllerRestDocsTest extends RestDocsTestSupport {
                                 pathParameter("categoryId", "순서를 변경할 카테고리 ID")
                         ),
                         requestFields(
-                                requestField("prevOrderIndex", JsonFieldType.NUMBER, "이전 순서 인덱스 (null일 경우 맨 처음)", true, "", "1024"),
-                                requestField("nextOrderIndex", JsonFieldType.NUMBER, "다음 순서 인덱스 (null일 경우 맨 마지막)", true, "", "2048")
+                                requestField("targetPosition", JsonFieldType.NUMBER, "카테고리 위치 (1부터 시작)", true, "1 이상의 정수", "2")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "카테고리 순서가 정상적으로 변경되었습니다."),
-                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
-                                responseField("data.orderIndex", JsonFieldType.NUMBER, "변경된 순서 인덱스", "1536")
+                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}")
                         )
                 ));
     }
