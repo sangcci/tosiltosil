@@ -6,11 +6,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -56,12 +60,15 @@ public class FractionalOrderManagerUnitTest {
     class 연속_순서_인덱스_생성_기능 {
 
         @Nested
-        class 카운트가_0_이하인_경우 {
+        class 카운트가_0인_경우 {
 
             @Test
             void 빈_리스트를_반환한다() {
+                // given
+                int count = 0;
+
                 // when
-                List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(null, 0);
+                List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(null, count);
 
                 // then
                 assertThat(result).isEmpty();
@@ -71,26 +78,26 @@ public class FractionalOrderManagerUnitTest {
         @Nested
         class 마지막_인덱스가_null인_경우 {
 
-            @Test
-            void 첫_번째_인덱스부터_연속적으로_생성한다() {
+            @ParameterizedTest(name = "{1}")
+            @MethodSource("sequentialIndexGenerationTestCases")
+            void 첫_번째_인덱스부터_연속적으로_생성한다(int count, String testCaseName, List<BigDecimal> expectedValues) {
                 // when
-                List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(null, 3);
+                List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(null, count);
 
                 // then
-                assertThat(result).hasSize(3);
-                assertThat(result.get(0)).isEqualTo(BigDecimal.valueOf(2048)); // 1024 + 1024
-                assertThat(result.get(1)).isEqualTo(BigDecimal.valueOf(3072)); // 2048 + 1024
-                assertThat(result.get(2)).isEqualTo(BigDecimal.valueOf(4096)); // 3072 + 1024
+                assertThat(result).hasSize(count);
+                assertThat(result).isEqualTo(expectedValues);
             }
 
-            @Test
-            void 단일_인덱스_생성() {
-                // when
-                List<BigDecimal> result = fractionalOrderManager.generateSequentialOrderIndexes(null, 1);
-
-                // then
-                assertThat(result).hasSize(1);
-                assertThat(result.get(0)).isEqualTo(BigDecimal.valueOf(2048));
+            private static Stream<Arguments> sequentialIndexGenerationTestCases() {
+                return Stream.of(
+                        Arguments.of(1, "단일 인덱스 생성", List.of(BigDecimal.valueOf(2048))),
+                        Arguments.of(3, "3개 연속 인덱스 생성", List.of(
+                                BigDecimal.valueOf(2048),
+                                BigDecimal.valueOf(3072),
+                                BigDecimal.valueOf(4096)
+                        ))
+                );
             }
         }
 
@@ -134,65 +141,62 @@ public class FractionalOrderManagerUnitTest {
         @Nested
         class 타겟_포지션_검증 {
 
-            @Test
-            void 타겟_포지션이_1보다_작으면_예외를_발생시킨다() {
-                // given
-                List<TestOrderableEntity> entities = List.of(
-                        new TestOrderableEntity(BigDecimal.valueOf(1024))
-                );
-
+            @ParameterizedTest(name = "{1}")
+            @MethodSource("invalidPositionTestCases")
+            void 잘못된_타겟_포지션에_대해_예외를_발생시킨다(List<TestOrderableEntity> entities, String testCaseName, int invalidPosition) {
                 // when & then
-                assertThatThrownBy(() -> fractionalOrderManager.calculateOrderIndexForPosition(entities, 0))
+                assertThatThrownBy(() -> fractionalOrderManager.calculateOrderIndexForPosition(entities, invalidPosition))
                         .isInstanceOf(BadRequestException.class)
                         .hasMessage("타겟 포지션 정보가 올바르지 않습니다.");
             }
 
-            @Test
-            void 타겟_포지션이_엔티티_범위보다_크면_예외를_발생시킨다() {
-                // given
-                List<TestOrderableEntity> entities = List.of(
+            private static Stream<Arguments> invalidPositionTestCases() {
+                List<TestOrderableEntity> singleEntity = List.of(
+                        new TestOrderableEntity(BigDecimal.valueOf(1024))
+                );
+                List<TestOrderableEntity> twoEntities = List.of(
                         new TestOrderableEntity(BigDecimal.valueOf(1024)),
                         new TestOrderableEntity(BigDecimal.valueOf(2048))
                 );
 
-                // when & then
-                assertThatThrownBy(() -> fractionalOrderManager.calculateOrderIndexForPosition(entities, 4))
-                        .isInstanceOf(BadRequestException.class)
-                        .hasMessage("타겟 포지션 정보가 올바르지 않습니다.");
+                return Stream.of(
+                        Arguments.of(singleEntity, "타겟 포지션이 0일 때", 0),
+                        Arguments.of(singleEntity, "타겟 포지션이 음수일 때", -1),
+                        Arguments.of(twoEntities, "타겟 포지션이 엔티티 사이즈 + 1 보다 클 때", 4)
+                );
             }
         }
 
         @Nested
         class 첫_번째_위치로_이동 {
 
-            @Test
-            void 단일_엔티티_리스트에서_첫_번째_위치의_인덱스를_계산한다() {
-                // given
-                List<TestOrderableEntity> entities = List.of(
-                        new TestOrderableEntity(BigDecimal.valueOf(2048))
-                );
-
+            @ParameterizedTest(name = "{1}")
+            @MethodSource("firstPositionTestCases")
+            void 첫_번째_위치의_인덱스를_계산한다(List<TestOrderableEntity> entities, String testCaseName, BigDecimal expectedResult) {
                 // when
                 BigDecimal result = fractionalOrderManager.calculateOrderIndexForPosition(entities, 1);
 
                 // then
-                assertThat(result).isEqualTo(BigDecimal.valueOf(1024)); // 2048 / 2
+                assertThat(result).isEqualTo(expectedResult);
             }
 
-            @Test
-            void 여러_엔티티_리스트에서_첫_번째_위치의_인덱스를_계산한다() {
-                // given
-                List<TestOrderableEntity> entities = List.of(
-                        new TestOrderableEntity(BigDecimal.valueOf(1024)),
-                        new TestOrderableEntity(BigDecimal.valueOf(2048)),
-                        new TestOrderableEntity(BigDecimal.valueOf(3072))
+            private static Stream<Arguments> firstPositionTestCases() {
+                return Stream.of(
+                        Arguments.of(
+                                List.of(new TestOrderableEntity(BigDecimal.valueOf(2048))),
+                                "단일 엔티티 리스트에서 첫 번째 위치",
+                                BigDecimal.valueOf(1024)
+                        ),
+                        Arguments.of(
+                                List.of(
+                                        new TestOrderableEntity(BigDecimal.valueOf(1024)),
+                                        new TestOrderableEntity(BigDecimal.valueOf(2048)),
+                                        new TestOrderableEntity(BigDecimal.valueOf(3072))
+                                ),
+                                "여러 엔티티 리스트에서 첫 번째 위치",
+                                BigDecimal.valueOf(512)
+                        )
                 );
-
-                // when
-                BigDecimal result = fractionalOrderManager.calculateOrderIndexForPosition(entities, 1);
-
-                // then
-                assertThat(result).isEqualTo(BigDecimal.valueOf(512)); // 1024 / 2
             }
         }
 
