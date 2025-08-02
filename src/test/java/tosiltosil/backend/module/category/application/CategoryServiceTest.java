@@ -26,13 +26,13 @@ import tosiltosil.backend.module.category.domain.value.CategoryColor;
 import tosiltosil.backend.module.category.domain.response.CategoryResponse;
 import tosiltosil.backend.module.category.domain.response.CurrentCategoryListResponse;
 import tosiltosil.backend.module.category.infrastructure.CategoryJpaRepository;
-import tosiltosil.backend.module.duration.application.DurationService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.goal.domain.Goal;
 import tosiltosil.backend.module.goal.domain.GoalRepository;
 import tosiltosil.backend.module.goal.domain.request.GoalCreateRequest;
 import tosiltosil.backend.module.goal.domain.response.GoalIdsResponse;
 import tosiltosil.backend.module.goal.infrastructure.GoalJpaRepository;
+import tosiltosil.backend.module.progress.application.ProgressService;
 import tosiltosil.backend.support.IntegrationTestSupport;
 
 @Import(TestTimeHolderConfig.class)
@@ -49,7 +49,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
     private GoalRepository goalRepository;
 
     @Autowired
-    private DurationService durationService;
+    private ProgressService progressService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -205,13 +205,13 @@ class CategoryServiceTest extends IntegrationTestSupport {
         goalRepository.save(goal);
 
         // 4. 총 기록시간에 30분 추가
-        durationService.updateTodayDuration(memberId, testDuration);
+        progressService.updateTodayDuration(memberId, testDuration);
         
         // when
         categoryService.deleteCategory(memberId, category.categoryId());
         
         // then
-        Duration afterDelete = durationService.getTodayDuration(memberId);
+        Duration afterDelete = progressService.getTodayDuration(memberId);
         assertThat(afterDelete).isEqualTo(Duration.ZERO);
 
         // verify

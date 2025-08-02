@@ -1,35 +1,35 @@
-package tosiltosil.backend.module.duration.application;
+package tosiltosil.backend.module.progress.application;
 
 import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tosiltosil.backend.module.duration.infrastructure.DurationRedisRepository;
+import tosiltosil.backend.module.progress.infrastructure.ProgressRedisRepository;
 
 @Service
 @RequiredArgsConstructor
-public class DurationService {
+public class ProgressService {
 
-    private final DurationRedisRepository durationRedisRepository;
+    private final ProgressRedisRepository progressRedisRepository;
 
     public Duration getTodayDuration(final UUID memberId) {
-        return durationRedisRepository.findTodayDuration(memberId);
+        return progressRedisRepository.findTodayDuration(memberId);
     }
 
     public Duration updateTodayDuration(final UUID memberId, final Duration duration) {
-        Duration todayTotalTime = durationRedisRepository.findTodayDuration(memberId);
+        Duration todayTotalTime = progressRedisRepository.findTodayDuration(memberId);
         todayTotalTime = todayTotalTime.plus(duration);
-        durationRedisRepository.cacheTodayDuration(memberId, todayTotalTime);
+        progressRedisRepository.cacheTodayDuration(memberId, todayTotalTime);
         return todayTotalTime;
     }
     
     public Duration subtractTodayDuration(final UUID memberId, final Duration duration) {
-        Duration todayTotalTime = durationRedisRepository.findTodayDuration(memberId);
+        Duration todayTotalTime = progressRedisRepository.findTodayDuration(memberId);
         todayTotalTime = todayTotalTime.minus(duration);
         if (todayTotalTime.isNegative()) {
             todayTotalTime = Duration.ZERO;
         }
-        durationRedisRepository.cacheTodayDuration(memberId, todayTotalTime);
+        progressRedisRepository.cacheTodayDuration(memberId, todayTotalTime);
         return todayTotalTime;
     }
 }

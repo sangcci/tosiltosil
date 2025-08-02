@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.duration.infrastructure;
+package tosiltosil.backend.module.progress.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,7 @@ import tosiltosil.backend.support.IntegrationTestSupport;
 public class TodayDurationRedisTest extends IntegrationTestSupport {
 
     @Autowired
-    private DurationRedisRepository durationRedisRepository;
+    private ProgressRedisRepository progressRedisRepository;
     
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -30,7 +30,7 @@ public class TodayDurationRedisTest extends IntegrationTestSupport {
         UUID memberId = UUID.randomUUID();
         
         // when
-        Duration result = durationRedisRepository.findTodayDuration(memberId);
+        Duration result = progressRedisRepository.findTodayDuration(memberId);
         
         // then
         assertThat(result).isEqualTo(Duration.ZERO);
@@ -41,10 +41,10 @@ public class TodayDurationRedisTest extends IntegrationTestSupport {
         // given
         UUID memberId = UUID.randomUUID();
         Duration zeroDuration = Duration.ZERO;
-        durationRedisRepository.cacheTodayDuration(memberId, zeroDuration);
+        progressRedisRepository.cacheTodayDuration(memberId, zeroDuration);
         
         // when
-        Duration result = durationRedisRepository.findTodayDuration(memberId);
+        Duration result = progressRedisRepository.findTodayDuration(memberId);
         
         // then
         assertThat(result).isEqualTo(Duration.ZERO);

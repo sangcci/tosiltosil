@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.messaging.Events;
-import tosiltosil.backend.module.duration.application.DurationService;
+import tosiltosil.backend.module.progress.application.ProgressService;
 import tosiltosil.backend.module.goal.application.GoalService;
 import tosiltosil.backend.module.stopwatch.domain.Stopwatch;
 import tosiltosil.backend.module.stopwatch.domain.StopwatchActivity;
@@ -24,7 +24,7 @@ public class StopwatchService {
 
     private final StopwatchRepository stopwatchRepository;
     private final GoalService goalService;
-    private final DurationService durationService;
+    private final ProgressService progressService;
 
     public void startStopwatch(
             final UUID memberId,
@@ -38,7 +38,7 @@ public class StopwatchService {
         stopwatchRepository.save(stopwatch);
 
         // 오늘 총 진행 시간 가져오기 - 방금 시작된 스톱워치 시간은 제외
-        Duration todayDuration = durationService.getTodayDuration(memberId);
+        Duration todayDuration = progressService.getTodayDuration(memberId);
 
         // 사용자 스탑워치 활성 상태로 변경
         StopwatchActivity stopwatchActivity = stopwatchRepository.findStopwatchActivityByMemberId(memberId)
@@ -68,7 +68,7 @@ public class StopwatchService {
         stopwatch.updateEndAt();
 
         // 오늘 총 진행 시간 업데이트
-        Duration updatedTodayDuration = durationService.updateTodayDuration(memberId, stopwatch.getDuration());
+        Duration updatedTodayDuration = progressService.updateTodayDuration(memberId, stopwatch.getDuration());
 
         // 사용자 스탑워치 비활성 상태로 변경
         StopwatchActivity stopwatchActivity = stopwatchRepository.findStopwatchActivityByMemberId(memberId)
