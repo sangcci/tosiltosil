@@ -425,7 +425,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 인증번호_유효_시간_만료_및_Redis_데이터가_존재하지않아_검증_실패() {
+    void 인증번호_만료로_검증_실패() {
         // given
         String request = """
                 {
