@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.restdocs.cookies.CookieDescriptor;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
@@ -24,6 +25,7 @@ import tosiltosil.backend.module.goal.presentation.GoalController;
 import tosiltosil.backend.module.stopwatch.presentation.StopwatchController;
 import tosiltosil.backend.support.RestDocsTestSupport.RestDocsTestConfig;
 
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
@@ -44,6 +46,18 @@ public abstract class RestDocsTestSupport {
 
     @Autowired
     protected RestDocumentationResultHandler documentHandler;
+
+    protected static CookieDescriptor requestCookie(
+            final String name,
+            final String description) {
+        return cookieWithName(name).description(description);
+    }
+
+    protected static CookieDescriptor responseCookie(
+            final String name,
+            final String description) {
+        return cookieWithName(name).description(description);
+    }
 
     protected static RequestPartDescriptor requestPart(
             final String name,
