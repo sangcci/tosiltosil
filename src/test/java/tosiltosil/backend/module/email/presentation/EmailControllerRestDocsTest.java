@@ -23,7 +23,6 @@ import tosiltosil.backend.support.RestDocsTestSupport;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -294,7 +293,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 .hasStatus(HttpStatus.OK)
                 .apply(documentHandler.document(
                         responseCookies(
-                                cookieWithName("temporary-token").description("임시 엑세스 토큰 쿠키")
+                                responseCookie("temporary-token", "임의 엑세스 토큰 쿠키")
                         ),
                         requestFields(
                                 requestField("email", JsonFieldType.STRING, "이메일 주소", false, "이메일 형식만 가능", "test@example.com"),

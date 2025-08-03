@@ -65,11 +65,11 @@ public class ReissueControllerRestDocsTest extends RestDocsTestSupport {
                 .hasStatus(HttpStatus.OK)
                 .apply(documentHandler.document(
                         requestCookies(
-                                cookieWithName("refresh-token").description("이전 리프레시 토큰 쿠키")
+                                requestCookie("refresh-token", "이전 리프레시 토큰 쿠키")
                         ),
                         responseCookies(
-                                cookieWithName("access-token").description("엑세스 토큰 쿠키"),
-                                cookieWithName("refresh-token").description("리프레시 토큰 쿠키")
+                                responseCookie("access-token", "엑세스 토큰 쿠키"),
+                                responseCookie("refresh-token", "리프레시 토큰 쿠키")
                         ),
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
