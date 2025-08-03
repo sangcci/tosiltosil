@@ -151,7 +151,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
     }
 
     @Test
-    void 이메일_인증_목적이_SIGN_UP_혹은_FORGOT_PASSWORD이_아닌_경우_실패() {
+    void 이메일_인증_목적이_올바르지_않을_경우_실패() {
         // given
         String request = """
                 {
