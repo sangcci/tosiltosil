@@ -29,7 +29,6 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -86,8 +85,8 @@ public class LoginControllerRestDocsTest extends RestDocsTestSupport {
                 .hasStatus(HttpStatus.OK)
                 .apply(documentHandler.document(
                         responseCookies(
-                                cookieWithName("access-token").description("엑세스 토큰 쿠키"),
-                                cookieWithName("refresh-token").description("리프레시 토큰 쿠키")
+                                responseCookie("access-token", "엑세스 토큰 쿠키"),
+                                responseCookie("refresh-token", "리프레시 토큰 쿠키")
                         ),
                         requestFields(
                                 requestField("email", JsonFieldType.STRING, "이메일 주소", false, "이메일 형식만 가능", "test@example.com"),

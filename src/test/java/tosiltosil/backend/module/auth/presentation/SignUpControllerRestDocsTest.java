@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
@@ -98,7 +97,7 @@ public class SignUpControllerRestDocsTest extends RestDocsTestSupport {
                                         requestField("terms[].agreed", JsonFieldType.BOOLEAN, "약관 동의 여부", false, "boolean 값만 허용됨", "true")
                                 ),
                                 requestCookies(
-                                        cookieWithName("temporary-token").description("임의 엑세스 토큰 쿠키")
+                                        requestCookie("temporary-token", "임의 엑세스 토큰 쿠키")
                                 ),
                                 responseFields(
                                         responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "201"),
