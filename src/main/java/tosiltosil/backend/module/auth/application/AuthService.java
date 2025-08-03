@@ -41,10 +41,10 @@ public class AuthService {
             final CreateLocalMemberRequest request,
             final MultipartFile profileImage
     ) {
-        termsService.validateTerms(request.terms());
-
         String email = getEmailFromRedis(temporaryToken);
         memberService.validateEmailIsExist(email, LOCAL.name());
+
+        termsService.validateTerms(request.terms());
 
         String code = memberService.generateRandomCode();
         String profileImgUrl = "https://example.com/profile.png"; // S3 구현 후 수정
