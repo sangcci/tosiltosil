@@ -15,6 +15,10 @@
 
 include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-request.adoc[]
 
+Request Fields
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/request-fields.adoc[]
+
 ==== Response
 
 include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-response.adoc[]
@@ -50,6 +54,10 @@ include::{snippets}/email-controller-rest-docs-test/이메일_전송_및_인증_
 ==== Request
 
 include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/http-request.adoc[]
+
+Request Fields
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/request-fields.adoc[]
 
 ==== Response
 
