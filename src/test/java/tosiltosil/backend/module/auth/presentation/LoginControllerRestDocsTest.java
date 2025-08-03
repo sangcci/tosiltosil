@@ -96,6 +96,7 @@ public class LoginControllerRestDocsTest extends RestDocsTestSupport {
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "정상적으로 로그인 되었습니다."),
+                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
                                 responseField("data.memberId", JsonFieldType.STRING, "로그인한 사용자의 ID", memberId.toString())
                         )
                 ));
