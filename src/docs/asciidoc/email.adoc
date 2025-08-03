@@ -15,6 +15,10 @@
 
 include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-request.adoc[]
 
+Request Fields
+
+include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/request-fields.adoc[]
+
 ==== Response
 
 include::{snippets}/email-controller-rest-docs-test/인증_이메일_전송하기/http-response.adoc[]
@@ -51,6 +55,10 @@ include::{snippets}/email-controller-rest-docs-test/이메일_전송_및_인증_
 
 include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/http-request.adoc[]
 
+Request Fields
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/request-fields.adoc[]
+
 ==== Response
 
 include::{snippets}/email-controller-rest-docs-test/인증_번호_검증하기/http-response.adoc[]
@@ -67,6 +75,6 @@ include::{snippets}/email-controller-rest-docs-test/잘못된_인증_번호에_�
 
 include::{snippets}/email-controller-rest-docs-test/이메일_인증_시도_횟수_초과로_인증번호_검증_실패/response-body.adoc[]
 
-==== 인증번호 만료 및 Redis 데이터가 존재하지 않아 인증번호 검증 실패 (404)
+==== 인증번호 만료로 인증번호 검증 실패(404)
 
-include::{snippets}/email-controller-rest-docs-test/인증번호_유효_시간_만료_및_Redis_데이터가_존재하지않아_검증_실패/response-body.adoc[]
+include::{snippets}/email-controller-rest-docs-test/인증번호_만료로_검증_실패/response-body.adoc[]
