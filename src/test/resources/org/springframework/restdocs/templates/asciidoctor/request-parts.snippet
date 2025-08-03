@@ -1,0 +1,10 @@
+|===
+|Part|Constraint|Description|Required
+
+{{#requestParts}}
+|{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{constraint}}{{/tableCellContent}}
+|{{#tableCellContent}}{{description}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#optional}}false{{/optional}}{{^optional}}true{{/optional}}{{/tableCellContent}}
+{{/requestParts}}
+|===
