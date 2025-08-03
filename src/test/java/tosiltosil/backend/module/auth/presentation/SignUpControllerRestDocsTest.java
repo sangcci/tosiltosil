@@ -103,7 +103,7 @@ public class SignUpControllerRestDocsTest extends RestDocsTestSupport {
                                 responseFields(
                                         responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "201"),
                                         responseField("message", JsonFieldType.STRING, "응답 메시지", "정상적으로 일반 회원가입 되었습니다."),
-                                        responseField("data.nickname", JsonFieldType.STRING, "응답 데이터", "유저1")
+                                        responseField("data.nickname", JsonFieldType.STRING, "사용자 닉네임", "유저1")
                                 )
                         ));
     }
