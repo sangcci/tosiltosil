@@ -71,6 +71,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                         responseFields(
                                 responseField("status", JsonFieldType.NUMBER, "응답 상태 코드", "200"),
                                 responseField("message", JsonFieldType.STRING, "응답 메시지", "정상적으로 이메일을 전송했습니다."),
+                                responseField("data", JsonFieldType.OBJECT, "응답 데이터", "{}"),
                                 responseField("data.email", JsonFieldType.STRING, "인증 이메일이 전송된 이메일 주소", "test@example.com")
                         )
                 ));
