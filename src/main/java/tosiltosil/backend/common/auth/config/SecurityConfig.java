@@ -18,12 +18,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import tosiltosil.backend.common.auth.JwtTokenProvider;
 import tosiltosil.backend.common.auth.filter.JwtAuthFilter;
 import tosiltosil.backend.common.util.CookieUtil;
+import tosiltosil.backend.common.web.handler.CustomAccessDeniedHandler;
+import tosiltosil.backend.common.web.handler.CustomAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieUtil cookieUtil;
 
@@ -33,6 +37,10 @@ public class SecurityConfig {
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
                 .formLogin(FormLoginConfigurer<HttpSecurity>::disable)
                 .httpBasic(HttpBasicConfigurer<HttpSecurity>::disable)
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
                 .headers(it -> it.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .sessionManagement(it -> it.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
