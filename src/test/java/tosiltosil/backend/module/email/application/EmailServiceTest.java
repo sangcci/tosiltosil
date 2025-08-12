@@ -184,6 +184,10 @@ class EmailServiceTest extends IntegrationTestSupport {
     void 인증번호_유효_시간_만료_및_Redis_데이터가_존재하지않아_검증_실패() {
         // given
         String authNumber = "123456";
+
+        // 인증번호 이메일을 전송했음을 나타냄
+        emailAuthRedisRepository.save(email, 1, 0, 100L);
+
         EmailAuthRequest request = new EmailAuthRequest(email, authNumber);
 
         // when & then
