@@ -457,4 +457,38 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         assertThat(testResult)
                 .apply(documentHandler.document());
     }
+
+    @Test
+    void 인증_번호_전송하지_않은_이메일로_인증번호_시도_시_실패() {
+        // given
+        String request = """
+                {
+                    "email": "test@example.com",
+                    "authNumber": "125526"
+                }
+                """;
+
+        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+                .willThrow(new NotFoundException("이메일 인증 요청을 먼저 진행해야 합니다."));
+
+        // when
+        MvcTestResult testResult = mockMvcTester.post()
+                .uri("/api/v1/auth/email/verify")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)
+                .exchange();
+
+        // then
+        assertThat(testResult)
+                .bodyJson().isEqualTo("""
+                            {
+                                "status": 404,
+                                "message": "이메일 인증 요청을 먼저 진행해야 합니다.",
+                                "errors": []
+                            }
+                        """);
+
+        assertThat(testResult)
+                .apply(documentHandler.document());
+    }
 }
