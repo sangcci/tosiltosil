@@ -27,6 +27,11 @@ public class EmailAuthRedisRepository {
 
     public EmailAuthMeta get(String email) {
         String key = createKey(email);
+
+        if (!redisTemplate.hasKey(key)) {
+            return null;
+        }
+
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);
 
         int sendCount = parseOrDefault(entries.get(SEND_COUNT_FIELD));
