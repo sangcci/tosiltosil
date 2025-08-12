@@ -149,6 +149,8 @@ Access Token은 쿠키로 관리합니다.
 [.lead]
 include::{docdir}/auth.adoc[]
 
+include::{docdir}/member.adoc[]
+
 include::{docdir}/email.adoc[]
 
 include::{docdir}/goal.adoc[]
