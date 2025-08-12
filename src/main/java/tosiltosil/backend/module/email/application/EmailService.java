@@ -84,7 +84,7 @@ public class EmailService {
 
         initEmailAttemptsIfAbsent(email);
 
-        validateSendCount(email);
+        validateCanSendEmail(email);
 
         validateEmailIsExistByPurpose(email, purpose);
 
@@ -101,13 +101,17 @@ public class EmailService {
     public EmailAuthResponse verifyAuthEmail(
             final EmailAuthRequest request
     ) {
-        int authFailCount = validateAndGetAuthFailCount(request.email());
+        String email = request.email();
 
-        validateAuthNumber(request.email(), request.authNumber(), authFailCount);
+        validateIsSentEmail(email);
 
-        deleteAuthNumber(request.email());
+        int authFailCount = validateAndGetAuthFailCount(email);
 
-        return generateTemporaryToken(request.email());
+        validateAuthNumber(email, request.authNumber(), authFailCount);
+
+        deleteAuthNumber(email);
+
+        return generateTemporaryToken(email);
     }
 
     private String loadAuthTemplate(String authNumber) {
@@ -130,12 +134,23 @@ public class EmailService {
         }
     }
 
-    private void validateSendCount(String email) {
+    private void validateSendCount(EmailAuthMeta emailAuthMeta) {
+        if (emailAuthMeta.sendCount() >= maxSendCount) {
+            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+        }
+    }
+
+    private void validateAuthFailCount(EmailAuthMeta emailAuthMeta) {
+        if (emailAuthMeta.authFailCount() >= maxAuthAttemptCount) {
+            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+        }
+    }
+
+    private void validateCanSendEmail(String email) {
         EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
-        if (emailAuthMeta.sendCount() >= maxSendCount) {
-            throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
-        }
+        validateSendCount(emailAuthMeta);
+        validateAuthFailCount(emailAuthMeta);
     }
 
     private void increaseSendCount(String email) {
@@ -146,6 +161,14 @@ public class EmailService {
         String authNumber = RandomUtils.generateRandomNumberString(CODE_LENGTH);
         authNumberRedisRepository.save(email, authNumber, authNumberExpiration);
         return authNumber;
+    }
+
+    private void validateIsSentEmail(String email) {
+        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
+
+        if (emailAuthMeta == null) {
+            throw new NotFoundException("이메일 인증 요청을 먼저 진행해야 합니다.");
+        }
     }
 
     private int validateAndGetAuthFailCount(String email) {
@@ -173,7 +196,7 @@ public class EmailService {
 
     private void validateAuthNumber(String email, String authNumber, int authFailCount) {
         String savedAuthNumber = authNumberRedisRepository.get(email)
-                .orElseThrow(() -> new NotFoundException("인증번호 데이터를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
             increaseAuthFailCount(email);
