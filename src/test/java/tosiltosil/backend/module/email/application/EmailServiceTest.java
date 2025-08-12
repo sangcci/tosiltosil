@@ -197,4 +197,18 @@ class EmailServiceTest extends IntegrationTestSupport {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다.");
     }
+
+    @Test
+    void 인증_번호_전송하지_않은_이메일로_인증번호_시도_시_실패() {
+        // given
+        String authNumber = "123456";
+        EmailAuthRequest request = new EmailAuthRequest(email, authNumber);
+
+        // when & then
+        assertThat(authNumberRedisRepository.get(email)).isEmpty();
+
+        assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("이메일 인증 요청을 먼저 진행해야 합니다.");
+    }
 }
