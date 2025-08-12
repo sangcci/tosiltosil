@@ -38,8 +38,13 @@ public class EmailService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JavaMailSender mailSender;
 
+    private static final int INITIAL_SEND_COUNT = 0;
+    private static final int INITIAL_FAIL_COUNT = 0;
     private static final int CODE_LENGTH = 6;
     private static final String EMAIL_TITLE = "토실토실 인증번호";
+
+    @Value("${email.auth.redis-expiration}")
+    private long emailAuthExpiration;
 
     @Value("${email.auth-number.redis-expiration}")
     private long authNumberExpiration;
@@ -77,7 +82,9 @@ public class EmailService {
         String email = request.email();
         EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
 
-        validateSendAndAuthCount(email);
+        initEmailAttemptsIfAbsent(email);
+
+        validateSendCount(email);
 
         validateEmailIsExistByPurpose(email, purpose);
 
@@ -113,11 +120,21 @@ public class EmailService {
         }
     }
 
-    private void validateSendAndAuthCount(String email) {
+    private void generateEmailAttemptsRedisData(String email) {
+        emailAuthRedisRepository.save(email, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, emailAuthExpiration);
+    }
+
+    private void initEmailAttemptsIfAbsent(String email) {
+        if (emailAuthRedisRepository.get(email) == null) {
+            generateEmailAttemptsRedisData(email);
+        }
+    }
+
+    private void validateSendCount(String email) {
         EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
-        if (emailAuthMeta.sendCount() >= maxSendCount || emailAuthMeta.authFailCount() >= maxAuthAttemptCount) {
-            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+        if (emailAuthMeta.sendCount() >= maxSendCount) {
+            throw new BadRequestException("일일 전송 제한 횟수를 초과하였습니다.");
         }
     }
 
@@ -156,16 +173,16 @@ public class EmailService {
 
     private void validateAuthNumber(String email, String authNumber, int authFailCount) {
         String savedAuthNumber = authNumberRedisRepository.get(email)
-                .orElseThrow(() -> new NotFoundException("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다."));
+                .orElseThrow(() -> new NotFoundException("인증번호 데이터를 찾을 수 없습니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
-            int failCount = increaseAuthFailCount(email);
-            throw new InvalidEmailCodeException(failCount);
+            increaseAuthFailCount(email);
+            throw new InvalidEmailCodeException(++authFailCount);
         }
     }
 
-    private int increaseAuthFailCount(String email) {
-        return emailAuthRedisRepository.increaseAuthFailCount(email);
+    private void increaseAuthFailCount(String email) {
+        emailAuthRedisRepository.increaseAuthFailCount(email);
     }
 
     private void deleteAuthNumber(String email) {
