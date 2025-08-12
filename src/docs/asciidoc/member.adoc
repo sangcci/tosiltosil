@@ -17,7 +17,7 @@ include::{snippets}/member-controller-rest-docs-test/등록되지_않은_이메�
 
 Query Parameters
 
-include::{snippets}/member-controller-rest-docs-test/등록되지_않은_이메일로_이메일_중복_확인_시_성공/Query-parameters.adoc[]
+include::{snippets}/member-controller-rest-docs-test/등록되지_않은_이메일로_이메일_중복_확인_시_성공/query-parameters.adoc[]
 
 ==== Response
 
