@@ -50,9 +50,10 @@ public class EmailAuthRedisRepository {
         redisTemplate.opsForHash().increment(key, SEND_COUNT_FIELD, 1);
     }
 
-    public void increaseAuthFailCount(String email) {
+    public int increaseAuthFailCount(String email) {
         String key = createKey(email);
-        redisTemplate.opsForHash().increment(key, AUTH_FAIL_COUNT_FIELD, 1);
+        Long increasedAuthFailCount = redisTemplate.opsForHash().increment(key, AUTH_FAIL_COUNT_FIELD, 1);
+        return increasedAuthFailCount.intValue();
     }
 
     private String createKey(String email) {

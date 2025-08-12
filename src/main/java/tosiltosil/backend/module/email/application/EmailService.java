@@ -199,13 +199,13 @@ public class EmailService {
                 .orElseThrow(() -> new NotFoundException("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
-            increaseAuthFailCount(email);
-            throw new InvalidEmailCodeException(++authFailCount);
+            int increasedAuthFailCount = increaseAuthFailCount(email);
+            throw new InvalidEmailCodeException(increasedAuthFailCount);
         }
     }
 
-    private void increaseAuthFailCount(String email) {
-        emailAuthRedisRepository.increaseAuthFailCount(email);
+    private int increaseAuthFailCount(String email) {
+        return emailAuthRedisRepository.increaseAuthFailCount(email);
     }
 
     private void deleteAuthNumber(String email) {
