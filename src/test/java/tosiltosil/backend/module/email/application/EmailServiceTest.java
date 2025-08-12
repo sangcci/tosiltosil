@@ -10,6 +10,7 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.module.auth.infrastructure.TemporaryTokenRedisRepository;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
 import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
@@ -43,6 +44,9 @@ class EmailServiceTest extends IntegrationTestSupport {
     @Autowired
     private AuthNumberRedisRepository authNumberRedisRepository;
 
+    @Autowired
+    private TemporaryTokenRedisRepository temporaryTokenRedisRepository;
+
     @Value("${email.auth.max-send-count}")
     private int maxSendCount;
 
@@ -60,6 +64,7 @@ class EmailServiceTest extends IntegrationTestSupport {
     void tearDown() {
         emailAuthRedisRepository.delete(email);
         authNumberRedisRepository.delete(email);
+        temporaryTokenRedisRepository.delete(email);
     }
 
     @Test
@@ -93,7 +98,7 @@ class EmailServiceTest extends IntegrationTestSupport {
     @Test
     void 이미_가입된_이메일로_회원가입용_이메일_인증_시도하여_전송_실패() {
         // given
-        String duplicatedEmail = "duplicated@example.com";
+        String duplicatedEmail = "test@example.com";
         EmailSendRequest request = new EmailSendRequest(duplicatedEmail, SIGN_UP.name());
 
         doThrow(new ConflictException("이미 등록된 이메일입니다."))
