@@ -103,9 +103,9 @@ public class EmailService {
     ) {
         String email = request.email();
 
-        validateIsSentEmail(email);
+        EmailAuthMeta emailAuthMeta = validateIsSentEmail(email);
 
-        int authFailCount = validateAndGetAuthFailCount(email);
+        int authFailCount = validateAndGetAuthFailCount(emailAuthMeta);
 
         validateAuthNumber(email, request.authNumber(), authFailCount);
 
@@ -163,17 +163,17 @@ public class EmailService {
         return authNumber;
     }
 
-    private void validateIsSentEmail(String email) {
+    private EmailAuthMeta validateIsSentEmail(String email) {
         EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
         if (emailAuthMeta == null) {
             throw new NotFoundException("이메일 인증 요청을 먼저 진행해야 합니다.");
         }
+
+        return emailAuthMeta;
     }
 
-    private int validateAndGetAuthFailCount(String email) {
-        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
-
+    private int validateAndGetAuthFailCount(EmailAuthMeta emailAuthMeta) {
         int authFailCount = emailAuthMeta.authFailCount();
 
         if (authFailCount >= maxAuthAttemptCount) {
