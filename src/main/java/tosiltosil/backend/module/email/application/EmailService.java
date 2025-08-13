@@ -38,8 +38,13 @@ public class EmailService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JavaMailSender mailSender;
 
+    private static final int INITIAL_SEND_COUNT = 0;
+    private static final int INITIAL_FAIL_COUNT = 0;
     private static final int CODE_LENGTH = 6;
     private static final String EMAIL_TITLE = "토실토실 인증번호";
+
+    @Value("${email.auth.redis-expiration}")
+    private long emailAuthExpiration;
 
     @Value("${email.auth-number.redis-expiration}")
     private long authNumberExpiration;
@@ -77,7 +82,9 @@ public class EmailService {
         String email = request.email();
         EmailAuthPurpose purpose = EmailAuthPurpose.valueOf(request.purpose());
 
-        validateSendAndAuthCount(email);
+        initEmailAttemptsIfAbsent(email);
+
+        validateCanSendEmail(email);
 
         validateEmailIsExistByPurpose(email, purpose);
 
@@ -94,13 +101,17 @@ public class EmailService {
     public EmailAuthResponse verifyAuthEmail(
             final EmailAuthRequest request
     ) {
-        int authFailCount = validateAndGetAuthFailCount(request.email());
+        String email = request.email();
 
-        validateAuthNumber(request.email(), request.authNumber(), authFailCount);
+        EmailAuthMeta emailAuthMeta = validateIsSentEmail(email);
 
-        deleteAuthNumber(request.email());
+        int authFailCount = validateAndGetAuthFailCount(emailAuthMeta);
 
-        return generateTemporaryToken(request.email());
+        validateAuthNumber(email, request.authNumber(), authFailCount);
+
+        deleteAuthNumber(email);
+
+        return generateTemporaryToken(email);
     }
 
     private String loadAuthTemplate(String authNumber) {
@@ -113,12 +124,33 @@ public class EmailService {
         }
     }
 
-    private void validateSendAndAuthCount(String email) {
-        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
+    private void generateEmailAttemptsRedisData(String email) {
+        emailAuthRedisRepository.save(email, INITIAL_SEND_COUNT, INITIAL_FAIL_COUNT, emailAuthExpiration);
+    }
 
-        if (emailAuthMeta.sendCount() >= maxSendCount || emailAuthMeta.authFailCount() >= maxAuthAttemptCount) {
+    private void initEmailAttemptsIfAbsent(String email) {
+        if (emailAuthRedisRepository.get(email) == null) {
+            generateEmailAttemptsRedisData(email);
+        }
+    }
+
+    private void validateSendCount(EmailAuthMeta emailAuthMeta) {
+        if (emailAuthMeta.sendCount() >= maxSendCount) {
             throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
         }
+    }
+
+    private void validateAuthFailCount(EmailAuthMeta emailAuthMeta) {
+        if (emailAuthMeta.authFailCount() >= maxAuthAttemptCount) {
+            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+        }
+    }
+
+    private void validateCanSendEmail(String email) {
+        EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
+
+        validateSendCount(emailAuthMeta);
+        validateAuthFailCount(emailAuthMeta);
     }
 
     private void increaseSendCount(String email) {
@@ -131,9 +163,17 @@ public class EmailService {
         return authNumber;
     }
 
-    private int validateAndGetAuthFailCount(String email) {
+    private EmailAuthMeta validateIsSentEmail(String email) {
         EmailAuthMeta emailAuthMeta = getEmailAuthMeta(email);
 
+        if (emailAuthMeta == null) {
+            throw new NotFoundException("이메일 인증 요청을 먼저 진행해야 합니다.");
+        }
+
+        return emailAuthMeta;
+    }
+
+    private int validateAndGetAuthFailCount(EmailAuthMeta emailAuthMeta) {
         int authFailCount = emailAuthMeta.authFailCount();
 
         if (authFailCount >= maxAuthAttemptCount) {
@@ -159,8 +199,8 @@ public class EmailService {
                 .orElseThrow(() -> new NotFoundException("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다."));
 
         if (!savedAuthNumber.equals(authNumber)) {
-            int failCount = increaseAuthFailCount(email);
-            throw new InvalidEmailCodeException(failCount);
+            int increasedAuthFailCount = increaseAuthFailCount(email);
+            throw new InvalidEmailCodeException(increasedAuthFailCount);
         }
     }
 

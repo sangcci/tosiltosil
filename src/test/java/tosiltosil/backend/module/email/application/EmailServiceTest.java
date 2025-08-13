@@ -10,6 +10,7 @@ import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.module.auth.infrastructure.TemporaryTokenRedisRepository;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
 import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
@@ -43,6 +44,9 @@ class EmailServiceTest extends IntegrationTestSupport {
     @Autowired
     private AuthNumberRedisRepository authNumberRedisRepository;
 
+    @Autowired
+    private TemporaryTokenRedisRepository temporaryTokenRedisRepository;
+
     @Value("${email.auth.max-send-count}")
     private int maxSendCount;
 
@@ -60,6 +64,7 @@ class EmailServiceTest extends IntegrationTestSupport {
     void tearDown() {
         emailAuthRedisRepository.delete(email);
         authNumberRedisRepository.delete(email);
+        temporaryTokenRedisRepository.delete(email);
     }
 
     @Test
@@ -93,7 +98,7 @@ class EmailServiceTest extends IntegrationTestSupport {
     @Test
     void 이미_가입된_이메일로_회원가입용_이메일_인증_시도하여_전송_실패() {
         // given
-        String duplicatedEmail = "duplicated@example.com";
+        String duplicatedEmail = "test@example.com";
         EmailSendRequest request = new EmailSendRequest(duplicatedEmail, SIGN_UP.name());
 
         doThrow(new ConflictException("이미 등록된 이메일입니다."))
@@ -179,6 +184,10 @@ class EmailServiceTest extends IntegrationTestSupport {
     void 인증번호_유효_시간_만료_및_Redis_데이터가_존재하지않아_검증_실패() {
         // given
         String authNumber = "123456";
+
+        // 인증번호 이메일을 전송했음을 나타냄
+        emailAuthRedisRepository.save(email, 1, 0, 100L);
+
         EmailAuthRequest request = new EmailAuthRequest(email, authNumber);
 
         // when & then
@@ -187,5 +196,19 @@ class EmailServiceTest extends IntegrationTestSupport {
         assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다.");
+    }
+
+    @Test
+    void 인증_번호_전송하지_않은_이메일로_인증번호_시도_시_실패() {
+        // given
+        String authNumber = "123456";
+        EmailAuthRequest request = new EmailAuthRequest(email, authNumber);
+
+        // when & then
+        assertThat(authNumberRedisRepository.get(email)).isEmpty();
+
+        assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("이메일 인증 요청을 먼저 진행해야 합니다.");
     }
 }

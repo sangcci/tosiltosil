@@ -78,3 +78,7 @@ include::{snippets}/email-controller-rest-docs-test/이메일_인증_시도_횟�
 ==== 인증번호 만료로 인증번호 검증 실패(404)
 
 include::{snippets}/email-controller-rest-docs-test/인증번호_만료로_검증_실패/response-body.adoc[]
+
+==== 인증 번호 이메일을 전송하지 않은 이메일로 인증번호 인증 시도로 검증 실패(404)
+
+include::{snippets}/email-controller-rest-docs-test/인증_번호_전송하지_않은_이메일로_인증번호_시도_시_실패/response-body.adoc[]
