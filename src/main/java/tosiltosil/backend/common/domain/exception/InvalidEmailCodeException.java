@@ -3,7 +3,7 @@ package tosiltosil.backend.common.domain.exception;
 import lombok.Getter;
 
 @Getter
-public class InvalidEmailCodeException extends RuntimeException {
+public class InvalidEmailCodeException extends BadRequestException{
 
     private final int failCount;
 
