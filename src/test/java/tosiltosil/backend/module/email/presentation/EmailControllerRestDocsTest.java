@@ -409,14 +409,8 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 .bodyJson().isEqualTo("""
                             {
                                 "status": 400,
-                                "message": "잘못된 인증번호입니다.",
-                                "errors": [
-                                    {
-                                        "field": "failCount",
-                                        "value": "1",
-                                        "reason": "금일 총 1회 틀렸습니다. 하루 최대 5회까지 가능합니다."
-                                    }
-                                ]
+                                "message": "인증번호를 1회 틀렸습니다. 다시 확인해주세요.",
+                                "errors": []
                             }
                         """);
 
