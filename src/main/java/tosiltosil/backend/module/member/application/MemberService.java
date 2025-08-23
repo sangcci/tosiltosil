@@ -3,8 +3,8 @@ package tosiltosil.backend.module.member.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.ConflictException;
+import tosiltosil.backend.common.domain.exception.NotFoundException;
 import tosiltosil.backend.common.domain.exception.UnauthorizedException;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.member.domain.LocalAccount;
@@ -58,7 +58,7 @@ public class MemberService {
     public void validateEmailIsExistForPasswordReset(String email, String loginType) {
         LoginType loginTypeEnum = LoginType.valueOf(loginType);
         if (!memberRepository.existsByEmailAndLoginType(email, loginTypeEnum))
-            throw new BadRequestException("등록되지 않은 이메일입니다.");
+            throw new NotFoundException("등록되지 않은 이메일입니다.");
     }
 
     @Transactional(readOnly = true)

@@ -119,7 +119,7 @@ class EmailServiceTest extends IntegrationTestSupport {
 
         // when & then
         assertThatThrownBy(() -> emailService.sendAuthEmail(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("등록되지 않은 이메일입니다.");
     }
 

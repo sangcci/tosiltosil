@@ -201,7 +201,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 """;
 
         given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
-                .willThrow(new BadRequestException("등록되지 않은 이메일입니다."));
+                .willThrow(new NotFoundException("등록되지 않은 이메일입니다."));
 
 
         // when
@@ -215,7 +215,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         assertThat(testResult)
                 .bodyJson().isEqualTo("""
                             {
-                                "status": 400,
+                                "status": 404,
                                 "message": "등록되지 않은 이메일입니다.",
                                 "errors": []
                             }
