@@ -9,9 +9,9 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tosiltosil.backend.common.auth.JwtTokenProvider;
-import tosiltosil.backend.common.domain.exception.BadRequestException;
 import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
 import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.domain.exception.TooManyRequestsException;
 import tosiltosil.backend.common.util.RandomUtils;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
@@ -136,13 +136,13 @@ public class EmailService {
 
     private void validateSendCount(EmailAuthMeta emailAuthMeta) {
         if (emailAuthMeta.sendCount() >= maxSendCount) {
-            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+            throw new TooManyRequestsException("일일 이메일 인증 횟수를 초과하였습니다.");
         }
     }
 
     private void validateAuthFailCount(EmailAuthMeta emailAuthMeta) {
         if (emailAuthMeta.authFailCount() >= maxAuthAttemptCount) {
-            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+            throw new TooManyRequestsException("일일 이메일 인증 횟수를 초과하였습니다.");
         }
     }
 
@@ -177,7 +177,7 @@ public class EmailService {
         int authFailCount = emailAuthMeta.authFailCount();
 
         if (authFailCount >= maxAuthAttemptCount) {
-            throw new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다.");
+            throw new TooManyRequestsException("일일 이메일 인증 횟수를 초과하였습니다.");
         }
         return authFailCount;
     }

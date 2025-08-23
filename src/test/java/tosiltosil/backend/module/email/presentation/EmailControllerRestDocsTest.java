@@ -8,10 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
-import tosiltosil.backend.common.domain.exception.BadRequestException;
-import tosiltosil.backend.common.domain.exception.ConflictException;
-import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
-import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.domain.exception.*;
 import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.module.email.application.EmailService;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
@@ -87,7 +84,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 """;
 
         given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
-                .willThrow(new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다."));
+                .willThrow(new TooManyRequestsException("일일 이메일 인증 횟수를 초과하였습니다."));
 
         // when
         MvcTestResult testResult = mockMvcTester.post()
@@ -100,7 +97,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         assertThat(testResult)
                 .bodyJson().isEqualTo("""
                             {
-                                "status": 400,
+                                "status": 429,
                                 "message": "일일 이메일 인증 횟수를 초과하였습니다.",
                                 "errors": []
                             }
@@ -318,7 +315,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 """;
 
         given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
-                .willThrow(new BadRequestException("일일 이메일 인증 횟수를 초과하였습니다."));
+                .willThrow(new TooManyRequestsException("일일 이메일 인증 횟수를 초과하였습니다."));
 
         // when
         MvcTestResult testResult = mockMvcTester.post()
@@ -331,7 +328,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
         assertThat(testResult)
                 .bodyJson().isEqualTo("""
                             {
-                                "status": 400,
+                                "status": 429,
                                 "message": "일일 이메일 인증 횟수를 초과하였습니다.",
                                 "errors": []
                             }
