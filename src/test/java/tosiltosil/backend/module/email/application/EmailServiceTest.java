@@ -6,10 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import tosiltosil.backend.common.domain.exception.BadRequestException;
-import tosiltosil.backend.common.domain.exception.ConflictException;
-import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
-import tosiltosil.backend.common.domain.exception.NotFoundException;
+import tosiltosil.backend.common.domain.exception.*;
 import tosiltosil.backend.module.auth.infrastructure.TemporaryTokenRedisRepository;
 import tosiltosil.backend.module.email.domain.EmailAuthMeta;
 import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
@@ -77,7 +74,7 @@ class EmailServiceTest extends IntegrationTestSupport {
 
         // when & then
         assertThatThrownBy(() -> emailService.sendAuthEmail(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(TooManyRequestsException.class)
                 .hasMessage("일일 이메일 인증 횟수를 초과하였습니다.");
     }
 
@@ -91,7 +88,7 @@ class EmailServiceTest extends IntegrationTestSupport {
 
         // when & then
         assertThatThrownBy(() -> emailService.sendAuthEmail(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(TooManyRequestsException.class)
                 .hasMessage("일일 이메일 인증 횟수를 초과하였습니다.");
     }
 
@@ -114,12 +111,12 @@ class EmailServiceTest extends IntegrationTestSupport {
     void 가입되지_않은_이메일로_비밀번호_찾기용_이메일_인증_시도하여_전송_실패() {
         // given
         EmailSendRequest request = new EmailSendRequest(email, FORGOT_PASSWORD.name());
-        doThrow(new BadRequestException("등록되지 않은 이메일입니다."))
+        doThrow(new NotFoundException("등록되지 않은 이메일입니다."))
                 .when(memberService).validateEmailIsExistForPasswordReset(anyString(), anyString());
 
         // when & then
         assertThatThrownBy(() -> emailService.sendAuthEmail(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("등록되지 않은 이메일입니다.");
     }
 
@@ -159,7 +156,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         // when & then
         assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
                 .isInstanceOf(InvalidEmailCodeException.class)
-                .hasMessage("금일 총 1회 틀렸습니다. 하루 최대 5회까지 가능합니다.");
+                .hasMessage("인증번호를 1회 틀렸습니다. 다시 확인해주세요.");
 
         EmailAuthMeta authMeta = emailAuthRedisRepository.get(email);
         assertThat(authMeta.authFailCount()).isEqualTo(1);
@@ -176,7 +173,7 @@ class EmailServiceTest extends IntegrationTestSupport {
 
         // when & then
         assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(TooManyRequestsException.class)
                 .hasMessage("일일 이메일 인증 횟수를 초과하였습니다.");
     }
 

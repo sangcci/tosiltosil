@@ -14,7 +14,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tosiltosil.backend.common.domain.exception.CustomException;
-import tosiltosil.backend.common.domain.exception.InvalidEmailCodeException;
 import tosiltosil.backend.common.logging.domain.ErrorLog;
 import tosiltosil.backend.common.logging.domain.InfoLog;
 import tosiltosil.backend.common.web.response.ErrorResponse;
@@ -178,30 +177,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status)
                 .body(ErrorResponse.of(status, message));
-    }
-
-    /**
-     * 이메일 인증번호 실패할 경우 발생
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidEmailCodeException.class)
-    protected ErrorResponse handleInvalidEmailCodeException(final InvalidEmailCodeException e) {
-        int failCount = e.getFailCount();
-
-        ErrorDetailResponse errorDetailResponse = ErrorDetailResponse.of(
-                "failCount",
-                String.valueOf(failCount),
-                e.getMessage()
-        );
-
-        InfoLog infoLog = InfoLog.of("잘못된 인증번호입니다.");
-        infoLog.writeLog();
-
-        return ErrorResponse.of(
-                400,
-                "잘못된 인증번호입니다.",
-                List.of(errorDetailResponse)
-        );
     }
 
     /**
