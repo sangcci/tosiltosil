@@ -34,9 +34,10 @@ class TodayProgressServiceTest {
         when(progressRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
 
         // when
-        Duration result = progressService.updateTodayDuration(memberId, additionalDuration);
+        progressService.updateTodayDuration(memberId, additionalDuration);
 
         // then
+        Duration result = progressService.getTodayDuration(memberId);
         assertThat(result).isEqualTo(expectedTotalDuration);
     }
 
