@@ -5,7 +5,7 @@ COPY gradle gradle
 COPY build.gradle settings.gradle gradlew ./
 COPY src src
 RUN chmod +x gradlew
-RUN ./gradlew build -x test
+RUN ./gradlew build
 
 # deploy stage
 FROM openjdk:17-jdk-slim
