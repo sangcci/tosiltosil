@@ -61,19 +61,6 @@ jobs:
           token: ${{ secrets.HS_TOKEN }}
           submodules: recursive
 
-      - name: Copy Config Files to Staging Server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.LOCAL_SERVER_HOST }}
-          username: ubuntu
-          key: ${{ secrets.LOCAL_SERVER_SSH_KEY }}
-          port: ${{ secrets.LOCAL_SERVER_PORT }}
-          passphrase: ${{ secrets.LOCAL_SERVER_SSH_PASSPHRASE }}
-          source: "src/main/resources/tosiltosil-yml/logback-stag.xml, src/main/resources/tosiltosil-yml/application-stag.yml"
-          target: /home/ubuntu/tosiltosil/
-          strip_components: 4  # This removes 4 directory levels (src/main/resources/tosiltosil-yml/)
-          overwrite: true
-
       - name: Deploy to Staging Server
         uses: appleboy/ssh-action@master
         with:
