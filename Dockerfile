@@ -1,15 +1,6 @@
-# build stage
-FROM gradle:7.6-jdk17 AS build
-WORKDIR /app
-COPY gradle gradle
-COPY build.gradle settings.gradle gradlew ./
-COPY src src
-RUN chmod +x gradlew
-RUN ./gradlew build
-
-# deploy stage
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
+FROM openjdk:17-slim
+COPY build/libs/*.jar app.jar
+ARG SPRING_PROFILES_ACTIVE
+ENV SPRING_PROFILES_ACTIVE $SPRING_PROFILES_ACTIVE
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "-Dserver.port=${PORT}", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
