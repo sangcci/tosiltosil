@@ -2,7 +2,7 @@ name: backend-cd
 
 on:
   push:
-    branches: [ "feature/#98-deploy" ]
+    branches: [ "develop" ]
 
 jobs:
   build:
