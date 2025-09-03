@@ -65,7 +65,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.STAGING_SERVER_HOST }}
-          username: ubuntu
+          username: ${{ secrets.STAGING_SERVER_USERNAME }}
           key: ${{ secrets.STAGING_SERVER_SSH_KEY }}
           port: ${{ secrets.STAGING_SERVER_PORT }}
           script: |
