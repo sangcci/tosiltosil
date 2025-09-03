@@ -79,6 +79,6 @@ jobs:
             echo "🏃 Starting the Spring Boot using Docker"
             docker run -it -d -p 8080:8080 \
             --name springboot \
-            -e SPRING_PROFILES_ACTIVE=dev \
+            -e SPRING_PROFILES_ACTIVE=stag \
             --network application_app-network \
             pshsh910/tosiltosil:latest
