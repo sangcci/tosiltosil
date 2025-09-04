@@ -45,6 +45,8 @@ public class SecurityConfig {
                 .sessionManagement(it -> it.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // actuator health/info endpoints (allow unauthenticated for health checks)
+                        .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/prometheus").permitAll()
                         // auth
                         .requestMatchers("/api/v1/auth/signup/local").permitAll()
                         .requestMatchers("/api/v1/auth/login/local").permitAll()
