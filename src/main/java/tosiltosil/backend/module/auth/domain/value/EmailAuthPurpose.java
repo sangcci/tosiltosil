@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.domain.value;
+package tosiltosil.backend.module.auth.domain.value;
 
 public enum EmailAuthPurpose {
     SIGN_UP,

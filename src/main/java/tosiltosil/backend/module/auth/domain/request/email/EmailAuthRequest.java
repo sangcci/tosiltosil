@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.domain.request;
+package tosiltosil.backend.module.auth.domain.request.email;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
