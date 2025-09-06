@@ -27,8 +27,6 @@ public class GoalEventHandler {
 
         // 목표 완료되었는지 체크 및 반영
         goal.changeStatusToCompleted();
-
-        // TODO: duration 추가
     }
     
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
