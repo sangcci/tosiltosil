@@ -1,9 +1,9 @@
-package tosiltosil.backend.module.email.infrastructure;
+package tosiltosil.backend.module.auth.infrastructure;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
-import tosiltosil.backend.module.email.domain.EmailAuthMeta;
+import tosiltosil.backend.module.auth.domain.response.email.EmailAuthMeta;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

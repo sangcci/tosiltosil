@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.presentation;
+package tosiltosil.backend.module.auth.presentation;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,18 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tosiltosil.backend.common.util.CookieUtil;
 import tosiltosil.backend.common.web.response.Response;
-import tosiltosil.backend.module.email.application.EmailService;
-import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
-import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
-import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
-import tosiltosil.backend.module.email.domain.response.EmailSendResponse;
+import tosiltosil.backend.module.auth.application.EmailAuthService;
+import tosiltosil.backend.module.auth.domain.request.email.EmailAuthRequest;
+import tosiltosil.backend.module.auth.domain.request.email.EmailSendRequest;
+import tosiltosil.backend.module.auth.domain.response.email.EmailAuthResponse;
+import tosiltosil.backend.module.auth.domain.response.email.EmailSendResponse;
 
 @RestController
 @RequestMapping("/api/v1/auth/email")
 @RequiredArgsConstructor
-public class EmailController {
+public class EmailAuthController {
 
-    private final EmailService emailService;
+    private final EmailAuthService emailAuthService;
     private final CookieUtil cookieUtil;
 
     @PostMapping("/send")
@@ -27,7 +27,7 @@ public class EmailController {
     public Response<EmailSendResponse> sendEmail(
             @Valid @RequestBody final EmailSendRequest request
     ) {
-        EmailSendResponse response = emailService.sendAuthEmail(request);
+        EmailSendResponse response = emailAuthService.sendAuthEmail(request);
         return Response.ok("정상적으로 이메일을 전송했습니다.", response);
     }
 
@@ -36,7 +36,7 @@ public class EmailController {
     public ResponseEntity<Response<?>> verifyEmailAuth(
             @Valid @RequestBody final EmailAuthRequest request
     ) {
-        EmailAuthResponse response = emailService.verifyAuthEmail(request);
+        EmailAuthResponse response = emailAuthService.verifyAuthEmail(request);
         String temporaryToken = response.temporaryToken();
 
         HttpHeaders headers = cookieUtil.generateTemporaryTokenCookies(temporaryToken);

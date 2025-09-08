@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.application;
+package tosiltosil.backend.module.auth.application;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tosiltosil.backend.common.domain.exception.*;
 import tosiltosil.backend.module.auth.infrastructure.TemporaryTokenRedisRepository;
-import tosiltosil.backend.module.email.domain.EmailAuthMeta;
-import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
-import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
-import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
-import tosiltosil.backend.module.email.infrastructure.AuthNumberRedisRepository;
-import tosiltosil.backend.module.email.infrastructure.EmailAuthRedisRepository;
+import tosiltosil.backend.module.auth.domain.response.email.EmailAuthMeta;
+import tosiltosil.backend.module.auth.domain.request.email.EmailAuthRequest;
+import tosiltosil.backend.module.auth.domain.request.email.EmailSendRequest;
+import tosiltosil.backend.module.auth.domain.response.email.EmailAuthResponse;
+import tosiltosil.backend.module.auth.infrastructure.AuthNumberRedisRepository;
+import tosiltosil.backend.module.auth.infrastructure.EmailAuthRedisRepository;
 import tosiltosil.backend.module.member.application.MemberService;
 import tosiltosil.backend.support.IntegrationTestSupport;
 
@@ -23,14 +23,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
-import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.FORGOT_PASSWORD;
-import static tosiltosil.backend.module.email.domain.value.EmailAuthPurpose.SIGN_UP;
+import static tosiltosil.backend.module.auth.domain.value.EmailAuthPurpose.FORGOT_PASSWORD;
+import static tosiltosil.backend.module.auth.domain.value.EmailAuthPurpose.SIGN_UP;
 
 @SuppressWarnings("NonAsciiCharacters")
-class EmailServiceTest extends IntegrationTestSupport {
+class EmailAuthServiceTest extends IntegrationTestSupport {
 
     @Autowired
-    private EmailService emailService;
+    private EmailAuthService emailAuthService;
 
     @MockitoBean
     private MemberService memberService;
@@ -73,7 +73,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         emailAuthRedisRepository.save(email, maxSendCount, currentAuthCount, 300L);
 
         // when & then
-        assertThatThrownBy(() -> emailService.sendAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.sendAuthEmail(request))
                 .isInstanceOf(TooManyRequestsException.class)
                 .hasMessage("일일 이메일 인증 횟수를 초과하였습니다.");
     }
@@ -87,7 +87,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         emailAuthRedisRepository.save(email, currentSendCount, maxAuthCount, 300L);
 
         // when & then
-        assertThatThrownBy(() -> emailService.sendAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.sendAuthEmail(request))
                 .isInstanceOf(TooManyRequestsException.class)
                 .hasMessage("일일 이메일 인증 횟수를 초과하였습니다.");
     }
@@ -102,7 +102,7 @@ class EmailServiceTest extends IntegrationTestSupport {
                 .when(memberService).validateEmailIsExist(anyString(), anyString());
 
         // when & then
-        assertThatThrownBy(() -> emailService.sendAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.sendAuthEmail(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("이미 등록된 이메일입니다.");
     }
@@ -115,7 +115,7 @@ class EmailServiceTest extends IntegrationTestSupport {
                 .when(memberService).validateEmailIsExistForPasswordReset(anyString(), anyString());
 
         // when & then
-        assertThatThrownBy(() -> emailService.sendAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.sendAuthEmail(request))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("등록되지 않은 이메일입니다.");
     }
@@ -132,7 +132,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         authNumberRedisRepository.save(email, authNumber, 300L);
 
         // when
-        EmailAuthResponse response = emailService.verifyAuthEmail(request);
+        EmailAuthResponse response = emailAuthService.verifyAuthEmail(request);
 
         // then
         assertThat(response.temporaryToken()).isNotBlank();
@@ -154,7 +154,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         authNumberRedisRepository.save(email, authNumber, 300L);
 
         // when & then
-        assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.verifyAuthEmail(request))
                 .isInstanceOf(InvalidEmailCodeException.class)
                 .hasMessage("인증번호를 1회 틀렸습니다. 다시 확인해주세요.");
 
@@ -172,7 +172,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         emailAuthRedisRepository.save(email, currentSendCount, maxAuthCount, 300L);
 
         // when & then
-        assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.verifyAuthEmail(request))
                 .isInstanceOf(TooManyRequestsException.class)
                 .hasMessage("일일 이메일 인증 횟수를 초과하였습니다.");
     }
@@ -190,7 +190,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         // when & then
         assertThat(authNumberRedisRepository.get(email)).isEmpty();
 
-        assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.verifyAuthEmail(request))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다.");
     }
@@ -204,7 +204,7 @@ class EmailServiceTest extends IntegrationTestSupport {
         // when & then
         assertThat(authNumberRedisRepository.get(email)).isEmpty();
 
-        assertThatThrownBy(() -> emailService.verifyAuthEmail(request))
+        assertThatThrownBy(() -> emailAuthService.verifyAuthEmail(request))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("이메일 인증 요청을 먼저 진행해야 합니다.");
     }

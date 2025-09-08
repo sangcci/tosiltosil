@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.domain;
+package tosiltosil.backend.module.auth.domain.response.email;
 
 import java.io.Serializable;
 

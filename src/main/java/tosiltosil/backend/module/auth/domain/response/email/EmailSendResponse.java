@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.domain.response;
+package tosiltosil.backend.module.auth.domain.response.email;
 
 public record EmailSendResponse(
         String email

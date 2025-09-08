@@ -1,9 +1,9 @@
-package tosiltosil.backend.module.email.domain.request;
+package tosiltosil.backend.module.auth.domain.request.email;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import tosiltosil.backend.common.domain.validator.IsEnum;
-import tosiltosil.backend.module.email.domain.value.EmailAuthPurpose;
+import tosiltosil.backend.module.auth.domain.value.EmailAuthPurpose;
 
 public record EmailSendRequest(
         @NotBlank(message="이메일을 입력해주세요.")

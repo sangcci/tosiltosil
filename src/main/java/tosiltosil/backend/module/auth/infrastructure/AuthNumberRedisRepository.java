@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.infrastructure;
+package tosiltosil.backend.module.auth.infrastructure;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

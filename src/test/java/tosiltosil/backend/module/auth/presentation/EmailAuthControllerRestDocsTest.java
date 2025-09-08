@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.email.presentation;
+package tosiltosil.backend.module.auth.presentation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -10,11 +10,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tosiltosil.backend.common.domain.exception.*;
 import tosiltosil.backend.common.util.CookieUtil;
-import tosiltosil.backend.module.email.application.EmailService;
-import tosiltosil.backend.module.email.domain.request.EmailAuthRequest;
-import tosiltosil.backend.module.email.domain.request.EmailSendRequest;
-import tosiltosil.backend.module.email.domain.response.EmailAuthResponse;
-import tosiltosil.backend.module.email.domain.response.EmailSendResponse;
+import tosiltosil.backend.module.auth.application.EmailAuthService;
+import tosiltosil.backend.module.auth.domain.request.email.EmailAuthRequest;
+import tosiltosil.backend.module.auth.domain.request.email.EmailSendRequest;
+import tosiltosil.backend.module.auth.domain.response.email.EmailAuthResponse;
+import tosiltosil.backend.module.auth.domain.response.email.EmailSendResponse;
 import tosiltosil.backend.support.RestDocsTestSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,12 +24,12 @@ import static org.springframework.restdocs.cookies.CookieDocumentation.responseC
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
-@WebMvcTest(EmailController.class)
+@WebMvcTest(EmailAuthController.class)
 @SuppressWarnings("NonAsciiCharacters")
-class EmailControllerRestDocsTest extends RestDocsTestSupport {
+class EmailAuthControllerRestDocsTest extends RestDocsTestSupport {
 
     @MockitoBean
-    private EmailService emailService;
+    private EmailAuthService emailAuthService;
 
     @MockitoBean
     private CookieUtil cookieUtil;
@@ -46,7 +46,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
 
         EmailSendResponse response = EmailSendResponse.of("test@example.com");
 
-        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
+        given(emailAuthService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willReturn(response);
 
         // when
@@ -83,7 +83,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
+        given(emailAuthService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new TooManyRequestsException("일일 이메일 인증 횟수를 초과하였습니다."));
 
         // when
@@ -117,7 +117,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
+        given(emailAuthService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new BadRequestException("파라미터 값이 잘못되었습니다"));
 
         // when
@@ -157,7 +157,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
+        given(emailAuthService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new BadRequestException("파라미터 값이 유효하지 않습니다."));
 
         // when
@@ -197,7 +197,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
+        given(emailAuthService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new NotFoundException("등록되지 않은 이메일입니다."));
 
 
@@ -232,7 +232,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.sendAuthEmail(any(EmailSendRequest.class)))
+        given(emailAuthService.sendAuthEmail(any(EmailSendRequest.class)))
                 .willThrow(new ConflictException("이미 등록된 이메일입니다."));
 
 
@@ -269,7 +269,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
 
         String temporaryToken = "temporary-token"; // 임시 토큰 예시
 
-        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+        given(emailAuthService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willReturn(EmailAuthResponse.of(temporaryToken));
 
         HttpHeaders mockHeaders = new HttpHeaders();
@@ -314,7 +314,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+        given(emailAuthService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willThrow(new TooManyRequestsException("일일 이메일 인증 횟수를 초과하였습니다."));
 
         // when
@@ -348,7 +348,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+        given(emailAuthService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willThrow(new BadRequestException("파라미터 값이 잘못되었습니다"));
 
         // when
@@ -391,7 +391,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
 
         int currentFailCount = 1;
 
-        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+        given(emailAuthService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willThrow(new InvalidEmailCodeException(currentFailCount));
 
         // when
@@ -425,7 +425,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+        given(emailAuthService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willThrow(new NotFoundException("인증 유효 시간이 만료되었거나, 잘못된 인증 요청입니다."));
 
         // when
@@ -459,7 +459,7 @@ class EmailControllerRestDocsTest extends RestDocsTestSupport {
                 }
                 """;
 
-        given(emailService.verifyAuthEmail(any(EmailAuthRequest.class)))
+        given(emailAuthService.verifyAuthEmail(any(EmailAuthRequest.class)))
                 .willThrow(new NotFoundException("이메일 인증 요청을 먼저 진행해야 합니다."));
 
         // when
