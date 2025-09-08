@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.duration.infrastructure;
+package tosiltosil.backend.module.progress.infrastructure;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class DurationRedisRepository {
+public class ProgressRedisRepository {
 
     private static final String TOTAL_TIME_KEY = "today_total_time:%s";
 

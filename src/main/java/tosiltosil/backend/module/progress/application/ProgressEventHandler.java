@@ -1,4 +1,4 @@
-package tosiltosil.backend.module.duration.application;
+package tosiltosil.backend.module.progress.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -9,18 +9,17 @@ import tosiltosil.backend.module.goal.domain.event.GoalDeletedEvent;
 
 @Component
 @RequiredArgsConstructor
-public class DurationEventHandler {
+public class ProgressEventHandler {
 
-    private final DurationService durationService;
+    private final ProgressService progressService;
 
-    // TODO: Transaction 구성 고민
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCategoryDeletedEvent(final CategoryDeletedEvent event) {
-        durationService.subtractTodayDuration(event.memberId(), event.deletedTotalDuration());
+        progressService.subtractTodayDuration(event.memberId(), event.deletedTotalDuration());
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGoalDeletedEvent(final GoalDeletedEvent event) {
-        durationService.subtractTodayDuration(event.memberId(), event.deletedDuration());
+        progressService.subtractTodayDuration(event.memberId(), event.deletedDuration());
     }
 }
