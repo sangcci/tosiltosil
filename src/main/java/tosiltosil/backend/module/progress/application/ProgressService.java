@@ -21,7 +21,7 @@ public class ProgressService {
         return progressRepository.findTodayDurationByMemberId(memberId);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Duration updateTodayDuration(final UUID memberId, final Duration duration) {
         Optional<Progress> progressOptional = progressRepository.findByMemberId(memberId);
         Progress progress = progressOptional.orElseGet(() -> {
@@ -35,7 +35,7 @@ public class ProgressService {
         return progress.getTodayDuration();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Duration subtractTodayDuration(final UUID memberId, final Duration duration) {
         Optional<Progress> progressOptional = progressRepository.findByMemberId(memberId);
         Progress progress = progressOptional.orElseGet(() -> {
