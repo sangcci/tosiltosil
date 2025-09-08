@@ -16,7 +16,7 @@ public class Progress extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "BINARY(16)")
+    @Column(nullable = false, unique = true, columnDefinition = "BINARY(16)")
     private UUID memberId;
 
     @Transient
@@ -33,7 +33,7 @@ public class Progress extends BaseEntity {
             final int totalGoalAchievedCount
     ) {
         this.memberId = memberId;
-        this.todayDuration = todayDuration;
+        this.todayDuration = (todayDuration == null) ? Duration.ZERO : todayDuration;
         this.totalGoalAchievedCount = totalGoalAchievedCount;
     }
 
