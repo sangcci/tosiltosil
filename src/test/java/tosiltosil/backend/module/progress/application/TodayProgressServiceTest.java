@@ -1,24 +1,25 @@
 package tosiltosil.backend.module.progress.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tosiltosil.backend.module.progress.infrastructure.ProgressRedisRepository;
+import tosiltosil.backend.module.progress.domain.Progress;
+import tosiltosil.backend.module.progress.domain.ProgressRepository;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NonAsciiCharacters")
 class TodayProgressServiceTest {
 
     @Mock
-    private ProgressRedisRepository progressRedisRepository;
+    private ProgressRepository progressRepository;
 
     @InjectMocks
     private ProgressService progressService;
@@ -28,16 +29,16 @@ class TodayProgressServiceTest {
         // given
         UUID memberId = UUID.randomUUID();
         Duration currentDuration = Duration.ofHours(3);
+        Progress progress = Progress.of(memberId, currentDuration, 0);
         Duration additionalDuration = Duration.ofHours(2);
         Duration expectedTotalDuration = Duration.ofHours(5);
-        
-        when(progressRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+
+        when(progressRepository.findByMemberId(memberId)).thenReturn(Optional.ofNullable(progress));
 
         // when
-        progressService.updateTodayDuration(memberId, additionalDuration);
+        Duration result = progressService.updateTodayDuration(memberId, additionalDuration);
 
         // then
-        Duration result = progressService.getTodayDuration(memberId);
         assertThat(result).isEqualTo(expectedTotalDuration);
     }
 
@@ -46,10 +47,11 @@ class TodayProgressServiceTest {
         // given
         UUID memberId = UUID.randomUUID();
         Duration currentDuration = Duration.ZERO;
+        Progress progress = Progress.of(memberId, currentDuration, 0);
         Duration additionalDuration = Duration.ofMinutes(30);
         Duration expectedTotalDuration = Duration.ofMinutes(30);
-        
-        when(progressRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+
+        when(progressRepository.findByMemberId(memberId)).thenReturn(Optional.ofNullable(progress));
 
         // when
         Duration result = progressService.updateTodayDuration(memberId, additionalDuration);
@@ -63,17 +65,17 @@ class TodayProgressServiceTest {
         // given
         UUID memberId = UUID.randomUUID();
         Duration currentDuration = Duration.ofMinutes(30);
+        Progress progress = Progress.of(memberId, currentDuration, 0);
         Duration subtractDuration = Duration.ofHours(2);
         Duration expectedTotalDuration = Duration.ZERO;
-        
-        when(progressRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+
+        when(progressRepository.findByMemberId(memberId)).thenReturn(Optional.ofNullable(progress));
 
         // when
         Duration result = progressService.subtractTodayDuration(memberId, subtractDuration);
 
         // then
         assertThat(result).isEqualTo(expectedTotalDuration);
-        verify(progressRedisRepository).cacheTodayDuration(memberId, expectedTotalDuration);
     }
     
     @Test
@@ -81,16 +83,16 @@ class TodayProgressServiceTest {
         // given
         UUID memberId = UUID.randomUUID();
         Duration currentDuration = Duration.ZERO;
+        Progress progress = Progress.of(memberId, currentDuration, 0);
         Duration subtractDuration = Duration.ofMinutes(30);
         Duration expectedTotalDuration = Duration.ZERO;
-        
-        when(progressRedisRepository.findTodayDuration(memberId)).thenReturn(currentDuration);
+
+        when(progressRepository.findByMemberId(memberId)).thenReturn(Optional.ofNullable(progress));
 
         // when
         Duration result = progressService.subtractTodayDuration(memberId, subtractDuration);
 
         // then
         assertThat(result).isEqualTo(expectedTotalDuration);
-        verify(progressRedisRepository).cacheTodayDuration(memberId, expectedTotalDuration);
     }
 }
