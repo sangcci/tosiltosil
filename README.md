@@ -16,6 +16,17 @@
 
 ## 📋 서비스 소개
 
+<div align="center">
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/a7441511-0e18-4bfd-a497-8319ab78ffd2" width="300" alt="캘린더 및 목표 설정"/></td>
+    <td><img src="https://github.com/user-attachments/assets/18c959a5-810b-4673-8791-0f1e841a77ac" width="300" alt="카테고리 관리"/></td>
+    <td><img src="https://github.com/user-attachments/assets/01edb816-534d-4fab-8236-43c7aa7d161b" width="300" alt="스톱워치 및 진행률"/></td>
+    <td><img src="https://github.com/user-attachments/assets/715604e6-cf4f-4c86-9a12-b679f17df3f8" width="300" alt="목표 상세 및 통계"/></td>
+  </tr>
+</table>
+</div>
+
 > **자신의 목표를 설정하고 친구와 경쟁하며 목표를 성취하는 서비스**
 
 항상 자신이 해야 하는 과제나 프로젝트가 있는 대학생이나 자신이 맡고 있는 일을 해야 하는 직장인, 또는 목표가 있는 사용자가 자신이 생각하는 데드라인에 맞춰 목표를 설정하지만 막상 벼락치기를 하거나 혹은 귀찮아서 목표를 이루지 못하는 경우가 많습니다.
