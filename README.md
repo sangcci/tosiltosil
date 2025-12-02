@@ -1,4 +1,4 @@
-# 🐰 토실토실 (Tosiltosil) - Backend
+# 🐰 토실토실 - Backend
 
 <div align="center">
 
@@ -37,7 +37,7 @@
 
 - 투두리스트나 일정을 꾸미고 친구와 같이 공유를 즐기는 **대학생**
 - 회사 내부 직원들과 계속 일정을 공유하는 것에 지루함을 느끼는 **직장인**
-- 특히 **2030 여성**을 주요 타깃으로 설정
+- **2030 여성**을 주요 타깃으로 설정
 
 ---
 
@@ -62,7 +62,6 @@
 
 ### ⏱️ Stopwatch System (개발 중)
 - WebSocket(STOMP) 기반 실시간 동기화
-- 이벤트 드리븐 아키텍처
 - 일일 총 진행 시간 Redis 캐싱
 
 ### 📊 Progress Tracking
@@ -73,7 +72,6 @@
 ### 👥 Friend System (개발 중)
 - 친구 추가 및 관계 관리
 - 친구 진행 상황 공유
-- 경쟁을 통한 동기부여
 
 ---
 
@@ -229,10 +227,10 @@ src/main/java/tosiltosil/backend/
 │  └──────────────┘    └──────────────┘    └──────────────┘       │
 │         │                                                       │
 │         ▼                                                       │
-│  ┌──────────────┐    ┌──────────────┐                           │
-│  │ Build Docker │───▶│  Push Image  │                           │
-│  │    Image     │    │ to docker hub│                           │
-│  └──────────────┘    └──────────────┘                           │
+│  ┌──────────────┐    ┌───────────────┐                          │
+│  │ Build Docker │───▶│  Push Image   │                          │
+│  │    Image     │    │ to docker hub │                          │
+│  └──────────────┘    └───────────────┘                          │
 │                              │                                  │
 └──────────────────────────────┼──────────────────────────────────┘
                                │
@@ -249,20 +247,6 @@ src/main/java/tosiltosil/backend/
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Pipeline Stages
-
-| Stage | Description | Tools |
-|-------|-------------|-------|
-| **Checkout** | 소스 코드 체크아웃 | GitHub Actions |
-| **Setup** | JDK 17 환경 설정 | actions/setup-java |
-| **Cache** | Gradle 의존성 캐싱 | actions/cache |
-| **Lint** | 코드 스타일 검사 | Checkstyle |
-| **Test** | 단위/통합 테스트 실행 | JUnit 5, Mockito |
-| **Build** | JAR 파일 빌드 | Gradle |
-| **Docker Build** | 컨테이너 이미지 빌드 | Docker |
-| **Push** | 이미지 레지스트리 업로드 | Docker Hub |
-| **Deploy** | 프로덕션 배포 | Oracle Cloud |
-
 ---
 
 ## 🧪 Testing Strategy
@@ -277,7 +261,7 @@ src/main/java/tosiltosil/backend/
                 ├───────────────────┤
                ╱                     ╲
               ╱   Integration Tests   ╲
-             ╱   (Repository, Redis)   ╲
+             ╱(계획 중,실제 DB 연결 테스트 진행 중) ╲
             ├───────────────────────────┤
            ╱                             ╲
           ╱        Unit Tests             ╲
