@@ -191,7 +191,8 @@ src/main/java/tosiltosil/backend/
 ---
 
 ## 🗄️ Database Schema
-<iframe width="560" height="315" src='https://dbdiagram.io/e/678f0c006b7fa355c380fbbf/692f2ad6d6676488ba4c3876'> </iframe>
+<img width="1454" height="1166" alt="tosiltosil" src="https://github.com/user-attachments/assets/73d1edbf-fb86-4421-b63c-eafc833d42ea" />
+
 <div align="left">
 
 [![DB Diagram](https://img.shields.io/badge/View%20Full%20Diagram-dbdiagram.io-blue?style=for-the-badge)](https://dbdiagram.io/d/678f0c006b7fa355c380fbbf)
