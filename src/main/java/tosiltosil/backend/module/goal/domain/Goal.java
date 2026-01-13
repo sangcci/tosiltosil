@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tosiltosil.backend.common.domain.BaseEntity;
 import tosiltosil.backend.common.domain.exception.BadRequestException;
-import tosiltosil.backend.common.domain.exception.ConflictException;
 import tosiltosil.backend.common.domain.exception.ForbiddenException;
 import tosiltosil.backend.common.domain.order.Orderable;
 import tosiltosil.backend.module.goal.domain.value.GoalStatus;
@@ -140,46 +139,18 @@ public class Goal extends BaseEntity implements Orderable {
 
     // status
     public void changeStatusToStarted() {
-        validateNotCompleted();
-        validateNotFailed();
-        validateNotRunning();
+        this.status.validateRunning();
         this.status = GoalStatus.RUNNING;
     }
 
     public void changeStatusToPaused() {
-        validateNotCompleted();
-        validateNotFailed();
-        validateNotPaused();
+        this.status.validatePaused();
         this.status = GoalStatus.PAUSED;
     }
 
     public void changeStatusToCompleted() {
         if (this.duration.compareTo(this.totalTime) >= 0) {
             this.status = GoalStatus.COMPLETED;
-        }
-    }
-
-    private void validateNotCompleted() {
-        if (this.status == GoalStatus.COMPLETED) {
-            throw new ConflictException("이미 완료된 목표입니다.");
-        }
-    }
-
-    private void validateNotFailed() {
-        if (this.status == GoalStatus.FAILED) {
-            throw new ConflictException("기간이 지나 실패한 목표입니다.");
-        }
-    }
-
-    private void validateNotRunning() {
-        if (this.status == GoalStatus.RUNNING) {
-            throw new ConflictException("스톱워치가 이미 실행중입니다.");
-        }
-    }
-
-    private void validateNotPaused() {
-        if (this.status == GoalStatus.BEFORE_STARTING || this.status == GoalStatus.PAUSED) {
-            throw new ConflictException("스톱워치가 이미 정지되었습니다.");
         }
     }
 
